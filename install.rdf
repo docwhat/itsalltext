@@ -10,7 +10,9 @@
 
     <!-- Front End Metadata -->
     <em:name>It's All Text!</em:name>
-    <em:description>Edit Textareas, and view source!</em:description>
+    <em:description>
+      Edit text and view source using your favorite editor!
+    </em:description>
     <em:homepageURL>http://addons.mozilla.org/firefox/1234</em:homepageURL>
     <em:optionsURL>chrome://itsalltext/content/options.xul</em:optionsURL>
     <em:iconURL>chrome://itsalltext/content/icon.png</em:iconURL>

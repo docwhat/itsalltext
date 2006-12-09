@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<dialog
+  id="ItsAllTextAbout"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  title="About for It's All Text"
+  buttons="accept,cancel"
+  >
+  <vbox>
+    <hbox>
+      <caption>Nothing Here Yet</caption>
+    </hbox>
+  </vbox>
+</dialog>

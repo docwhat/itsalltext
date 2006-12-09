@@ -1,0 +1,3 @@
+content itsalltext chrome/content/
+
+overlay chrome://browser/content/browser.xul chrome://itsalltext/content/itsalltext.xul

@@ -1,0 +1,190 @@
+/*
+ * Places I learned how to do some of this stuff and used as references:
+ *   - Mozex
+ *   - Stylish
+ */
+
+  /**
+   * Creates a mostly unique hash of a string
+   * Most of this code is from:
+   *    http://developer.mozilla.org/en/docs/nsICryptoHash
+   * @param {String} some_string The string to hash.
+   * @returns {String} a hashed string.
+   */
+function hashString(some_string) {
+  var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+  converter.charset = "UTF-8";
+  
+  /* result is the result of the hashing.  It's not yet a string,
+   * that'll be in retval.
+   * result.value will contain the array length
+   */
+  var result = {};
+  
+  /* data is an array of bytes */
+  var data = converter.convertToByteArray(some_string, result);
+  var ch   = Components.classes["@mozilla.org/security/hash;1"].createInstance(Components.interfaces.nsICryptoHash);
+  
+  ch.init(ch.MD5);
+  ch.update(data, data.length);
+  var hash = ch.finish(true);
+  
+  // return the two-digit hexadecimal code for a byte
+  toHexString = function(charCode) {
+    return ("0" + charCode.toString(36)).slice(-2);
+  };
+  
+  // convert the binary hash data to a hex string.
+  var retval = [];
+  for(i in hash) {
+    retval[i] = toHexString(hash.charCodeAt(i));
+  }
+  
+  return(retval.join(""));
+}
+
+function ItsAllTextOverlay() {
+  /* This data is all private, which prevents security problems and it
+   * prevents clutter and collection.
+   */
+  var that = this;
+  var cache = {};
+  var cron = {};
+
+  var makeLocalFile = function(path) {
+    var obj = Components.classes["@mozilla.org/file/local;1"].
+      createInstance(Components.interfaces.nsILocalFile);
+    obj.initWithPath(path);
+    return obj;
+  };
+
+  function CacheObj(node) {
+    var self = this;
+    self.timestamp = 0;
+    self.size = 0;
+    self.node = node;
+
+    self.uid = hashString([ node.ownerDocument.URL,
+                            Math.random(),
+                            node.getAttribute("name") ].join(':'));
+    node.setAttribute('ItsAllText_UID', self.uid);
+    cache[self.uid] = self;
+    // TODO: This would be better if it was smarter
+    self.filename  = self.uid + '.txt';
+
+    self.toString = function() {
+      return [ "CacheObj",
+               " uid=",self.uid,
+               " timestamp=",self.timestamp,
+               " size=",self.size
+      ].join('');
+    };
+  }
+
+  /**
+   * This is a handy debug message.  I'll remove it or disable it when
+   * I release this.
+   * @param {String} aMessage The message to log.
+   */
+  that.log = function() {
+    var args = Array.prototype.slice.apply(arguments,[0]);
+    var consoleService = Components.
+      classes["@mozilla.org/consoleservice;1"].
+      getService(Components.interfaces.nsIConsoleService);
+    consoleService.logStringMessage("ItsAllTextOverlay: " + args.join(' '));
+  };
+
+  // TODO: tempdir should be a preference.
+  // TODO: tempdir should be a method that makes sure it exists.
+
+  /**
+   * Returns a cache object
+   * Note: These UIDs are only unique for Its All Text.
+   * @param {Object} node A dom object node.
+   * @returns {String} the UID.
+   */
+  that.getCacheObj = function(node) {
+    var uid = node.getAttribute("ItsAllText_UID");
+    if (uid) {
+      return cache[uid];
+    } else {
+      return new CacheObj(node);
+    }
+  };
+
+  /**
+   * Refresh Textarea.
+   * @param {Object} textarea A specific textarea dom object to update.
+   */
+  that.refreshTextarea = function(textarea) {
+    var cobj = that.getCacheObj(textarea);
+    that.log('refreshTextarea(): '+cobj);
+  };
+
+  /**
+   * Refresh Document.
+   * @param {Object} doc The document to refresh.
+   */
+  that.refreshDocument = function(doc) {
+    that.log('refreshDocument()',doc.URL);
+    var nodes = doc.getElementsByTagName('textarea');
+    for(var i=0; i < nodes.length; i++) {
+      that.refreshTextarea(nodes[i]);
+    }
+  };
+
+  /**
+   * Callback whenever the DOM content in a window or tab is loaded.
+   * @param {Object} event An event passed in.
+   */
+  that.onDOMContentLoad = function(event) {
+    if (event.originalTarget.nodeName != "#document") { return; }
+    var doc = event.originalTarget;
+
+    that.log('onDOMContentLoad: start');
+
+    // Set up the autorefresh
+    cron[doc] = null;
+    cronjob = function() {
+      var lasttime = new Date().valueOf();
+
+      var fun = function () {
+        var last = cron[doc];
+        if(!last || last == lasttime) {
+          that.log('last:'+last,'lasttime:'+lasttime,doc);
+          that.refreshDocument(doc);
+          lasttime = new Date().valueOf();
+          cron[doc] = lasttime;
+          setTimeout(cronjob, 6000);
+        } else {
+          that.log('skipping', doc);
+        }
+      };
+      return fun;
+    }();
+    cronjob();
+
+    /*
+      TODO: Put edit button inside the lower right side of the text area.
+    */
+    that.log('onDOMContentLoad: done');
+    return;
+  };
+
+  /**
+   * Initialize the module.  Should be called once, when a window is loaded.
+   * @private
+   */
+  var init = function() {
+    that.log('init');
+    var appcontent = document.getElementById("appcontent"); // The Browser
+    if (appcontent) {
+      appcontent.addEventListener("DOMContentLoaded", that.onDOMContentLoad,
+                                  true);
+    }
+  };
+  
+  window.addEventListener("load", init, true);
+  that.log('loaded overlay');
+}
+var itsAllTextOverlay = new ItsAllTextOverlay();
