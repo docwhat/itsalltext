@@ -113,6 +113,39 @@ function ItsAllTextOverlay() {
   that.cleanEditDir();
 
   /**
+   * A Preference Option: What character set should the file use?
+   * @returns {String} the charset to be used.
+   */
+  that.getCharset = function() {
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].
+      getService(Components.interfaces.nsIPrefService);
+    var branch = prefs.getBranch("extensions."+MYSTRING+".");
+    return branch.getCharPref("charset");
+  };
+
+  /**
+   * A Preference Option: What editor should we use?
+   * @returns {nsILocalFile} A file object of the editor.
+   */
+  that.getEditor = function() {
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].
+      getService(Components.interfaces.nsIPrefService);
+    var branch = prefs.getBranch("extensions."+MYSTRING+".");
+    var editor = branch.getCharPref("editor");
+
+    // TODO: It'd be nice to have this use PATH.
+    // TODO: It should behave better the editor is unset or invalid.
+
+    // create an nsILocalFile for the executable
+    var file = Components.
+      classes["@mozilla.org/file/local;1"].
+      createInstance(Components.interfaces.nsILocalFile);
+
+    file.initWithPath(editor);
+    return file;
+  };
+
+  /**
    * A Cache object is used to manage the node and the file behind it.
    * @constructor
    * @param {Object} node A DOM Node to watch.
@@ -177,11 +210,11 @@ function ItsAllTextOverlay() {
         foStream.init(self.file, 0x02 | 0x08 | 0x20, 
                       parseInt('0600',8), 0); 
 
-        /* We convert to UTF-8 */
+        /* We convert to charset */
         var conv = Components.
           classes["@mozilla.org/intl/scriptableunicodeconverter"].
           createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-        conv.charset = "UTF-8";
+        conv.charset = that.getCharset();
 
         var text = conv.ConvertFromUnicode(self.node.value);
         foStream.write(text, text.length);
@@ -197,19 +230,13 @@ function ItsAllTextOverlay() {
       if (self.node.nodeName != "TEXTAREA") { return; }
       var filename = self.write();
       try {
-        // create an nsILocalFile for the executable
-        var file = Components.
-          classes["@mozilla.org/file/local;1"].
-          createInstance(Components.interfaces.nsILocalFile);
-        // TODO: Editor should be a preference
-        // TODO: It'd be nice to have this use PATH
-        file.initWithPath("/usr/bin/gedit");
+        var program = that.getEditor();
 
         // create an nsIProcess
         var process = Components.
           classes["@mozilla.org/process/util;1"].
           createInstance(Components.interfaces.nsIProcess);
-        process.init(file);
+        process.init(program);
 
         // Run the process.
         // If first param is true, calling thread will be blocked until
@@ -239,7 +266,7 @@ function ItsAllTextOverlay() {
         var is = Components.
           classes["@mozilla.org/intl/converter-input-stream;1"].
           createInstance(Components.interfaces.nsIConverterInputStream);
-        is.init(fis, 'UTF-8', 4096, DEFAULT_REPLACEMENT_CHARACTER);
+        is.init(fis, that.getCharset(), 4096, DEFAULT_REPLACEMENT_CHARACTER);
   
         var str = {};
         while (is.readString(4096, str) !== 0) {
