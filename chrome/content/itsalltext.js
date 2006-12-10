@@ -94,6 +94,10 @@ function ItsAllTextOverlay() {
     consoleService.logStringMessage("ItsAllTextOverlay: " + args.join(' '));
   };
 
+  that.debug = function() {
+    return Firebug.Console.logFormatted(arguments);
+  }
+
   // TODO: tempdir should be a preference.
   // TODO: tempdir should be a method that makes sure it exists.
 
@@ -118,7 +122,7 @@ function ItsAllTextOverlay() {
    */
   that.refreshTextarea = function(node) {
     var cobj = that.getCacheObj(node);
-    that.log('refreshNode(): '+cobj);
+    //that.log('refreshNode(): '+cobj);
 
     if(!cobj) { return; }
     if (!cobj._narf) {
@@ -135,7 +139,7 @@ function ItsAllTextOverlay() {
    * @param {Object} doc The document to refresh.
    */
   that.refreshDocument = function(doc) {
-    that.log('refreshDocument()',doc.URL);
+    //that.log('refreshDocument()',doc.URL);
     var nodes = doc.getElementsByTagName('textarea');
     for(var i=0; i < nodes.length; i++) {
       that.refreshTextarea(nodes[i]);
@@ -155,7 +159,7 @@ function ItsAllTextOverlay() {
       doc.ItsAllText_CronJobID = id;
     }
 
-    that.log('onDOMContentLoad: start',id);
+    //that.log('onDOMContentLoad: start',id);
     var lasttime = new Date().valueOf();
 
     /**
@@ -175,7 +179,19 @@ function ItsAllTextOverlay() {
     /*
       TODO: Put edit button inside the lower right side of the text area.
     */
-    that.log('onDOMContentLoad: done',id);
+    //that.log('onDOMContentLoad: done',id);
+    return;
+  };
+
+  that.openEditor = function(textarea) {
+    that.debug('openEditor',arguments);
+    return;
+  }
+
+  that.onContextMenu = function(event) {
+    that.debug('onContextMenu',document.popupNode.nodeName);
+    document.getElementById("its-all-text-edit").
+      setAttribute('disabled', (document.popupNode.nodeName != "TEXTAREA"));
     return;
   };
 
@@ -184,15 +200,16 @@ function ItsAllTextOverlay() {
    * @private
    */
   var init = function() {
-    that.log('init');
     var appcontent = document.getElementById("appcontent"); // The Browser
     if (appcontent) {
       appcontent.addEventListener("DOMContentLoaded", that.onDOMContentLoad,
                                   true);
     }
+    document.getElementById("contentAreaContextMenu").
+      addEventListener("popupshowing", that.onContextMenu, false);
+
   };
   
   window.addEventListener("load", init, true);
-  that.log('loaded overlay');
 }
 var itsAllTextOverlay = new ItsAllTextOverlay();

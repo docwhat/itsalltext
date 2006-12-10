@@ -2,4 +2,9 @@
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="itsalltext.js"/>
+  <popup id="contentAreaContextMenu">
+     <menuitem id="its-all-text-edit" label="It's All Text" 
+               oncommand="itsAllTextOverlay.openEditor(document.popupNode)" accesskey="i" />
+  </popup>
 </overlay>
+
