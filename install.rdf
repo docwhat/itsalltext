@@ -16,7 +16,6 @@
     <em:homepageURL>http://addons.mozilla.org/firefox/1234</em:homepageURL>
     <em:optionsURL>chrome://itsalltext/content/options.xul</em:optionsURL>
     <em:iconURL>chrome://itsalltext/content/icon.png</em:iconURL>
-    <em:aboutURL>chrome://itsalltext/content/about.xul</em:aboutURL>
 
     <!-- Author and Contributors -->
     <em:creator>Christian Höltje</em:creator>
