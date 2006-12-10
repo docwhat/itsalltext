@@ -84,6 +84,23 @@ function ItsAllTextOverlay() {
     // NARF TODO: Remove
     self.filename = self.filename.slice(0,5) + '.txt';
 
+    /* Where is the directory that we use. */
+    editdir = Components.classes["@mozilla.org/file/directory_service;1"].
+      getService(Components.interfaces.nsIProperties).
+      get("TmpD", Components.interfaces.nsIFile).path;
+    that.debug('editdir',editdir);
+
+    /* Get a file */
+    self.file = Components.classes["@mozilla.org/file/local;1"].
+      createInstance(Components.interfaces.nsILocalFile);
+    // TODO: Use a proper directory to write these.
+    self.file.initWithPath(editdir+'/'+self.filename);
+
+    /* Remove any existing files */
+    if (self.file.exists()) {
+      self.file.remove(false);
+    }
+
     self.toString = function() {
       return [ "CacheObj",
                " uid=",self.uid,
@@ -98,26 +115,13 @@ function ItsAllTextOverlay() {
     self.write = function() {
       var path = null;
       try {
-        /* Where is the directory that we use. */
-        editdir = Components.classes["@mozilla.org/file/directory_service;1"].
-          getService(Components.interfaces.nsIProperties).
-          get("TmpD", Components.interfaces.nsIFile).path;
-        that.debug('editdir',editdir);
-
-        /* Get a file */
-        var file = Components.classes["@mozilla.org/file/local;1"].
-          createInstance(Components.interfaces.nsILocalFile);
-        // TODO: Use a proper directory to write these.
-        path = editdir+'/'+self.filename;
-        file.initWithPath(path);
-
         /* file is nsIFile, data is a string */
         var foStream = Components.
           classes["@mozilla.org/network/file-output-stream;1"].
           createInstance(Components.interfaces.nsIFileOutputStream);
         
         /* write, create, truncate */
-        foStream.init(file, 0x02 | 0x08 | 0x20, 
+        foStream.init(self.file, 0x02 | 0x08 | 0x20, 
                       parseInt('0600',8), 0); 
 
         /* We convert to UTF-8 */
@@ -129,9 +133,9 @@ function ItsAllTextOverlay() {
         var text = conv.ConvertFromUnicode(self.node.value);
         foStream.write(text, text.length);
         foStream.close();
-        return file.path;
+        return self.file.path;
       } catch(e) {
-        that.debug('write',path,e);
+        that.debug('write',self.file.path,e);
       }
     };
       
@@ -165,6 +169,72 @@ function ItsAllTextOverlay() {
         that.debug('edit',filename,e);
       }
     };
+
+    self.read = function() {
+      /* read file, reset ts & size */
+      const DEFAULT_REPLACEMENT_CHARACTER = 65533;
+      var buffer = [];
+
+      try {
+        var fis = Components.
+          classes["@mozilla.org/network/file-input-stream;1"].
+          createInstance(Components.interfaces.nsIFileInputStream);
+        fis.init(self.file, 0x01, parseInt('00400',8), 0); 
+        // MODE_RDONLY | PERM_IRUSR
+  
+        var is = Components.
+          classes["@mozilla.org/intl/converter-input-stream;1"].
+          createInstance(Components.interfaces.nsIConverterInputStream);
+        is.init(fis, 'UTF-8', 4096, DEFAULT_REPLACEMENT_CHARACTER);
+  
+        var str = {};
+        while (is.readString(4096, str) != 0) {
+          buffer.push(str.value);
+        }
+        
+        is.close();
+        fis.close();
+  
+        self.timestamp = self.file.lastModifiedTime;
+        self.size      = self.file.fileSize;
+  
+        return buffer.join('');
+      } catch(e) {
+        return null;
+      }
+    };
+
+    /**
+     * Has the file object changed?
+     * @returns {boolean} returns true if the file has changed on disk.
+     */
+    self.hasChanged = function() {
+      /* Check exists.  Check ts and size. */
+      if(!self.file.exists() ||
+         !self.file.isReadable() ||
+         (self.file.lastModifiedTime == self.timestamp && 
+          self.file.fileSize         == self.size)) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
+    /**
+     * Update the node from the file.
+     * @returns {boolean} Returns true ifthe file changed.
+     */
+    self.update = function() {
+      if (self.hasChanged()) {
+        var value = self.read();
+        if (value !== null) {
+          self.node.value = value;
+          return true;
+        }
+      }
+      return false; // If we fall through, we 
+    };
+ 
   }
 
   /**
@@ -195,12 +265,14 @@ function ItsAllTextOverlay() {
    * @returns {String} the UID or null.
    */
   that.getCacheObj = function(node) {
+    var cobj = null;
     if (node && node.hasAttribute("ItsAllText_UID")) {
-      var val = cache[node.getAttribute("ItsAllText_UID")];
-      return val ? val : null; // Return the value or null
-    } else {
-      return new CacheObj(node);
+      cobj = cache[node.getAttribute("ItsAllText_UID")];
     }
+    if (!cobj) {
+      cobj = new CacheObj(node);
+    }
+    return cobj;
   };
 
   /**
@@ -214,12 +286,13 @@ function ItsAllTextOverlay() {
     if(!cobj) { return; }
     if (!cobj._narf) {
       cobj._narf = true;
-      cobj.node.style.backgroundColor = '#fdd';
+      cobj.node.style.backgroundColor = '#ddf';
     } else {
       cobj._narf = false;
       cobj.node.style.backgroundColor = '#dfd';
     }
-    };
+    cobj.update();
+  };
 
   /**
    * Refresh Document.
@@ -276,8 +349,12 @@ function ItsAllTextOverlay() {
    */
   that.onEditNode = function(node) {
     var cobj = that.getCacheObj(node);
-    that.debug('onEditNode',cobj);
-    cobj.edit();
+    if(!cobj) {
+      that.debug('onEditNode','missing cobj for ',node);
+    } else {
+      that.debug('onEditNode',cobj);
+      cobj.edit();
+    }
     return;
   };
 
