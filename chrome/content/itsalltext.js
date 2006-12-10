@@ -99,9 +99,9 @@ function ItsAllTextOverlay() {
       var path = null;
       try {
         /* Where is the directory that we use. */
-        editdir = Components.classes["@mozilla.org/file/directory_service;1"]
-          .getService(Components.interfaces.nsIProperties)
-          .get("TmpD", Components.interfaces.nsIFile).path;
+        editdir = Components.classes["@mozilla.org/file/directory_service;1"].
+          getService(Components.interfaces.nsIProperties).
+          get("TmpD", Components.interfaces.nsIFile).path;
         that.debug('editdir',editdir);
 
         /* Get a file */
@@ -117,7 +117,8 @@ function ItsAllTextOverlay() {
           createInstance(Components.interfaces.nsIFileOutputStream);
         
         /* write, create, truncate */
-        foStream.init(file, 0x02 | 0x08 | 0x20, 0600, 0); 
+        foStream.init(file, 0x02 | 0x08 | 0x20, 
+                      parseInt('0600',8), 0); 
 
         /* We convert to UTF-8 */
         var conv = Components.
@@ -276,7 +277,7 @@ function ItsAllTextOverlay() {
   that.onEditNode = function(node) {
     var cobj = that.getCacheObj(node);
     that.debug('onEditNode',cobj);
-    cobj.edit()
+    cobj.edit();
     return;
   };
 
