@@ -14,7 +14,7 @@
 function hashString(some_string) {
   var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
   converter.charset = "UTF-8";
-  
+
   /* result is the result of the hashing.  It's not yet a string,
    * that'll be in retval.
    * result.value will contain the array length
@@ -51,12 +51,66 @@ function ItsAllTextOverlay() {
   var cache = {};
   var cron = [null]; // Eat the 0th position
 
+  var MYSTRING = 'itsalltext';
+
+  /**
+   * This is a handy debug message.  I'll remove it or disable it when
+   * I release this.
+   * @param {String} aMessage The message to log.
+   */
+  that.log = function() {
+    var args = Array.prototype.slice.apply(arguments,[0]);
+    var consoleService = Components.
+      classes["@mozilla.org/consoleservice;1"].
+      getService(Components.interfaces.nsIConsoleService);
+    consoleService.logStringMessage("ItsAllTextOverlay: " + args.join(' '));
+  };
+
+  that.debug = function() {
+    try { return Firebug.Console.logFormatted(arguments); } 
+    catch(e) { return null; }
+  };
+
   var makeLocalFile = function(path) {
     var obj = Components.classes["@mozilla.org/file/local;1"].
       createInstance(Components.interfaces.nsILocalFile);
     obj.initWithPath(path);
     return obj;
   };
+
+  that.getEditDir = function() {
+    /* Where is the directory that we use. */
+    var fobj = Components.classes["@mozilla.org/file/directory_service;1"].
+      getService(Components.interfaces.nsIProperties).
+      get("ProfD", Components.interfaces.nsIFile);
+    fobj.append(MYSTRING);
+    if (!fobj.exists()) {
+      fobj.create(Components.interfaces.nsIFile.DIRECTORY_TYPE,
+                  parseInt('0700',8));
+    }
+    if (!fobj.isDirectory()) {
+      that.error('Having a problem finding or creating directory: '+fobj.path);
+    }
+    return fobj;
+  };
+
+  that.cleanEditDir = function() {
+    var fobj = that.getEditDir();
+    //return dir.directoryEntries;
+    // file is the given directory (nsIFile)
+    var entries = fobj.directoryEntries;
+    while (entries.hasMoreElements()) {
+      var entry = entries.getNext();
+      entry.QueryInterface(Components.interfaces.nsIFile);
+      try{
+        entry.remove(false);
+      } catch(e) {
+        that.debug('unable to remove',entry,'error:',e);
+      }
+    }
+  };
+  /* Clean the edit directory right now, on startup. */
+  that.cleanEditDir();
 
   /**
    * A Cache object is used to manage the node and the file behind it.
@@ -78,29 +132,30 @@ function ItsAllTextOverlay() {
                                  node.getAttribute("name") ].join(':')) +
       '.txt';
 
-    node.setAttribute('ItsAllText_UID', self.uid);
+    node.setAttribute(MYSTRING+'_UID', self.uid);
     cache[self.uid] = self;
     
-    // NARF TODO: Remove
+    // NARF TODO: Remove this hack to shorten names
     self.filename = self.filename.slice(0,5) + '.txt';
 
-    /* Where is the directory that we use. */
-    editdir = Components.classes["@mozilla.org/file/directory_service;1"].
-      getService(Components.interfaces.nsIProperties).
-      get("TmpD", Components.interfaces.nsIFile).path;
-    that.debug('editdir',editdir);
+    var editdir = that.getEditDir();
+    that.debug('editdir',editdir.path);
 
     /* Get a file */
     self.file = Components.classes["@mozilla.org/file/local;1"].
       createInstance(Components.interfaces.nsILocalFile);
-    // TODO: Use a proper directory to write these.
-    self.file.initWithPath(editdir+'/'+self.filename);
+    self.file.initWithFile(editdir);
+    self.file.append(self.filename);
 
     /* Remove any existing files */
     if (self.file.exists()) {
       self.file.remove(false);
     }
 
+    /**
+     * Convert to this object to a useful string.
+     * @returns {String} A string representation of this object.
+     */
     self.toString = function() {
       return [ "CacheObj",
                " uid=",self.uid,
@@ -113,9 +168,7 @@ function ItsAllTextOverlay() {
      * Write out the contents of the node.
      */
     self.write = function() {
-      var path = null;
       try {
-        /* file is nsIFile, data is a string */
         var foStream = Components.
           classes["@mozilla.org/network/file-output-stream;1"].
           createInstance(Components.interfaces.nsIFileOutputStream);
@@ -136,6 +189,7 @@ function ItsAllTextOverlay() {
         return self.file.path;
       } catch(e) {
         that.debug('write',self.file.path,e);
+        return null;
       }
     };
       
@@ -172,7 +226,7 @@ function ItsAllTextOverlay() {
 
     self.read = function() {
       /* read file, reset ts & size */
-      const DEFAULT_REPLACEMENT_CHARACTER = 65533;
+      var DEFAULT_REPLACEMENT_CHARACTER = 65533;
       var buffer = [];
 
       try {
@@ -188,7 +242,7 @@ function ItsAllTextOverlay() {
         is.init(fis, 'UTF-8', 4096, DEFAULT_REPLACEMENT_CHARACTER);
   
         var str = {};
-        while (is.readString(4096, str) != 0) {
+        while (is.readString(4096, str) !== 0) {
           buffer.push(str.value);
         }
         
@@ -237,24 +291,6 @@ function ItsAllTextOverlay() {
  
   }
 
-  /**
-   * This is a handy debug message.  I'll remove it or disable it when
-   * I release this.
-   * @param {String} aMessage The message to log.
-   */
-  that.log = function() {
-    var args = Array.prototype.slice.apply(arguments,[0]);
-    var consoleService = Components.
-      classes["@mozilla.org/consoleservice;1"].
-      getService(Components.interfaces.nsIConsoleService);
-    consoleService.logStringMessage("ItsAllTextOverlay: " + args.join(' '));
-  };
-
-  that.debug = function() {
-    try { return Firebug.Console.logFormatted(arguments); } 
-    catch(e) { return null; }
-  };
-
   // TODO: tempdir should be a preference.
   // TODO: tempdir should be a method that makes sure it exists.
 
@@ -266,8 +302,8 @@ function ItsAllTextOverlay() {
    */
   that.getCacheObj = function(node) {
     var cobj = null;
-    if (node && node.hasAttribute("ItsAllText_UID")) {
-      cobj = cache[node.getAttribute("ItsAllText_UID")];
+    if (node && node.hasAttribute(MYSTRING+"_UID")) {
+      cobj = cache[node.getAttribute(MYSTRING+"_UID")];
     }
     if (!cobj) {
       cobj = new CacheObj(node);
