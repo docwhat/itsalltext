@@ -4,13 +4,13 @@
  *   - Stylish
  */
 
-  /**
-   * Creates a mostly unique hash of a string
-   * Most of this code is from:
-   *    http://developer.mozilla.org/en/docs/nsICryptoHash
-   * @param {String} some_string The string to hash.
-   * @returns {String} a hashed string.
-   */
+/**
+ * Creates a mostly unique hash of a string
+ * Most of this code is from:
+ *    http://developer.mozilla.org/en/docs/nsICryptoHash
+ * @param {String} some_string The string to hash.
+ * @returns {String} a hashed string.
+ */
 function hashString(some_string) {
   var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
   converter.charset = "UTF-8";
@@ -49,7 +49,7 @@ function ItsAllTextOverlay() {
    */
   var that = this;
   var cache = {};
-  var cron = {};
+  var cron = [null]; // Eat the 0th position
 
   var makeLocalFile = function(path) {
     var obj = Components.classes["@mozilla.org/file/local;1"].
@@ -101,12 +101,12 @@ function ItsAllTextOverlay() {
    * Returns a cache object
    * Note: These UIDs are only unique for Its All Text.
    * @param {Object} node A dom object node.
-   * @returns {String} the UID.
+   * @returns {String} the UID or null.
    */
   that.getCacheObj = function(node) {
-    var uid = node.getAttribute("ItsAllText_UID");
-    if (uid) {
-      return cache[uid];
+    if (node && node.hasAttribute("ItsAllText_UID")) {
+      var val = cache[node.getAttribute("ItsAllText_UID")];
+      return val ? val : null; // Return the value or null
     } else {
       return new CacheObj(node);
     }
@@ -114,12 +114,21 @@ function ItsAllTextOverlay() {
 
   /**
    * Refresh Textarea.
-   * @param {Object} textarea A specific textarea dom object to update.
+   * @param {Object} node A specific textarea dom object to update.
    */
-  that.refreshTextarea = function(textarea) {
-    var cobj = that.getCacheObj(textarea);
-    that.log('refreshTextarea(): '+cobj);
-  };
+  that.refreshTextarea = function(node) {
+    var cobj = that.getCacheObj(node);
+    that.log('refreshNode(): '+cobj);
+
+    if(!cobj) { return; }
+    if (!cobj._narf) {
+      cobj._narf = true;
+      cobj.node.style.backgroundColor = '#fdd';
+    } else {
+      cobj._narf = false;
+      cobj.node.style.backgroundColor = '#dfd';
+    }
+    };
 
   /**
    * Refresh Document.
@@ -140,34 +149,33 @@ function ItsAllTextOverlay() {
   that.onDOMContentLoad = function(event) {
     if (event.originalTarget.nodeName != "#document") { return; }
     var doc = event.originalTarget;
+    var id = cron[doc.ItsAllText_CronJobID];
+    if (!id) {
+      id = cron.push(null);
+      doc.ItsAllText_CronJobID = id;
+    }
 
-    that.log('onDOMContentLoad: start');
+    that.log('onDOMContentLoad: start',id);
+    var lasttime = new Date().valueOf();
 
-    // Set up the autorefresh
-    cron[doc] = null;
-    cronjob = function() {
-      var lasttime = new Date().valueOf();
-
-      var fun = function () {
-        var last = cron[doc];
-        if(!last || last == lasttime) {
-          that.log('last:'+last,'lasttime:'+lasttime,doc);
-          that.refreshDocument(doc);
-          lasttime = new Date().valueOf();
-          cron[doc] = lasttime;
-          setTimeout(cronjob, 6000);
-        } else {
-          that.log('skipping', doc);
-        }
-      };
-      return fun;
-    }();
+    /**
+     * This sets up the autorefresh for a given page.
+     */
+    var cronjob = function () {
+      var last = cron[id];
+      if(!last || last == lasttime) {
+        that.refreshDocument(doc);
+        lasttime = new Date().valueOf();
+        cron[id] = lasttime;
+        setTimeout(cronjob, 3000+(1000*Math.random()));
+      }
+    };
     cronjob();
 
     /*
       TODO: Put edit button inside the lower right side of the text area.
     */
-    that.log('onDOMContentLoad: done');
+    that.log('onDOMContentLoad: done',id);
     return;
   };
 
