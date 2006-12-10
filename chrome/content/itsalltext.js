@@ -58,6 +58,11 @@ function ItsAllTextOverlay() {
     return obj;
   };
 
+  /**
+   * A Cache object is used to manage the node and the file behind it.
+   * @constructor
+   * @param {Object} node A DOM Node to watch.
+   */
   function CacheObj(node) {
     var self = this;
     self.timestamp = 0;
@@ -67,10 +72,17 @@ function ItsAllTextOverlay() {
     self.uid = hashString([ node.ownerDocument.URL,
                             Math.random(),
                             node.getAttribute("name") ].join(':'));
+
+    // TODO: This would be better if it autodetected the extension
+    self.filename = hashString([ node.ownerDocument.URL,
+                                 node.getAttribute("name") ].join(':')) +
+      '.txt';
+
     node.setAttribute('ItsAllText_UID', self.uid);
     cache[self.uid] = self;
-    // TODO: This would be better if it was smarter
-    self.filename  = self.uid + '.txt';
+    
+    // NARF TODO: Remove
+    self.filename = self.filename.slice(0,5) + '.txt';
 
     self.toString = function() {
       return [ "CacheObj",
@@ -78,6 +90,79 @@ function ItsAllTextOverlay() {
                " timestamp=",self.timestamp,
                " size=",self.size
       ].join('');
+    };
+
+    /**
+     * Write out the contents of the node.
+     */
+    self.write = function() {
+      var path = null;
+      try {
+        /* Where is the directory that we use. */
+        editdir = Components.classes["@mozilla.org/file/directory_service;1"]
+          .getService(Components.interfaces.nsIProperties)
+          .get("TmpD", Components.interfaces.nsIFile).path;
+        that.debug('editdir',editdir);
+
+        /* Get a file */
+        var file = Components.classes["@mozilla.org/file/local;1"].
+          createInstance(Components.interfaces.nsILocalFile);
+        // TODO: Use a proper directory to write these.
+        path = editdir+'/'+self.filename;
+        file.initWithPath(path);
+
+        /* file is nsIFile, data is a string */
+        var foStream = Components.
+          classes["@mozilla.org/network/file-output-stream;1"].
+          createInstance(Components.interfaces.nsIFileOutputStream);
+        
+        /* write, create, truncate */
+        foStream.init(file, 0x02 | 0x08 | 0x20, 0600, 0); 
+
+        /* We convert to UTF-8 */
+        var conv = Components.
+          classes["@mozilla.org/intl/scriptableunicodeconverter"].
+          createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+        conv.charset = "UTF-8";
+
+        var text = conv.ConvertFromUnicode(self.node.value);
+        foStream.write(text, text.length);
+        foStream.close();
+        return file.path;
+      } catch(e) {
+        that.debug('write',path,e);
+      }
+    };
+      
+    self.edit = function() {
+      if (self.node.nodeName != "TEXTAREA") { return; }
+      var filename = self.write();
+      try {
+        // create an nsILocalFile for the executable
+        var file = Components.
+          classes["@mozilla.org/file/local;1"].
+          createInstance(Components.interfaces.nsILocalFile);
+        // TODO: Editor should be a preference
+        // TODO: It'd be nice to have this use PATH
+        file.initWithPath("/usr/bin/gedit");
+
+        // create an nsIProcess
+        var process = Components.
+          classes["@mozilla.org/process/util;1"].
+          createInstance(Components.interfaces.nsIProcess);
+        process.init(file);
+
+        // Run the process.
+        // If first param is true, calling thread will be blocked until
+        // called process terminates.
+        // Second and third params are used to pass command-line arguments
+        // to the process.
+        var args = [filename];
+        var result = {};
+        process.run(false, args, args.length, result);
+      } catch(e) {
+        that.debug('edit',filename,e);
+      }
     };
   }
 
@@ -95,8 +180,9 @@ function ItsAllTextOverlay() {
   };
 
   that.debug = function() {
-    return Firebug.Console.logFormatted(arguments);
-  }
+    try { return Firebug.Console.logFormatted(arguments); } 
+    catch(e) { return null; }
+  };
 
   // TODO: tempdir should be a preference.
   // TODO: tempdir should be a method that makes sure it exists.
@@ -183,11 +269,21 @@ function ItsAllTextOverlay() {
     return;
   };
 
-  that.openEditor = function(textarea) {
-    that.debug('openEditor',arguments);
+  /**
+   * Open the editor for a selected node.
+   * @param {Object} node The textarea to get.
+   */
+  that.onEditNode = function(node) {
+    var cobj = that.getCacheObj(node);
+    that.debug('onEditNode',cobj);
+    cobj.edit()
     return;
-  }
+  };
 
+  /**
+   * Triggered when the context menu is shown.
+   * @param {Object} event The event passed in by the event handler.
+   */
   that.onContextMenu = function(event) {
     that.debug('onContextMenu',document.popupNode.nodeName);
     document.getElementById("its-all-text-edit").
