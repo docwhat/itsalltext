@@ -1,18 +1,30 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+ 
+<prefwindow id="itsalltext-prefs"
+     title="It's All Text Preferences"
+     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+ 
+<prefpane id="itsalltext-pane" label="It's All Text Preferences">
+  <preferences>
+    <preference id="pref_charset"
+                name="extensions.itsalltext.charset" type="string"/>
+    <preference id="pref_editor"
+                name="extensions.itsalltext.editor" type="string"/>
+  </preferences>
 
-<dialog
-  id="ItsAllTextOptions"
-  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-  ondialogaccept="itsalltextOptionsSave();"
-  onload="itsalltextOptionsLoad();"
-  title="Options for It's All Text"
-  buttons="accept,cancel"
-  >
-  <script type="application/x-javascript" src="options.js"/>
-  <vbox>
+  <vbox> 
     <hbox>
-      <caption>Nothing Here Yet</caption>
+    <hbox align="right">
+      <label control="editor" value="Editor (needs full path): "/>
+      <textbox preference="pref_editor" id="editor" maxlength="20"/>
+    </hbox>
+    <hbox align="right">
+      <label control="charset"
+             value="Character Set (default: UTF-8): "/>
+      <textbox preference="pref_charset" id="charset" maxlength="8"/>
     </hbox>
   </vbox>
-</dialog>
+</prefpane>
+ 
+</prefwindow>

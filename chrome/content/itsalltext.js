@@ -436,7 +436,7 @@ function ItsAllTextOverlay() {
    * Initialize the module.  Should be called once, when a window is loaded.
    * @private
    */
-  var init = function() {
+  var startup = function() {
     var appcontent = document.getElementById("appcontent"); // The Browser
     if (appcontent) {
       appcontent.addEventListener("DOMContentLoaded", that.onDOMContentLoad,
@@ -447,6 +447,6 @@ function ItsAllTextOverlay() {
 
   };
   
-  window.addEventListener("load", init, true);
+  window.addEventListener("load", startup, true);
 }
 var itsAllTextOverlay = new ItsAllTextOverlay();
