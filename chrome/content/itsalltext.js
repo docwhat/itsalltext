@@ -124,6 +124,21 @@ function ItsAllTextOverlay() {
   };
 
   /**
+   * A Preference Option: How often should we search for new content?
+   * @returns {int} The number of seconds between checking for new content.
+   */
+  that.getRefresh = function() {
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].
+      getService(Components.interfaces.nsIPrefService);
+    var branch = prefs.getBranch("extensions."+MYSTRING+".");
+    var refresh = branch.getIntPref("refresh");
+    var retval = Math.round((1000*refresh) + (1000*Math.random()));
+    that.debug('refresh in',retval);
+    return retval;
+
+  };
+
+  /**
    * A Preference Option: What editor should we use?
    * @returns {nsILocalFile} A file object of the editor.
    */
@@ -394,7 +409,7 @@ function ItsAllTextOverlay() {
         that.refreshDocument(doc);
         lasttime = new Date().valueOf();
         cron[id] = lasttime;
-        setTimeout(cronjob, 3000+(1000*Math.random()));
+        setTimeout(cronjob, that.getRefresh);
       }
     };
     cronjob();
