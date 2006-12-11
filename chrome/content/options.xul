@@ -18,16 +18,16 @@
   <vbox> 
     <hbox align="right">
       <label control="editor" value="Editor (needs full path): "/>
-      <textbox preference="pref_editor" id="editor" maxlength="20"/>
+      <textbox preference="pref_editor" id="editor" size="20"/>
     </hbox>
     <hbox align="right">
       <label control="seconds" value="Seconds between refreshing: "/>
-      <textbox preference="pref_seconds" id="seconds" maxlength="2"/>
+      <textbox preference="pref_seconds" id="seconds" size="2" maxlength="2"/>
     </hbox>
     <hbox align="right">
       <label control="charset"
              value="Character Set (default: UTF-8): "/>
-      <textbox preference="pref_charset" id="charset" maxlength="8"/>
+      <textbox preference="pref_charset" id="charset" size="8"/>
     </hbox>
   </vbox>
 </prefpane>

@@ -362,13 +362,6 @@ function ItsAllTextOverlay() {
     //that.log('refreshNode(): '+cobj);
 
     if(!cobj) { return; }
-    if (!cobj._narf) {
-      cobj._narf = true;
-      cobj.node.style.backgroundColor = '#ddf';
-    } else {
-      cobj._narf = false;
-      cobj.node.style.backgroundColor = '#dfd';
-    }
     cobj.update();
   };
 
