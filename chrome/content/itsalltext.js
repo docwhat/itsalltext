@@ -203,6 +203,7 @@ function ItsAllTextOverlay() {
 
     // TODO: It'd be nice to have this use PATH.
     // TODO: It should behave better the editor is unset or invalid.
+    // TODO: On the mac, we should allow for "open -a <app> <file>"
 
     // create an nsILocalFile for the executable
     var file = Components.
