@@ -67,8 +67,10 @@ function ItsAllTextOverlay() {
   };
 
   that.debug = function() {
-    try { return Firebug.Console.logFormatted(arguments); } 
-    catch(e) { return null; }
+    if (that.preferences.data.debug) {
+      try { return Firebug.Console.logFormatted(arguments); } 
+      catch(e) { return null; }
+    }
   };
 
   var makeLocalFile = function(path) {
@@ -113,14 +115,71 @@ function ItsAllTextOverlay() {
   that.cleanEditDir();
 
   /**
+   * A Preference Observer.
+   */
+  that.preferences = {
+    /**
+     * Dictionary for storing the preferences in.
+     * @type Hash
+     */
+    data: {
+    },
+    /**
+     * Dictionary of types (well, really the method needed to get/set the
+     * type.
+     * @type Hash
+     */
+    types: {
+      'charset': 'Char',
+      'editor':  'Char',
+      'refresh': 'Int',
+      'debug':   'Bool'
+    },
+
+    /**
+     * Register the observer.
+     */
+    register: function() {
+      var prefService = Components.
+        classes["@mozilla.org/preferences-service;1"].
+        getService(Components.interfaces.nsIPrefService);
+      this._branch = prefService.getBranch("extensions."+MYSTRING+".");
+      this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+      for(var type in this.types) {
+        this.data[type] = this._branch['get'+(this.types[type])+'Pref'](type);
+      }
+      this._branch.addObserver("", this, false);
+    },
+
+    /**
+     * Unregister the observer. Not currently used, but may be
+     * useful in the future.
+     */
+    unregister: function() {
+      if (!this._branch) {return;}
+      this._branch.removeObserver("", this);
+    },
+
+    /**
+     * Observation callback.
+     * @param {String} aSubject The nsIPrefBranch we're observing (after appropriate QI)e
+     * @param {String} aData The name of the pref that's been changed (relative to the aSubject).
+     * @param {String} aTopic The string defined by NS_PREFBRANCH_PREFCHANGE_TOPIC_ID
+     */
+    observe: function(aSubject, aTopic, aData) {
+      if (aTopic != "nsPref:changed") {return;}
+      if (this.data.hasOwnProperty(aData)) {
+        this.data[aData] = this._branch['get'+(this.types[aData])+'Pref'](aData);
+      }
+    }
+  };
+
+  /**
    * A Preference Option: What character set should the file use?
    * @returns {String} the charset to be used.
    */
   that.getCharset = function() {
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"].
-      getService(Components.interfaces.nsIPrefService);
-    var branch = prefs.getBranch("extensions."+MYSTRING+".");
-    return branch.getCharPref("charset");
+    return that.preferences.data.charset;
   };
 
   /**
@@ -128,10 +187,7 @@ function ItsAllTextOverlay() {
    * @returns {int} The number of seconds between checking for new content.
    */
   that.getRefresh = function() {
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"].
-      getService(Components.interfaces.nsIPrefService);
-    var branch = prefs.getBranch("extensions."+MYSTRING+".");
-    var refresh = branch.getIntPref("refresh");
+    var refresh = that.preferences.data.refresh;
     var retval = Math.round((1000*refresh) + (1000*Math.random()));
     that.debug('refresh in',retval);
     return retval;
@@ -143,10 +199,7 @@ function ItsAllTextOverlay() {
    * @returns {nsILocalFile} A file object of the editor.
    */
   that.getEditor = function() {
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"].
-      getService(Components.interfaces.nsIPrefService);
-    var branch = prefs.getBranch("extensions."+MYSTRING+".");
-    var editor = branch.getCharPref("editor");
+    var editor = that.preferences.data.editor;
 
     // TODO: It'd be nice to have this use PATH.
     // TODO: It should behave better the editor is unset or invalid.
@@ -159,6 +212,14 @@ function ItsAllTextOverlay() {
     file.initWithPath(editor);
     return file;
   };
+
+  /**
+   * A Preference Option: should we display debugging info?
+   * @returns {bool}
+   */
+  that.getDebug = function() {
+    return that.preferences.data.debug;
+  }
 
   /**
    * A Cache object is used to manage the node and the file behind it.
@@ -183,8 +244,11 @@ function ItsAllTextOverlay() {
     node.setAttribute(MYSTRING+'_UID', self.uid);
     cache[self.uid] = self;
     
-    // NARF TODO: Remove this hack to shorten names
-    self.filename = self.filename.slice(0,5) + '.txt';
+    /* Since the hash is supposed to be equally distributed, it shouldn't
+     * matter how we slice it.  However, this does make it less unique.
+     */
+    // TODO: add hash collision detection using the raw key.
+    self.filename = self.filename.slice(0,15) + '.txt';
 
     var editdir = that.getEditDir();
     that.debug('editdir',editdir.path);
@@ -361,6 +425,16 @@ function ItsAllTextOverlay() {
     var cobj = that.getCacheObj(node);
     //that.log('refreshNode(): '+cobj);
 
+    if (that.getDebug()) {
+      if (!cobj._toggle) {
+        cobj.node.style.background = '#fed';
+        cobj._toggle = true;
+      } else {
+        cobj.node.style.background = '#def';
+        cobj._toggle = false;
+      }
+    }
+
     if(!cobj) { return; }
     cobj.update();
   };
@@ -402,7 +476,7 @@ function ItsAllTextOverlay() {
         that.refreshDocument(doc);
         lasttime = new Date().valueOf();
         cron[id] = lasttime;
-        setTimeout(cronjob, that.getRefresh);
+        setTimeout(cronjob, that.getRefresh());
       }
     };
     cronjob();
@@ -452,9 +526,12 @@ function ItsAllTextOverlay() {
     }
     document.getElementById("contentAreaContextMenu").
       addEventListener("popupshowing", that.onContextMenu, false);
-
   };
   
+  // Start watching the preferences.
+  that.preferences.register();
+  
+  // Do the startup when things are loaded.
   window.addEventListener("load", startup, true);
 }
 var itsAllTextOverlay = new ItsAllTextOverlay();

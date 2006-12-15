@@ -13,6 +13,8 @@
                 name="extensions.itsalltext.editor" type="string"/>
     <preference id="pref_seconds"
                 name="extensions.itsalltext.refresh" type="int"/>
+    <preference id="pref_debug"
+                name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
 
   <vbox> 
@@ -28,6 +30,11 @@
       <label control="charset"
              value="Character Set (default: UTF-8): "/>
       <textbox preference="pref_charset" id="charset" size="8"/>
+    </hbox>
+    <hbox align="right">
+      <label control="debug"
+             value="Enable Debugging: "/>
+      <checkbox preference="pref_debug" id="debug"/>
     </hbox>
   </vbox>
 </prefpane>
