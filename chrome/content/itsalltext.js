@@ -201,9 +201,9 @@ function ItsAllTextOverlay() {
   that.getEditor = function() {
     var editor = that.preferences.data.editor;
 
-    // TODO: It'd be nice to have this use PATH.
-    // TODO: It should behave better the editor is unset or invalid.
-    // TODO: On the mac, we should allow for "open -a <app> <file>"
+    // TODO: The prefereces dialog should have a filepicker.
+    // TODO: !! If the editor fails, we should open preferences.
+    // TODO: !! MacOSX, we should allow for "open -a <app> <file>".
 
     // create an nsILocalFile for the executable
     var file = Components.
@@ -237,7 +237,7 @@ function ItsAllTextOverlay() {
                             Math.random(),
                             node.getAttribute("name") ].join(':'));
 
-    // TODO: This would be better if it autodetected the extension
+    // TODO: !! We should have a menu that lets the user pick the extension.
     self.filename = hashString([ node.ownerDocument.URL,
                                  node.getAttribute("name") ].join(':')) +
       '.txt';
@@ -483,7 +483,7 @@ function ItsAllTextOverlay() {
     cronjob();
 
     /*
-      TODO: Put edit button inside the lower right side of the text area.
+      TODO: !! edit should be a gumdrop floating above a textarea corner.
     */
     //that.log('onDOMContentLoad: done',id);
     return;
