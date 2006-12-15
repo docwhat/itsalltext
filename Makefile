@@ -51,6 +51,14 @@ jslint.log: $(SOURCES_JS)
 	   echo "  ... there were $$(egrep '^Lint at line ' $@ | wc -l) errors."; \
 	 fi
 
+.PHONY: todo
+todo:
+	$(Q)grep -nr 'TODO' [a-z0-9]*
+
+.PHONY: narf
+narf:
+	$(Q)grep -nri 'narf' [a-z0-9]*
+
 .PHONY: clean
 clean:
 	$(Q)rm -rf $(XPI_FILE) *.log docs
