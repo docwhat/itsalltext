@@ -100,8 +100,8 @@ function ItsAllTextOverlay() {
    */
   that.debug = function() {
     if (that.preferences.data.debug) {
-      try { return Firebug.Console.logFormatted(arguments); } 
-      catch(e) { return null; }
+      try { Firebug.Console.logFormatted(arguments); } 
+      catch(e) {}
     }
   };
 
@@ -228,7 +228,7 @@ function ItsAllTextOverlay() {
   that.getRefresh = function() {
     var refresh = that.preferences.data.refresh;
     var retval = Math.round((1000*refresh) + (1000*Math.random()));
-    that.debug('refresh in',retval);
+    //that.debug('refresh in',retval);
     return retval;
 
   };
@@ -463,7 +463,8 @@ function ItsAllTextOverlay() {
    */
   that.refreshTextarea = function(node) {
     var cobj = that.getCacheObj(node);
-    //that.log('refreshNode(): '+cobj);
+    //that.debug('refreshNode():',cobj);
+    if(!cobj) { return; }
 
     if (that.getDebug()) {
       if (!cobj._toggle) {
@@ -475,20 +476,84 @@ function ItsAllTextOverlay() {
       }
     }
 
-    if(!cobj) { return; }
     cobj.update();
+    that.addGumDrop(cobj);
   };
 
+  // TODO: Refresh when text area is clicked on or something like that.
   /**
    * Refresh Document.
    * @param {Object} doc The document to refresh.
    */
   that.refreshDocument = function(doc) {
-    //that.log('refreshDocument()',doc.URL);
+    //that.debug('refreshDocument()',doc.URL);
     var nodes = doc.getElementsByTagName('textarea');
     for(var i=0; i < nodes.length; i++) {
       that.refreshTextarea(nodes[i]);
     }
+  };
+
+  /**
+   * Add the gumdrop to a textarea.
+   * @param {Object} cache_object The Cache Object that contains the node.
+   */
+  that.addGumDrop = function(cache_object) {
+    that.debug('addGumDrop',cache_object);
+    if (cache_object._is_gummed) {
+      return; // we did it already
+    }
+    // So we don't gum it again.
+    cache_object._is_gummed = true;
+
+    var node = cache_object.node;
+    var doc = node.ownerDocument;
+    var offsetNode = node;
+    if (!node.parentNode) { return; }
+
+    var gumdrop = doc.createElementNS("http://www.w3.org/1999/xhtml", "div");
+    gumdrop.appendChild(doc.createTextNode('edit'));
+    gumdrop.style.backgroundColor  = '#24c';
+    gumdrop.style.color            = '#fff';
+    gumdrop.style.direction        = 'ltr';
+    gumdrop.style.border           = 'solid red 1px';
+    gumdrop.style.font             = 'normal normal normal 10px/normal sans-serif';
+    gumdrop.style.textIndent       = '0px';
+    gumdrop.style.textTransform    = 'none';
+    gumdrop.style.textAlign        = 'center';
+    gumdrop.style.cursor           = 'pointer';
+    gumdrop.style.padding          = '0px';
+    gumdrop.style.display          = 'block';
+    gumdrop.style.position         = 'relative';
+    gumdrop.style.width            = '2em';
+    gumdrop.style.MozBorderRadius  = '8px';
+    gumdrop.style.zIndex           = 65535;
+    gumdrop.style.MozOpacity       = "0.7";
+    gumdrop.title                  = "It's All Text"
+
+    // This doesn't seem to work because it's not privelidged enough to get
+    // to the chrome.
+    // var gumdrop = doc.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "image");
+    // gumdrop.style.border     = 'none';
+    // gumdrop.style.position   = 'relative';
+    // gumdrop.src              = 'chrome://itsalltext/chrome/content/gumdrop.png';
+    // gumdrop.alt              = 'edit';
+
+    //gumdrop.style.paddingLeft = node.offsetWidth + "px";
+    // Click event handler
+    gumdrop.addEventListener("click", function(){cache_object.edit();}, false);
+
+    // Insert gumdrop into the document
+    //gumdrop.style.display = "none";
+    var nextSibling = node.nextSibling;
+    if (nextSibling) {
+      node.parentNode.insertBefore(gumdrop, node.nextSibling);
+    } else {
+      node.parentNode.appendChild(gumdrop);
+    }
+
+    // Position it correctly.
+    gumdrop.style.marginTop        = '-' + (gumdrop.offsetHeight-1)+'px';
+    gumdrop.style.marginLeft       = (node.offsetWidth-gumdrop.offsetWidth+1)+'px';
   };
 
   /**
@@ -504,7 +569,7 @@ function ItsAllTextOverlay() {
       doc.ItsAllText_CronJobID = id;
     }
 
-    //that.log('onDOMContentLoad: start',id);
+    that.debug('onDOMContentLoad: start',id);
     var lasttime = new Date().valueOf();
 
     /**
@@ -521,10 +586,7 @@ function ItsAllTextOverlay() {
     };
     cronjob();
 
-    /*
-      TODO: !! edit should be a gumdrop floating above a textarea corner.
-    */
-    //that.log('onDOMContentLoad: done',id);
+    that.debug('onDOMContentLoad: done',id);
     return;
   };
 
