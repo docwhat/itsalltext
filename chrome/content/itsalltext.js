@@ -57,13 +57,27 @@ function hashString(some_string) {
 }
 
 function ItsAllTextOverlay() {
-  /* This data is all private, which prevents security problems and it
+  /**
+   * This data is all private, which prevents security problems and it
    * prevents clutter and collection.
+   * @type Object
    */
   var that = this;
+  /**
+   * This holds a cache of all the textareas that we are watching.
+   * @type Hash
+   */
   var cache = {};
+  /**
+   * Keeps track of all the refreshes we are running.
+   * @type Array
+   */
   var cron = [null]; // Eat the 0th position
 
+  /**
+   * A constant, a string used for things like the preferences.
+   * @type String
+   */
   var MYSTRING = 'itsalltext';
 
   /**
@@ -79,6 +93,11 @@ function ItsAllTextOverlay() {
     consoleService.logStringMessage("ItsAllTextOverlay: " + args.join(' '));
   };
 
+  /**
+   * Displays debug information, if debugging is turned on.
+   * Requires Firebug.
+   * @param Object message One or more objects can be passed in to display.
+   */
   that.debug = function() {
     if (that.preferences.data.debug) {
       try { return Firebug.Console.logFormatted(arguments); } 
@@ -93,6 +112,10 @@ function ItsAllTextOverlay() {
     return obj;
   };
 
+  /**
+   * Returns the directory where we put files to edit.
+   * @returns nsILocalFile The location where we should write editable files.
+   */
   that.getEditDir = function() {
     /* Where is the directory that we use. */
     var fobj = Components.classes["@mozilla.org/file/directory_service;1"].
@@ -109,6 +132,9 @@ function ItsAllTextOverlay() {
     return fobj;
   };
 
+  /**
+   * Cleans out the edit directory, deleting all files.
+   */
   that.cleanEditDir = function() {
     var fobj = that.getEditDir();
     //return dir.directoryEntries;
@@ -233,7 +259,7 @@ function ItsAllTextOverlay() {
    */
   that.getDebug = function() {
     return that.preferences.data.debug;
-  }
+  };
 
   /**
    * A Cache object is used to manage the node and the file behind it.

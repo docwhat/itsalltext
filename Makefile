@@ -30,7 +30,7 @@ SOURCES=$(shell find . \
 VERSION=$(shell grep '<em:version>' install.rdf| perl -p -e 's!.*<em:version>\s*([^<]*)\s*</em:version>.*!$$1!;')
 SOURCES_JS=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
 
-XPI_FILE=../itsalltext.xpi
+XPI_FILE=../itsalltext-$(VERSION).xpi
 
 ifeq ($(VERBOSE),1)
 	Q =
@@ -38,11 +38,15 @@ else
 	Q = @
 endif
 
-all: jslint docs xpi
+all: jslint docs
 	$(Q)echo done
 
-.PHONY: xpi
-xpi: jslint $(XPI_FILE)
+.PHONY: release
+release: jslint version_check $(XPI_FILE)
+
+.PHONY: version_check
+version_check:
+	$(Q)echo "Version is $(VERSION)"
 
 %.xpi: $(SOURCES)
 	$(Q)echo Creating $@ ...
@@ -80,4 +84,8 @@ narf:
 
 .PHONY: clean
 clean:
-	$(Q)rm -rf $(XPI_FILE) *.log docs
+	$(Q)rm -rf $(XPI_FILE) *.log
+
+.PHONY: realclean
+realclean: clean
+	$(Q)rm -rf ../itsalltext*.xpi docs
