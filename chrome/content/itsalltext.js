@@ -271,6 +271,7 @@ function ItsAllTextOverlay() {
     self.timestamp = 0;
     self.size = 0;
     self.node = node;
+    self.button = null;
 
     self.uid = hashString([ node.ownerDocument.URL,
                             Math.random(),
@@ -498,12 +499,8 @@ function ItsAllTextOverlay() {
    * @param {Object} cache_object The Cache Object that contains the node.
    */
   that.addGumDrop = function(cache_object) {
+    if (cache_object.button !== null) { return; /*already done*/ }
     that.debug('addGumDrop',cache_object);
-    if (cache_object._is_gummed) {
-      return; // we did it already
-    }
-    // So we don't gum it again.
-    cache_object._is_gummed = true;
 
     var node = cache_object.node;
     var doc = node.ownerDocument;
@@ -512,6 +509,7 @@ function ItsAllTextOverlay() {
 
     var gumdrop = doc.createElementNS("http://www.w3.org/1999/xhtml", "div");
     gumdrop.appendChild(doc.createTextNode('edit'));
+    cache_object.button = gumdrop; // Store it for easy finding in the future.
     gumdrop.style.backgroundColor  = '#24c';
     gumdrop.style.color            = '#fff';
     gumdrop.style.direction        = 'ltr';
@@ -528,7 +526,7 @@ function ItsAllTextOverlay() {
     gumdrop.style.MozBorderRadius  = '8px';
     gumdrop.style.zIndex           = 65535;
     gumdrop.style.MozOpacity       = "0.7";
-    gumdrop.title                  = "It's All Text"
+    gumdrop.title                  = "It's All Text";
 
     // This doesn't seem to work because it's not privelidged enough to get
     // to the chrome.
@@ -539,8 +537,16 @@ function ItsAllTextOverlay() {
     // gumdrop.alt              = 'edit';
 
     //gumdrop.style.paddingLeft = node.offsetWidth + "px";
+
+    var onEditClick = function(event) {
+      ////event.target.showPopup();
+      //var menu = document.getElementById('its-all-text-menu');
+      //menu.showPopup(cache_object.node,-1,-1,'context');
+      cache_object.edit();
+    };
+
     // Click event handler
-    gumdrop.addEventListener("click", function(){cache_object.edit();}, false);
+    gumdrop.addEventListener("click", onEditClick, false);
 
     // Insert gumdrop into the document
     //gumdrop.style.display = "none";
