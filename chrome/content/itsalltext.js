@@ -243,8 +243,8 @@ function ItsAllTextOverlay() {
     var editor = that.preferences.data.editor;
 
     // TODO: The prefereces dialog should have a filepicker.
-    // TODO: !! If the editor fails, we should open preferences.
-    // TODO: !! MacOSX, we should allow for "open -a <app> <file>".
+    // TODO: If the editor fails, we should open preferences. (!)
+    // TODO: MacOSX: add support for "open -a <app> <file>". (!)
 
     // create an nsILocalFile for the executable
     var file = Components.
@@ -279,7 +279,7 @@ function ItsAllTextOverlay() {
                             Math.random(),
                             node.getAttribute("name") ].join(':'));
 
-    // TODO: !! We should have a menu that lets the user pick the extension.
+    // TODO: We should have a menu that lets the user pick the extension. (!)
     self.filename = hashString([ node.ownerDocument.URL,
                                  node.getAttribute("name") ].join(':')) +
       '.txt';
@@ -290,7 +290,7 @@ function ItsAllTextOverlay() {
     /* Since the hash is supposed to be equally distributed, it shouldn't
      * matter how we slice it.  However, this does make it less unique.
      */
-    // TODO: add hash collision detection using the raw key.
+    // TODO: Detect collisions using the raw key.
     self.filename = self.filename.slice(0,15) + '.txt';
 
     var editdir = that.getEditDir();
@@ -440,8 +440,7 @@ function ItsAllTextOverlay() {
  
   }
 
-  // TODO: tempdir should be a preference.
-  // TODO: tempdir should be a method that makes sure it exists.
+  // TODO: Profiling and optimization.
 
   /**
    * Returns a cache object
@@ -483,7 +482,11 @@ function ItsAllTextOverlay() {
     that.addGumDrop(cobj);
   };
 
-  // TODO: Refresh when text area is clicked on or something like that.
+  // TODO: If the textarea is focused, we should refresh it.
+  // TODO: When the editor quits, we should refresh the textarea.
+  // TODO: IDEA - support for input elements as well?
+  // TODO: Remove debugging/narf code.
+
   /**
    * Refresh Document.
    * @param {Object} doc The document to refresh.
