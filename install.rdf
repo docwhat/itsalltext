@@ -11,8 +11,9 @@
     <!-- Front End Metadata -->
     <em:name>It's All Text!</em:name>
     <em:description>
-      Edit text and view source using your favorite editor!
+      Edit text using your favorite editor!
     </em:description>
+    <em:homepageURL>http://addons.mozilla.org/firefox/4125</em:homepageURL>
     <em:optionsURL>chrome://itsalltext/content/options.xul</em:optionsURL>
     <em:iconURL>chrome://itsalltext/content/icon.png</em:iconURL>
     <em:aboutURL>chrome://itsalltext/content/about.xul</em:aboutURL>
