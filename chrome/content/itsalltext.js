@@ -492,6 +492,7 @@ function ItsAllTextOverlay() {
    * @param {Object} doc The document to refresh.
    */
   that.refreshDocument = function(doc) {
+    // TOOD: Confirm that we find textareas inside iframes and the like.
     //that.debug('refreshDocument()',doc.URL);
     var nodes = doc.getElementsByTagName('textarea');
     for(var i=0; i < nodes.length; i++) {
