@@ -68,6 +68,8 @@ function ItsAllTextOverlay() {
    * @type Hash
    */
   var cache = {};
+  // TODO: The cache should periodically be cleaned up.
+
   /**
    * Keeps track of all the refreshes we are running.
    * @type Array
