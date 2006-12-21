@@ -68,7 +68,7 @@ function ItsAllTextOverlay() {
    * @type Hash
    */
   var cache = {};
-  // TODO: The cache should periodically be cleaned up.
+  // @todo The cache should periodically be cleaned up.
 
   /**
    * Keeps track of all the refreshes we are running.
@@ -242,9 +242,9 @@ function ItsAllTextOverlay() {
   that.getEditor = function() {
     var editor = that.preferences.data.editor;
 
-    // TODO: The prefereces dialog should have a filepicker.
-    // TODO: If the editor fails, we should open preferences. (!)
-    // TODO: MacOSX: add support for "open -a <app> <file>". (!)
+    // @todo The prefereces dialog should have a filepicker.
+    // @todo If the editor fails, we should open preferences. (!)
+    // @todo MacOSX: add support for "open -a <app> <file>". (!)
 
     // create an nsILocalFile for the executable
     var file = Components.
@@ -279,7 +279,7 @@ function ItsAllTextOverlay() {
                             Math.random(),
                             node.getAttribute("name") ].join(':'));
 
-    // TODO: We should have a menu that lets the user pick the extension. (!)
+    // @todo We should have a menu that lets the user pick the extension. (!)
     self.filename = hashString([ node.ownerDocument.URL,
                                  node.getAttribute("name") ].join(':')) +
       '.txt';
@@ -290,7 +290,7 @@ function ItsAllTextOverlay() {
     /* Since the hash is supposed to be equally distributed, it shouldn't
      * matter how we slice it.  However, this does make it less unique.
      */
-    // TODO: Detect collisions using the raw key.
+    // @todo Detect collisions using the raw key.
     self.filename = self.filename.slice(0,15) + '.txt';
 
     var editdir = that.getEditDir();
@@ -428,6 +428,7 @@ function ItsAllTextOverlay() {
      * @returns {boolean} Returns true ifthe file changed.
      */
     self.update = function() {
+      // @todo This should really use something like YFT.
       if (self.hasChanged()) {
         var value = self.read();
         if (value !== null) {
@@ -440,7 +441,7 @@ function ItsAllTextOverlay() {
  
   }
 
-  // TODO: Profiling and optimization.
+  // @todo Profiling and optimization.
 
   /**
    * Returns a cache object
@@ -482,17 +483,17 @@ function ItsAllTextOverlay() {
     that.addGumDrop(cobj);
   };
 
-  // TODO: If the textarea is focused, we should refresh it.
-  // TODO: When the editor quits, we should refresh the textarea.
-  // TODO: IDEA - support for input elements as well?
-  // TODO: Remove debugging/narf code.
+  // @todo If the textarea is focused, we should refresh it.
+  // @todo When the editor quits, we should refresh the textarea.
+  // @todo IDEA - support for input elements as well?
+  // @todo Remove debugging/narf code.
 
   /**
    * Refresh Document.
    * @param {Object} doc The document to refresh.
    */
   that.refreshDocument = function(doc) {
-    // TOOD: Confirm that we find textareas inside iframes and the like.
+    // @todo Confirm that we find textareas inside iframes and the like.
     //that.debug('refreshDocument()',doc.URL);
     var nodes = doc.getElementsByTagName('textarea');
     for(var i=0; i < nodes.length; i++) {

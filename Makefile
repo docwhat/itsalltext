@@ -77,7 +77,7 @@ jslint.log: $(SOURCES_JS)
 .PHONY: todo
 todo:
 	$(Q)echo "ToDo List:"
-	$(Q)grep -hr 'TODO' [a-z0-9]* | perl -p -e 's!^[ /*\t]+todo:?\s*! * !i;'
+	$(Q)grep -hr '@todo' [a-z0-9]* | perl -p -e 's!^[ /*\t]+\@todo:?\s*! * !i;'
 
 .PHONY: narf
 narf:
