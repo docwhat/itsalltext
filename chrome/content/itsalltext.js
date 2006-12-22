@@ -348,6 +348,7 @@ function ItsAllTextOverlay() {
       }
     };
       
+    // @todo cool idea, pass in the line number to the editor
     self.edit = function() {
       if (self.node.nodeName != "TEXTAREA") { return; }
       var filename = self.write();
