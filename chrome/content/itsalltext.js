@@ -596,6 +596,10 @@ function ItsAllTextOverlay() {
         lasttime = new Date().valueOf();
         cron[id] = lasttime;
         setTimeout(cronjob, that.getRefresh());
+        /* @todo replace complicated setTimeout system with setinterval */
+        // example:
+        // var ourInterval = setInterval(functionhere, 1000);
+        // clearInterval(ourInterval);
       }
     };
     cronjob();
