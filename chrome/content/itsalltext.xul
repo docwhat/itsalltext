@@ -2,10 +2,21 @@
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="itsalltext.js"/>
+  <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
      <menuitem id="its-all-text-edit" label="It's All Text" 
                oncommand="itsAllTextOverlay.onEditNode(document.popupNode)"
                accesskey="i" />
   </popup>
-</overlay>
 
+  <popupset>
+    <menupopup id="its-all-text-menu">
+      <menuitem label="Cut"/>
+      <menuitem label="Copy"/>
+      <menuitem label="Paste"/>
+    </menupopup>
+  </popupset>
+</overlay>
+<!-- Local Variables: -->
+<!-- mode: xml -->
+<!-- End: -->

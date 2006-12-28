@@ -43,7 +43,7 @@ function hashString(some_string) {
   var hash = ch.finish(true);
   
   // return the two-digit hexadecimal code for a byte
-  toHexString = function(charCode) {
+  var toHexString = function(charCode) {
     return ("0" + charCode.toString(36)).slice(-2);
   };
   
@@ -429,7 +429,7 @@ function ItsAllTextOverlay() {
      * @returns {boolean} Returns true ifthe file changed.
      */
     self.update = function() {
-      // @todo This should really use something like YFT.
+      // @todo This should really use something like FTY.
       if (self.hasChanged()) {
         var value = self.read();
         if (value !== null) {
@@ -470,12 +470,14 @@ function ItsAllTextOverlay() {
     //that.debug('refreshNode():',cobj);
     if(!cobj) { return; }
 
-    if (that.getDebug()) {
+    if (that.getDebug() && cobj.button !== null) {
       if (!cobj._toggle) {
-        cobj.node.style.background = '#fed';
+        cobj.button.style.borderColor = 'yellow';
+        cobj.button.style.color       = 'yellow';
         cobj._toggle = true;
       } else {
-        cobj.node.style.background = '#def';
+        cobj.button.style.borderColor = 'red';
+        cobj.button.style.color       = 'white';
         cobj._toggle = false;
       }
     }
@@ -515,6 +517,7 @@ function ItsAllTextOverlay() {
     var offsetNode = node;
     if (!node.parentNode) { return; }
 
+    // @todo The gumdrop shouldn't alter the layout of the page.
     var gumdrop = doc.createElementNS("http://www.w3.org/1999/xhtml", "div");
     gumdrop.appendChild(doc.createTextNode('edit'));
     cache_object.button = gumdrop; // Store it for easy finding in the future.
@@ -577,34 +580,28 @@ function ItsAllTextOverlay() {
   that.onDOMContentLoad = function(event) {
     if (event.originalTarget.nodeName != "#document") { return; }
     var doc = event.originalTarget;
-    var id = cron[doc.ItsAllText_CronJobID];
-    if (!id) {
-      id = cron.push(null);
-      doc.ItsAllText_CronJobID = id;
+    function startswith(needle, haystack) {
+      needle   = needle.toString();
+      haystack = haystack.toString();
+      return haystack.substring(0,needle.length) == needle;
+    }
+    if (startswith('chrome://', doc.URL) ||
+        startswith('about:', doc.URL) ) {
+      return; // Ignore these URLs
     }
 
-    that.debug('onDOMContentLoad: start',id);
-    var lasttime = new Date().valueOf();
-
-    /**
-     * This sets up the autorefresh for a given page.
-     */
-    var cronjob = function () {
-      var last = cron[id];
-      if(!last || last == lasttime) {
+    var id = null;
+    that.refreshDocument(doc);
+    id = setInterval(function() {
+      if (doc) {
+        that.debug('document %s %o "%s"', id, doc, doc.URL);
         that.refreshDocument(doc);
-        lasttime = new Date().valueOf();
-        cron[id] = lasttime;
-        setTimeout(cronjob, that.getRefresh());
-        /* @todo replace complicated setTimeout system with setinterval */
-        // example:
-        // var ourInterval = setInterval(functionhere, 1000);
-        // clearInterval(ourInterval);
+      } else {
+        that.debug('document %s (cancelled)', id);
+        clearInterval(id);
       }
-    };
-    cronjob();
+    }, that.getRefresh());
 
-    that.debug('onDOMContentLoad: done',id);
     return;
   };
 
