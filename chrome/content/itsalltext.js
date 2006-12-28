@@ -593,7 +593,7 @@ function ItsAllTextOverlay() {
     var id = null;
     that.refreshDocument(doc);
     id = setInterval(function() {
-      if (doc) {
+      if (doc.location) {
         that.debug('document %s %o "%s"', id, doc, doc.URL);
         that.refreshDocument(doc);
       } else {
