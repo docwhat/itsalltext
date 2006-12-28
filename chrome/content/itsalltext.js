@@ -68,7 +68,6 @@ function ItsAllTextOverlay() {
    * @type Hash
    */
   var cache = {};
-  // @todo The cache should periodically be cleaned up.
 
   /**
    * Keeps track of all the refreshes we are running.
@@ -462,6 +461,25 @@ function ItsAllTextOverlay() {
   };
 
   /**
+   * Cleans out all old cache objects.
+   */
+  that.cleanCacheObjs = function() {
+    var count = 0;
+    for(var id in cache) {
+      var cobj = cache[id];
+      if (cobj.node.ownerDocument.location === null) {
+        that.debug('cleaning %s', id);
+        delete cobj.node;
+        delete cobj.button;
+        delete cache[id];
+      } else {
+        count += 1;
+      }
+    }
+    that.debug('cache count: %s', count);
+  };
+
+  /**
    * Refresh Textarea.
    * @param {Object} node A specific textarea dom object to update.
    */
@@ -598,6 +616,7 @@ function ItsAllTextOverlay() {
         that.refreshDocument(doc);
       } else {
         that.debug('document %s (cancelled)', id);
+        that.cleanCacheObjs();
         clearInterval(id);
       }
     }, that.getRefresh());
