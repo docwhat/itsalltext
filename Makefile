@@ -43,6 +43,9 @@ all: jslint docs
 
 .PHONY: release
 release: jslint version_check $(XPI_FILE)
+	$(Q)echo "Don't forget to:"
+	$(Q)echo " * update changelog.txt"
+	$(Q)echo " * bump the version number"
 
 .PHONY: version_check
 version_check:
