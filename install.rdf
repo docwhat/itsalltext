@@ -5,7 +5,7 @@
   <Description about="urn:mozilla:install-manifest">
 
     <em:id>itsalltext@docwhat.gerf.org</em:id>
-	<em:version>0.2</em:version>
+	<em:version>0.3</em:version>
     <em:type>2</em:type>
 
     <!-- Front End Metadata -->
