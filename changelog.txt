@@ -1,3 +1,17 @@
+****** 0.3 ******
+Second release to addons.mozilla.org (first still not accepted).
+
+This version is still beta.
+
+Upon installation, go to Tools->Addons and select It's All Text and
+set the Preferences.  Specifically, you'll have to set the editor's
+full path.  A future version will automagically pop up preferences
+when you try to edit without an editor set.
+
+Note to Mac OS X users: You'll have to create a shell script to exec
+"open -a <your app> $*" so that it'll open correctly.  I haven't had
+time to research how to fix this, yet.
+
 ****** 0.2 ******
 First release to addons.
 
