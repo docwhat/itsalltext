@@ -559,9 +559,8 @@ function ItsAllTextOverlay() {
     gumdrop.style.MozOpacity       = "0.7";
     gumdrop.title                  = "It's All Text";
 
-    // This doesn't seem to work because it's not privelidged enough to get
-    // to the chrome.
-    // var gumdrop = doc.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "image");
+    // @todo try the gumdrop graphic again
+    // var gumdrop = doc.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "xul:image");
     // gumdrop.style.border     = 'none';
     // gumdrop.style.position   = 'relative';
     // gumdrop.src              = 'chrome://itsalltext/chrome/content/gumdrop.png';
