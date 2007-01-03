@@ -17,6 +17,8 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+// @todo Dropdown list for charsets, maybe utf-8, western-iso and the default one as least?
+
 /**
  * Creates a mostly unique hash of a string
  * Most of this code is from:
@@ -241,7 +243,7 @@ function ItsAllTextOverlay() {
   that.getEditor = function() {
     var editor = that.preferences.data.editor;
 
-    // @todo The prefereces dialog should have a filepicker.
+    // @todo The prefereces dialog should have a filepicker: http://developer.mozilla.org/en/docs/nsIFilePicker
     // @todo If the editor fails, we should open preferences. (!)
     // @todo MacOSX: add support for "open -a <app> <file>". (!)
 
