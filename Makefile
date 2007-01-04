@@ -27,7 +27,8 @@ SOURCES=$(shell find . \
        -not -name '.*' \
        -not -name '*~' \
 	   -print)
-VERSION=$(shell grep '<em:version>' install.rdf| perl -p -e 's!.*<em:version>\s*([^<]*)\s*</em:version>.*!$$1!;')
+#VERSION=$(shell grep '<em:version>' install.rdf| perl -p -e 's!.*<em:version>\s*([^<]*)\s*</em:version>.*!$$1!;')
+VERSION=$(shell grep 'em:version=' install.rdf| perl -p -e 's!.*em:version\s*=\s*"([^"]*)".*!$$1!;')
 SOURCES_JS=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
 
 XPI_FILE=../itsalltext-$(VERSION).xpi
