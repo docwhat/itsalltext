@@ -4,6 +4,8 @@
 <prefwindow id="itsalltext-prefs"
      title="It's All Text Preferences"
      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<script type="application/x-javascript" src="preferences.js"/>
  
 <prefpane id="itsalltext-pane" label="It's All Text Preferences">
   <preferences>
@@ -21,6 +23,7 @@
     <hbox align="right">
       <label control="editor" value="Editor (needs full path): "/>
       <textbox preference="pref_editor" id="editor" size="20"/>
+      <button oncommand="pref_editor_select();"><description>Browse</description></button>
     </hbox>
     <hbox align="right">
       <label control="seconds" value="Seconds between refreshing: "/>

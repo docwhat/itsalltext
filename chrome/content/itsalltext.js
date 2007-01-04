@@ -108,13 +108,6 @@ function ItsAllTextOverlay() {
     }
   };
 
-  var makeLocalFile = function(path) {
-    var obj = Components.classes["@mozilla.org/file/local;1"].
-      createInstance(Components.interfaces.nsILocalFile);
-    obj.initWithPath(path);
-    return obj;
-  };
-
   /**
    * Returns the directory where we put files to edit.
    * @returns nsILocalFile The location where we should write editable files.
@@ -242,10 +235,6 @@ function ItsAllTextOverlay() {
    */
   that.getEditor = function() {
     var editor = that.preferences.data.editor;
-
-    // @todo The prefereces dialog should have a filepicker: http://developer.mozilla.org/en/docs/nsIFilePicker
-    // @todo If the editor fails, we should open preferences. (!)
-    // @todo MacOSX: add support for "open -a <app> <file>". (!)
 
     // create an nsILocalFile for the executable
     var file = Components.

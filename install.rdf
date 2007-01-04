@@ -1,35 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
-
-  <Description about="urn:mozilla:install-manifest">
-
-    <em:id>itsalltext@docwhat.gerf.org</em:id>
-	<em:version>0.3</em:version>
-    <em:type>2</em:type>
-
-    <!-- Front End Metadata -->
-    <em:name>It's All Text!</em:name>
-    <em:description>
-      Edit text using your favorite editor!
-    </em:description>
-    <em:homepageURL>http://addons.mozilla.org/firefox/4125</em:homepageURL>
-    <em:optionsURL>chrome://itsalltext/content/options.xul</em:optionsURL>
-    <em:iconURL>chrome://itsalltext/content/icon.png</em:iconURL>
-    <em:aboutURL>chrome://itsalltext/content/about.xul</em:aboutURL>
-
-    <!-- Author and Contributors -->
-    <em:creator>Christian Höltje</em:creator>
-    <!-- <em:contributor></em:contributor> -->
-
-    <!-- Firefox -->
-    <em:targetApplication>
-      <Description>
-         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-         <em:minVersion>1.5</em:minVersion>
-         <em:maxVersion>2.0.0.*</em:maxVersion>
-       </Description>
-	</em:targetApplication>
-  </Description>
-
-</RDF>
+<?xml version="1.0"?>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="rdf:#$dlkc22"
+                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   em:minVersion="1.5"
+                   em:maxVersion="2.0.0.*" />
+  <RDF:Description RDF:about="urn:mozilla:install-manifest"
+                   em:id="itsalltext@docwhat.gerf.org"
+                   em:version="0.3.1"
+                   em:type="2"
+                   em:name="It's All Text!"
+                   em:description="Edit text using your favorite editor!"
+                   em:homepageURL="http://addons.mozilla.org/firefox/4125"
+                   em:optionsURL="chrome://itsalltext/content/preferences.xul"
+                   em:iconURL="chrome://itsalltext/content/icon.png"
+                   em:aboutURL="chrome://itsalltext/content/about.xul"
+                   em:creator="Christian Höltje">
+    <em:targetApplication RDF:resource="rdf:#$dlkc22"/>
+  </RDF:Description>
+</RDF:RDF>
