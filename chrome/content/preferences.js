@@ -17,9 +17,13 @@ function pref_editor_select() {
 
   var initdir = Components.classes["@mozilla.org/file/local;1"].
     createInstance(Components.interfaces.nsILocalFile);
-  initdir.initWithPath('/usr/bin');
-  if (initdir.exists() && initdir.isDirectory()) {
-    fp.displayDirectory = initdir;
+  try {
+    initdir.initWithPath('/usr/bin');
+    if (initdir.exists() && initdir.isDirectory()) {
+      fp.displayDirectory = initdir;
+    }
+  } catch(e) {
+    // Ignore error - /usr/bin only useful for unix boxen.
   }
   
   var rv = fp.show();
