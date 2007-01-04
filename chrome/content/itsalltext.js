@@ -504,15 +504,14 @@ function ItsAllTextOverlay() {
     if(!cobj) { return; }
 
     if (that.getDebug() && cobj.button !== null) {
-      if (!cobj._toggle) {
-        cobj.button.style.borderColor = 'yellow';
-        cobj.button.style.color       = 'yellow';
-        cobj._toggle = true;
+      var opacity = parseFloat(cobj.button.style.opacity);
+      
+      if (opacity > 0.7 || opacity <= 0) {
+        opacity = 0.4;
       } else {
-        cobj.button.style.borderColor = 'red';
-        cobj.button.style.color       = 'white';
-        cobj._toggle = false;
+        opacity += 0.12;
       }
+      cobj.button.style.opacity = opacity;
     }
 
     cobj.update();
@@ -551,45 +550,17 @@ function ItsAllTextOverlay() {
     if (!node.parentNode) { return; }
 
     // @todo The gumdrop shouldn't alter the layout of the page.
-    var gumdrop = doc.createElementNS("http://www.w3.org/1999/xhtml", "div");
-    gumdrop.appendChild(doc.createTextNode('edit'));
+    //var gumdrop = doc.createElementNS("http://www.w3.org/1999/xhtml", "div");
+    //gumdrop.appendChild(doc.createTextNode('edit'));
+    var XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+    var gumdrop = doc.createElementNS(XULNS, "xul:image");
+    //gumdrop.setAttribute('label', "edit");
+    gumdrop.setAttribute('src', 'chrome://itsalltext/content/gumdrop.png');
+    gumdrop.setAttribute('tooltipText', "It's All Text!");
     cache_object.button = gumdrop; // Store it for easy finding in the future.
-    gumdrop.style.backgroundColor  = '#24c';
-    gumdrop.style.color            = '#fff';
-    gumdrop.style.direction        = 'ltr';
-    gumdrop.style.border           = 'solid red 1px';
-    gumdrop.style.font             = 'normal normal normal 10px/normal sans-serif';
-    gumdrop.style.textIndent       = '0px';
-    gumdrop.style.textTransform    = 'none';
-    gumdrop.style.textAlign        = 'center';
-    gumdrop.style.cursor           = 'pointer';
-    gumdrop.style.padding          = '0px';
-    gumdrop.style.display          = 'block';
-    gumdrop.style.position         = 'relative';
-    gumdrop.style.width            = '2em';
-    gumdrop.style.MozBorderRadius  = '8px';
-    gumdrop.style.zIndex           = 65535;
-    gumdrop.style.MozOpacity       = "0.7";
-    gumdrop.title                  = "It's All Text";
-
-    // @todo try the gumdrop graphic again
-    // var gumdrop = doc.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "xul:image");
-    // gumdrop.style.border     = 'none';
-    // gumdrop.style.position   = 'relative';
-    // gumdrop.src              = 'chrome://itsalltext/chrome/content/gumdrop.png';
-    // gumdrop.alt              = 'edit';
-
-    //gumdrop.style.paddingLeft = node.offsetWidth + "px";
-
-    var onEditClick = function(event) {
-      ////event.target.showPopup();
-      //var menu = document.getElementById('its-all-text-menu');
-      //menu.showPopup(cache_object.node,-1,-1,'context');
-      cache_object.edit();
-    };
 
     // Click event handler
-    gumdrop.addEventListener("click", onEditClick, false);
+    gumdrop.addEventListener("click", function(ev){cache_object.edit();}, false);
 
     // @todo gumdrop placement is horrible.  Obscures scroll bars.
     // Insert gumdrop into the document
@@ -602,8 +573,13 @@ function ItsAllTextOverlay() {
     }
 
     // Position it correctly.
-    gumdrop.style.marginTop        = '-' + (gumdrop.offsetHeight-1)+'px';
-    gumdrop.style.marginLeft       = (node.offsetWidth-gumdrop.offsetWidth+1)+'px';
+    gumdrop.setAttribute('style', 
+                         ['opacity: 0.5;',
+                          'position: relative;',
+                          'right: 30px;',//@todo gumdrop width is hardcoded. :-(
+                          'bottom: 0px;',
+                          'padding: 0;',
+                          'zIndex: 65534;'].join(''));
   };
 
   /**
