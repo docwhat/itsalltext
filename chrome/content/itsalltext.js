@@ -567,6 +567,7 @@ function ItsAllTextOverlay() {
     // Click event handler
     gumdrop.addEventListener("click", onEditClick, false);
 
+    // @todo gumdrop placement is horrible.  Obscures scroll bars.
     // Insert gumdrop into the document
     //gumdrop.style.display = "none";
     var nextSibling = node.nextSibling;
