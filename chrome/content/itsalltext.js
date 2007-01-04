@@ -264,6 +264,7 @@ function ItsAllTextOverlay() {
     self.size = 0;
     self.node = node;
     self.button = null;
+    self.initial_color = 'transparent';
 
     self.uid = hashString([ node.ownerDocument.URL,
                             Math.random(),
@@ -331,6 +332,11 @@ function ItsAllTextOverlay() {
         var text = conv.ConvertFromUnicode(self.node.value);
         foStream.write(text, text.length);
         foStream.close();
+
+        /* Reset Timestamp and filesize, to prevent a spurious refresh */
+        self.timestamp = self.file.lastModifiedTime;
+        self.size      = self.file.fileSize;
+
         return self.file.path;
       } catch(e) {
         that.debug('write',self.file.path,e);
@@ -342,6 +348,7 @@ function ItsAllTextOverlay() {
     self.edit = function() {
       if (self.node.nodeName != "TEXTAREA") { return; }
       var filename = self.write();
+      self.initial_color = self.node.style.backgroundColor;
       try {
         var program = that.getEditor();
 
@@ -414,6 +421,22 @@ function ItsAllTextOverlay() {
       }
     };
 
+    fadeStep = function(pallet, step, delay) {
+      return function() {
+		if (step < pallet.length) {
+          self.node.style.backgroundColor = pallet[step++].hex();
+          setTimeout(fadeStep(pallet, step, delay),delay);
+		}
+      };
+    };
+      
+    fade = function(steps, delay) {
+      var colEnd = new Color(self.initial_color);
+      var colStart = new Color('yellow');//colEnd.invert();
+      var pallet = colStart.blend(colEnd, steps);
+      setTimeout(fadeStep(pallet, 0, delay), delay);
+    };
+
     /**
      * Update the node from the file.
      * @returns {boolean} Returns true ifthe file changed.
@@ -423,6 +446,7 @@ function ItsAllTextOverlay() {
       if (self.hasChanged()) {
         var value = self.read();
         if (value !== null) {
+          fade(15, 100);
           self.node.value = value;
           return true;
         }
