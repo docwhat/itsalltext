@@ -6,9 +6,7 @@
 /**
  * Open a filepicker to select the value of the editor.
  */
-function pref_editor_select() {
-  var tb = document.getElementById('editor');
-  
+function pref_editor_select() {  
   // Note: If jslint could, we'd use const here
   var nsIFilePicker = Components.interfaces.nsIFilePicker;
  
@@ -27,6 +25,7 @@ function pref_editor_select() {
   var rv = fp.show();
   if (rv == nsIFilePicker.returnOK) {
     var file = fp.file;
-    tb.value = file.path;
+    var pref_editor = document.getElementById('pref_editor');
+    pref_editor.value = file.path;
   }
 }
