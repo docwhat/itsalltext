@@ -60,7 +60,7 @@ version_check:
 docs: $(SOURCES_JS)
 	$(Q)echo Creating $@ ...
 	$(Q)jsdoc --directory "$@" \
-	--project-name "It's All Text" \
+	--project-name "It's All Text - A Firefox Extension" \
 	--logo chrome/content/icon.png \
 	--package-naming \
 	--private \
