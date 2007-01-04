@@ -9,7 +9,8 @@
 function pref_editor_select() {
   var tb = document.getElementById('editor');
   
-  const nsIFilePicker = Components.interfaces.nsIFilePicker;
+  // Note: If jslint could, we'd use const here
+  var nsIFilePicker = Components.interfaces.nsIFilePicker;
  
   var fp = Components.classes["@mozilla.org/filepicker;1"].
     createInstance(nsIFilePicker);
