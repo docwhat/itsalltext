@@ -15,7 +15,7 @@ function pref_editor_select() {
   var fp = Components.classes["@mozilla.org/filepicker;1"].
     createInstance(nsIFilePicker);
   fp.init(window, "Choose your editor", nsIFilePicker.modeOpen);
-  fp.appendFilters(nsIFilePicker.filterAll | nsIFilePicker.filterApps);
+  fp.appendFilters(nsIFilePicker.filterApps);
 
   var initdir = Components.classes["@mozilla.org/file/local;1"].
     createInstance(Components.interfaces.nsILocalFile);

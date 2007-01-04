@@ -23,7 +23,7 @@
     <hbox align="right">
       <label control="editor" value="Editor (needs full path): "/>
       <textbox preference="pref_editor" id="editor" size="20"/>
-      <button oncommand="pref_editor_select();"><description>Browse</description></button>
+      <button oncommand="pref_editor_select();" label="Browse" accesskey="b"/>
     </hbox>
     <hbox align="right">
       <label control="seconds" value="Seconds between refreshing: "/>
