@@ -1,7 +1,5 @@
-// @todo The prefereces dialog should have a filepicker: http://developer.mozilla.org/en/docs/nsIFilePicker
 // @todo If the editor fails, we should open preferences. (!)
 // @todo MacOSX: add support for "open -a <app> <file>". (!)
-
 
 /**
  * Open a filepicker to select the value of the editor.
