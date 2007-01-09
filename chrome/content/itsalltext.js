@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// @todo Dropdown list for charsets, maybe utf-8, western-iso and the default one as least?
+// @todo [idea] dropdown list for charsets (utf-8, western-iso, default)
 
 /**
  * Creates a mostly unique hash of a string
@@ -270,7 +270,6 @@ function ItsAllTextOverlay() {
                             Math.random(),
                             node.getAttribute("name") ].join(':'));
 
-    // @todo We should have a menu that lets the user pick the extension. (!)
     self.filename = hashString([ node.ownerDocument.URL,
                                  node.getAttribute("name") ].join(':')) +
       '.txt';
@@ -282,6 +281,7 @@ function ItsAllTextOverlay() {
      * matter how we slice it.  However, this does make it less unique.
      */
     // @todo Detect collisions using the raw key.
+    // @todo Figure out what's up with collection-configure-converting.
     self.filename = self.filename.slice(0,15) + '.txt';
 
     var editdir = that.getEditDir();
@@ -344,7 +344,9 @@ function ItsAllTextOverlay() {
       }
     };
       
-    // @todo cool idea, pass in the line number to the editor
+    // @todo [idea] pass in the line number to the editor
+    // @todo [high] If the editor fails, we should open preferences.
+    // @todo [high] On edit, let user pick extension.
     self.edit = function() {
       if (self.node.nodeName != "TEXTAREA") { return; }
       var filename = self.write();
@@ -442,7 +444,6 @@ function ItsAllTextOverlay() {
      * @returns {boolean} Returns true ifthe file changed.
      */
     self.update = function() {
-      // @todo This should really use something like FTY.
       if (self.hasChanged()) {
         var value = self.read();
         if (value !== null) {
@@ -531,9 +532,8 @@ function ItsAllTextOverlay() {
   };
 
   // @todo If the textarea is focused, we should refresh it.
-  // @todo When the editor quits, we should refresh the textarea.
-  // @todo IDEA - support for input elements as well?
-  // @todo Remove debugging/narf code.
+  // @todo [low] When the editor quits, we should refresh the textarea.
+  // @todo [idea] support for input elements as well?
 
   /**
    * Refresh Document.
