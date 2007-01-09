@@ -27,5 +27,27 @@ function pref_editor_select() {
     var file = fp.file;
     var pref_editor = document.getElementById('pref_editor');
     pref_editor.value = file.path;
+    var editor = document.getElementById('editor');
+    editor.style.color = 'inherit';
+    editor.style.backgroundColor = 'inherit';
+  }
+}
+
+function setHelp(text) {
+    var help = document.getElementById('help');
+    while (help.firstChild) {
+      help.removeChild(help.firstChild);
+    }
+    var textnode = document.createTextNode(text);
+    help.appendChild(textnode);
+}
+
+function pref_onload() {
+  document.getElementById('browse').focus();
+  if (window.arguments && window.arguments[0] && window.arguments[0] == 'badeditor') {
+    var editor = document.getElementById('editor');
+    editor.style.color = 'black';
+    editor.style.backgroundColor = '#fb4';
+    setHelp("I was unable to run your editor, '"+editor.value+"'.  You the browse button to choose another editor and try again.");
   }
 }

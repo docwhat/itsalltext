@@ -4,7 +4,7 @@
 <prefwindow id="itsalltext-prefs"
      title="It's All Text Preferences"
      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-     onload="document.getElementById('browse').focus();">
+     onload="pref_onload();">
 
 <script type="application/x-javascript" src="preferences.js"/>
  
@@ -20,30 +20,36 @@
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
 
-  <vbox> 
-    <hbox align="right">
-      <label control="editor" value="Editor: "/>
-      <textbox preference="pref_editor" id="editor" size="20" readonly="false"
-       style="-moz-appearance: none !important; background: inherit !important;" />
-      <button oncommand="pref_editor_select();" label="Browse" id="browse"
-      accesskey="b" tabindex="1"/>
-    </hbox>
-    <hbox align="right">
-      <label control="seconds" value="Seconds between refreshing: "/>
-      <textbox preference="pref_seconds" id="seconds" size="2"
-      maxlength="2" tabindex="2"/>
-    </hbox>
-    <hbox align="right">
-      <label control="charset"
-             value="Character Set (default: UTF-8): "/>
-      <textbox preference="pref_charset" id="charset" size="8" tabindex="3"/>
-    </hbox>
-    <hbox align="right">
-      <label control="debug"
-             value="Enable Debugging: "/>
-      <checkbox preference="pref_debug" id="debug" tabindex="4"/>
-    </hbox>
-  </vbox>
+  <hbox>
+    <vbox> 
+      <hbox align="right">
+        <label control="editor" value="Editor: "/>
+        <textbox preference="pref_editor" id="editor" size="20" readonly="false"
+         style="-moz-appearance: none !important; background: inherit;" />
+        <button oncommand="pref_editor_select();" label="Browse" id="browse"
+        accesskey="b" tabindex="1"/>
+      </hbox>
+      <hbox align="right">
+        <label control="seconds" value="Seconds between refreshing: "/>
+        <textbox preference="pref_seconds" id="seconds" size="2"
+        maxlength="2" tabindex="2"/>
+      </hbox>
+      <hbox align="right">
+        <label control="charset"
+               value="Character Set (default: UTF-8): "/>
+        <textbox preference="pref_charset" id="charset" size="8" tabindex="3"/>
+      </hbox>
+      <hbox align="right">
+        <label control="debug"
+               value="Enable Debugging: "/>
+        <checkbox preference="pref_debug" id="debug" tabindex="4"/>
+      </hbox>
+    </vbox>
+    <vbox>
+      <description id="help" style="max-width: 15em;">
+      </description>
+    </vbox>
+  </hbox>
 </prefpane>
  
 </prefwindow>

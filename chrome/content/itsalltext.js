@@ -345,7 +345,6 @@ function ItsAllTextOverlay() {
     };
       
     // @todo [idea] pass in the line number to the editor
-    // @todo [high] If the editor fails, we should open preferences.
     // @todo [high] On edit, let user pick extension.
     self.edit = function() {
       if (self.node.nodeName != "TEXTAREA") { return; }
@@ -369,7 +368,10 @@ function ItsAllTextOverlay() {
         var result = {};
         process.run(false, args, args.length, result);
       } catch(e) {
-        that.debug('edit',filename,e);
+        window.openDialog('chrome://itsalltext/chrome/preferences.xul',
+                          "Preferences", 
+                          "chrome,titlebar,toolbar,centerscreen,modal",
+                          "badeditor");
       }
     };
 
