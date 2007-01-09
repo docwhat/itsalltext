@@ -39,11 +39,11 @@ else
 	Q = @
 endif
 
-all: jslint docs
+all: lint docs
 	$(Q)echo done
 
 .PHONY: release
-release: jslint version_check $(XPI_FILE)
+release: lint version_check $(XPI_FILE)
 	$(Q)echo "Don't forget to:"
 	$(Q)echo " * update changelog.txt"
 	$(Q)echo " * bump the version number"
@@ -66,16 +66,17 @@ docs: $(SOURCES_JS)
 	--private \
 	$(SOURCES_JS)
 
-.PHONY: jslint
-jslint: jslint.log
+.PHONY: lint
+lint: lint.log
 
-jslint.log: $(SOURCES_JS)
+lint.log: $(SOURCES_JS)
 	$(Q)echo Linting source ...
 	$(Q)for jsfile in $^; do echo "jslint: $${jsfile}" ; jslint $${jsfile}; done > "$@" 2>&1
 	$(Q)if [ `egrep -v '^jslint: ' "$@" | wc -l` -eq 0 ]; \
 	 then echo "  ... pass" ; \
 	 else touch --date='1972-01-01' "$@"; \
 	   echo "  ... there were $$(egrep '^Lint at line ' $@ | wc -l) errors."; \
+	   false ;\
 	 fi
 
 .PHONY: todo

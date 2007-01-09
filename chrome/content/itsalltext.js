@@ -453,6 +453,18 @@ function ItsAllTextOverlay() {
       }
       return false; // If we fall through, we 
     };
+
+    /**
+     * Updates the position of the gumdrop, incase the textarea shifts around.
+     */
+    self.adjust = function() {
+      var gumdrop  = self.button;
+      var n        = self.node;
+      var parent   = node.parentNode;
+      if (gumdrop === null || n === null || parent === null) { return; }
+      gumdrop.style.bottom  = '0px';
+      gumdrop.style.right   = (0-n.offsetWidth) + 'px';
+    };
  
   }
 
@@ -541,7 +553,10 @@ function ItsAllTextOverlay() {
    * @param {Object} cache_object The Cache Object that contains the node.
    */
   that.addGumDrop = function(cache_object) {
-    if (cache_object.button !== null) { return; /*already done*/ }
+    if (cache_object.button !== null) {
+      cache_object.adjust();
+      return; /*already done*/
+    }
     that.debug('addGumDrop',cache_object);
 
     var node = cache_object.node;
@@ -549,12 +564,8 @@ function ItsAllTextOverlay() {
     var offsetNode = node;
     if (!node.parentNode) { return; }
 
-    // @todo The gumdrop shouldn't alter the layout of the page.
-    //var gumdrop = doc.createElementNS("http://www.w3.org/1999/xhtml", "div");
-    //gumdrop.appendChild(doc.createTextNode('edit'));
-    var XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-    var gumdrop = doc.createElementNS(XULNS, "xul:image");
-    //gumdrop.setAttribute('label', "edit");
+    var XHTMLNS = "http://www.w3.org/1999/xhtml";
+    var gumdrop = doc.createElementNS(XHTMLNS, "img");
     gumdrop.setAttribute('src', 'chrome://itsalltext/content/gumdrop.png');
     gumdrop.setAttribute('tooltipText', "It's All Text!");
     cache_object.button = gumdrop; // Store it for easy finding in the future.
@@ -562,24 +573,28 @@ function ItsAllTextOverlay() {
     // Click event handler
     gumdrop.addEventListener("click", function(ev){cache_object.edit();}, false);
 
-    // @todo gumdrop placement is horrible.  Obscures scroll bars.
-    // Insert gumdrop into the document
-    //gumdrop.style.display = "none";
+    // Image Attributes
+    var width = 28; var height = 14;
+    gumdrop.style.opacity          = '0.5';
+    gumdrop.style.cursor           = 'pointer';
+    gumdrop.style.display          = 'block';
+    gumdrop.style.position         = 'relative';
+    gumdrop.style.padding          = '0';
+    gumdrop.style.border           = 'none';
+    gumdrop.style.zIndex           = 2147483647; //Max Int
+
+    gumdrop.style.width            = width+'px';
+    gumdrop.style.height           = height+'px';
+    gumdrop.style.margin           = ['-',height/2,'px -',width/2,'px'].join('');
+
+    // Insert it into the document
     var nextSibling = node.nextSibling;
     if (nextSibling) {
-      node.parentNode.insertBefore(gumdrop, node.nextSibling);
+      node.parentNode.insertBefore(gumdrop, nextSibling);
     } else {
       node.parentNode.appendChild(gumdrop);
     }
-
-    // Position it correctly.
-    gumdrop.setAttribute('style', 
-                         ['opacity: 0.5;',
-                          'position: relative;',
-                          'right: 30px;',//@todo gumdrop width is hardcoded. :-(
-                          'bottom: 0px;',
-                          'padding: 0;',
-                          'zIndex: 65534;'].join(''));
+    cache_object.adjust();
   };
 
   /**

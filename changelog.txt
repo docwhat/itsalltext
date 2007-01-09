@@ -10,6 +10,10 @@ Note to Mac OS X users: Most editors come with a component in
 strange, then create a shell script to do an "open -a /path/to/editor
 $*".
 
+****** 0.3.2 ******
+* Fixed browse button for windows
+* Added better icon based on the Foolish Dictionary's splash page
+* Pretty gumdrop!  It should also stay in place better.
 
 ****** 0.3.1 ******
 * Working browse button for choosing your editor.
