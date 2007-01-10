@@ -266,7 +266,7 @@ function ItsAllTextOverlay() {
         
       /* Get a serial that's unique to this document */
       var serial = doc.getAttribute(attr);
-      if (serial) { serial = parseInt(serial)+1;
+      if (serial) { serial = parseInt(serial, 10)+1;
       } else { serial = 1; }
       id = [MYSTRING,'generated_id',name,serial].join('_');
       doc.setAttribute(attr,serial);
