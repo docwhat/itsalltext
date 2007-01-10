@@ -254,6 +254,30 @@ function ItsAllTextOverlay() {
   };
 
   /**
+   * Returns a unique identifier for the node, within the document.
+   * @returns {String} the unique identifier.
+   */
+  that.getNodeIdentifier = function(node) {
+    // @todo getNodeIdentifier() - if result isn't unque enough, add id to node.
+    var name = node.getAttribute('name');
+    var id   = node.getAttribute('id');
+    if (id) {
+      return id;
+    } else {
+      return name;
+    }
+  };
+
+  /**
+   * Returns a unique identifier for the document.
+   * @returns {String} the unique identifier.
+   */
+  that.getDocumentIdentifier = function(doc) {
+    // @todo getDocumentIdentifier should sort arguments and append the post data.
+    return doc.URL;
+  };
+
+  /**
    * A Cache object is used to manage the node and the file behind it.
    * @constructor
    * @param {Object} node A DOM Node to watch.
@@ -266,12 +290,14 @@ function ItsAllTextOverlay() {
     self.button = null;
     self.initial_color = 'transparent';
 
-    self.uid = hashString([ node.ownerDocument.URL,
+    self.node_id = that.getNodeIdentifier(node);
+    self.doc_id  = that.getDocumentIdentifier(node.ownerDocument);
+    self.uid = hashString([ self.doc_id,
                             Math.random(),
-                            node.getAttribute("name") ].join(':'));
+                            self.node_id ].join(':'));
 
-    self.filename = hashString([ node.ownerDocument.URL,
-                                 node.getAttribute("name") ].join(':')) +
+    self.filename = hashString([ self.doc_id,
+                                 self.node_id ].join(':')) +
       '.txt';
 
     node.setAttribute(MYSTRING+'_UID', self.uid);
@@ -425,20 +451,31 @@ function ItsAllTextOverlay() {
       }
     };
 
-    fadeStep = function(pallet, step, delay) {
+    /**
+     * Part of the fading technique.
+     * @param {Object} pallet A Color blend pallet object.
+     * @param {int}    step   Size of a step.
+     * @param {delay}  delay  Delay in microseconds.
+     */
+    self.fadeStep = function(pallet, step, delay) {
       return function() {
 		if (step < pallet.length) {
           self.node.style.backgroundColor = pallet[step++].hex();
-          setTimeout(fadeStep(pallet, step, delay),delay);
+          setTimeout(self.fadeStep(pallet, step, delay),delay);
 		}
       };
     };
-      
-    fade = function(steps, delay) {
+
+    /**
+     * Node fade technique.
+     * @param {int} steps  Number of steps in the transition.
+     * @param {int} delay  How long to wait between delay (microseconds).
+     */
+    self.fade = function(steps, delay) {
       var colEnd = new Color(self.initial_color);
       var colStart = new Color('yellow');//colEnd.invert();
       var pallet = colStart.blend(colEnd, steps);
-      setTimeout(fadeStep(pallet, 0, delay), delay);
+      setTimeout(self.fadeStep(pallet, 0, delay), delay);
     };
 
     /**
@@ -449,7 +486,7 @@ function ItsAllTextOverlay() {
       if (self.hasChanged()) {
         var value = self.read();
         if (value !== null) {
-          fade(15, 100);
+          self.fade(15, 100);
           self.node.value = value;
           return true;
         }
@@ -569,7 +606,11 @@ function ItsAllTextOverlay() {
     var XHTMLNS = "http://www.w3.org/1999/xhtml";
     var gumdrop = doc.createElementNS(XHTMLNS, "img");
     gumdrop.setAttribute('src', 'chrome://itsalltext/content/gumdrop.png');
-    gumdrop.setAttribute('tooltipText', "It's All Text!");
+    if (this.getDebug()) {
+      gumdrop.setAttribute('title', cache_object.node_id);
+    } else {
+      gumdrop.setAttribute('title', "It's All Text!");
+    }
     cache_object.button = gumdrop; // Store it for easy finding in the future.
 
     // Click event handler
