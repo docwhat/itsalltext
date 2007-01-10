@@ -258,14 +258,22 @@ function ItsAllTextOverlay() {
    * @returns {String} the unique identifier.
    */
   that.getNodeIdentifier = function(node) {
-    // @todo getNodeIdentifier() - if result isn't unque enough, add id to node.
-    var name = node.getAttribute('name');
     var id   = node.getAttribute('id');
-    if (id) {
-      return id;
-    } else {
-      return name;
+    if (!id) {
+      var name = node.getAttribute('name');
+      var doc = node.ownerDocument.getElementsByTagName('html')[0];
+      var attr = MYSTRING+'_id_serial';
+        
+      /* Get a serial that's unique to this document */
+      var serial = doc.getAttribute(attr);
+      if (serial) { serial = parseInt(serial)+1;
+      } else { serial = 1; }
+      id = [MYSTRING,'generated_id',name,serial].join('_');
+      doc.setAttribute(attr,serial);
+      
+      node.setAttribute('id',id);
     }
+    return id;
   };
 
   /**
