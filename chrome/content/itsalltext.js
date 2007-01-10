@@ -596,6 +596,7 @@ function ItsAllTextOverlay() {
     } else {
       node.parentNode.appendChild(gumdrop);
     }
+    // @todo [idea] Have gumdrop fade in and out on mouseover
     cache_object.adjust();
   };
 
