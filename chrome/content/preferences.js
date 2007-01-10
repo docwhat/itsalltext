@@ -44,7 +44,7 @@ function setHelp(text) {
 
 function pref_onload() {
   document.getElementById('browse').focus();
-  if (window.arguments && window.arguments[0] && window.arguments[0] == 'badeditor') {
+  if (window['arguments'] && window['arguments'][0] && window['arguments'][0] == 'badeditor') {
     var editor = document.getElementById('editor');
     editor.style.color = 'black';
     editor.style.backgroundColor = '#fb4';
