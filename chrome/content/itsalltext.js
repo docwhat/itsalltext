@@ -315,7 +315,6 @@ function ItsAllTextOverlay() {
      * matter how we slice it.  However, this does make it less unique.
      */
     // @todo Detect collisions using the raw key.
-    // @todo Figure out what's up with collection-configure-converting.
     self.filename = self.filename.slice(0,15) + '.txt';
 
     var editdir = that.getEditDir();
@@ -587,7 +586,7 @@ function ItsAllTextOverlay() {
    * @param {Object} doc The document to refresh.
    */
   that.refreshDocument = function(doc) {
-    // @todo Confirm that we find textareas inside iframes and the like.
+    // @todo [high] Confirm that we find textareas inside iframes and frames.
     //that.debug('refreshDocument()',doc.URL);
     var nodes = doc.getElementsByTagName('textarea');
     for(var i=0; i < nodes.length; i++) {
