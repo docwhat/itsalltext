@@ -631,7 +631,7 @@ function ItsAllTextOverlay() {
     gumdrop.style.position         = 'relative';
     gumdrop.style.padding          = '0';
     gumdrop.style.border           = 'none';
-    gumdrop.style.zIndex           = 2147483647; //Max Int
+    gumdrop.style.zIndex           = 2147483646; // Max Int - 1
 
     gumdrop.style.width            = width+'px';
     gumdrop.style.height           = height+'px';
