@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// @todo [idea] dropdown list for charsets (utf-8, western-iso, default)
+// @todo [idea] dropdown list for charsets (utf-8, western-iso, default)?
 
 /**
  * Creates a mostly unique hash of a string
@@ -281,7 +281,7 @@ function ItsAllTextOverlay() {
    * @returns {String} the unique identifier.
    */
   that.getDocumentIdentifier = function(doc) {
-    // @todo getDocumentIdentifier should sort arguments and append the post data.
+    // @todo [low] getDocumentIdentifier should sort arguments and append the post data.
     return doc.URL;
   };
 
@@ -314,7 +314,7 @@ function ItsAllTextOverlay() {
     /* Since the hash is supposed to be equally distributed, it shouldn't
      * matter how we slice it.  However, this does make it less unique.
      */
-    // @todo Detect collisions using the raw key.
+    // @todo [security] Detect collisions using the raw key.
     self.filename = self.filename.slice(0,15) + '.txt';
 
     var editdir = that.getEditDir();
@@ -377,8 +377,9 @@ function ItsAllTextOverlay() {
       }
     };
       
-    // @todo [idea] pass in the line number to the editor
-    // @todo [high] On edit, let user pick extension.
+    // @todo [idea] Pass in the line number to the editor, arbitrary command?
+    // @todo [high] On edit, let user pick the file extension.
+    // @todo [idea] allow the user to pick an alternative editor?
     self.edit = function() {
       if (self.node.nodeName != "TEXTAREA") { return; }
       var filename = self.write();
@@ -515,7 +516,7 @@ function ItsAllTextOverlay() {
  
   }
 
-  // @todo Profiling and optimization.
+  // @todo [med] Profiling and optimization.
 
   /**
    * Returns a cache object
@@ -577,7 +578,7 @@ function ItsAllTextOverlay() {
     that.addGumDrop(cobj);
   };
 
-  // @todo If the textarea is focused, we should refresh it.
+  // @todo [med] If the textarea is focused, we should refresh it.
   // @todo [low] When the editor quits, we should refresh the textarea.
   // @todo [idea] support for input elements as well?
 
@@ -644,7 +645,7 @@ function ItsAllTextOverlay() {
     } else {
       node.parentNode.appendChild(gumdrop);
     }
-    // @todo [idea] Have gumdrop fade in and out on mouseover
+    // @todo [med] Have gumdrop fade in and out on mouseover
     cache_object.adjust();
   };
 
