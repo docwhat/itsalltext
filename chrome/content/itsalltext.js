@@ -102,7 +102,7 @@ function ItsAllTextOverlay() {
    * @param Object message One or more objects can be passed in to display.
    */
   that.debug = function() {
-    if (that.preferences.data.debug) {
+    if (that.preferences.debug) {
       try { Firebug.Console.logFormatted(arguments); } 
       catch(e) {}
     }
@@ -150,15 +150,15 @@ function ItsAllTextOverlay() {
   that.cleanEditDir();
 
   /**
+   * Dictionary for storing the preferences in.
+   * @type Hash
+   */
+  that.preferences = {};
+
+  /**
    * A Preference Observer.
    */
-  that.preferences = {
-    /**
-     * Dictionary for storing the preferences in.
-     * @type Hash
-     */
-    data: {
-    },
+  that.preference_observer = {
     /**
      * Dictionary of types (well, really the method needed to get/set the
      * type.
@@ -181,7 +181,7 @@ function ItsAllTextOverlay() {
       this._branch = prefService.getBranch("extensions."+MYSTRING+".");
       this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
       for(var type in this.types) {
-        this.data[type] = this._branch['get'+(this.types[type])+'Pref'](type);
+        that.preferences[type] = this._branch['get'+(this.types[type])+'Pref'](type);
       }
       this._branch.addObserver("", this, false);
     },
@@ -203,8 +203,8 @@ function ItsAllTextOverlay() {
      */
     observe: function(aSubject, aTopic, aData) {
       if (aTopic != "nsPref:changed") {return;}
-      if (this.data.hasOwnProperty(aData)) {
-        this.data[aData] = this._branch['get'+(this.types[aData])+'Pref'](aData);
+      if (that.preferences.hasOwnProperty(aData)) {
+        that.preferences[aData] = this._branch['get'+(this.types[aData])+'Pref'](aData);
       }
     }
   };
@@ -214,7 +214,7 @@ function ItsAllTextOverlay() {
    * @returns {String} the charset to be used.
    */
   that.getCharset = function() {
-    return that.preferences.data.charset;
+    return that.preferences.charset;
   };
 
   /**
@@ -222,7 +222,7 @@ function ItsAllTextOverlay() {
    * @returns {int} The number of seconds between checking for new content.
    */
   that.getRefresh = function() {
-    var refresh = that.preferences.data.refresh;
+    var refresh = that.preferences.refresh;
     var retval = Math.round((1000*refresh) + (1000*Math.random()));
     //that.debug('refresh in',retval);
     return retval;
@@ -234,7 +234,7 @@ function ItsAllTextOverlay() {
    * @returns {nsILocalFile} A file object of the editor.
    */
   that.getEditor = function() {
-    var editor = that.preferences.data.editor;
+    var editor = that.preferences.editor;
 
     // create an nsILocalFile for the executable
     var file = Components.
@@ -250,7 +250,7 @@ function ItsAllTextOverlay() {
    * @returns {bool}
    */
   that.getDebug = function() {
-    return that.preferences.data.debug;
+    return that.preferences.debug;
   };
 
   /**
@@ -723,7 +723,7 @@ function ItsAllTextOverlay() {
   };
   
   // Start watching the preferences.
-  that.preferences.register();
+  that.preference_observer.register();
   
   // Do the startup when things are loaded.
   window.addEventListener("load", startup, true);
