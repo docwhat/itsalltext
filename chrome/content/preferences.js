@@ -1,4 +1,4 @@
-
+// @todo [low] Use the EDITOR environment variable for default editor.
 /**
  * Open a filepicker to select the value of the editor.
  */

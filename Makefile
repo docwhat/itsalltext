@@ -82,7 +82,7 @@ lint.log: $(SOURCES_JS)
 .PHONY: todo
 todo:
 	$(Q)echo "ToDo List:"
-	$(Q)grep -h '@todo' $(SOURCES) | perl -p -e 's!^[ /*\t]+\@todo:?\s*! * !i;'
+	$(Q)grep -h '@todo' Makefile $(SOURCES) | grep -v 'grep -h' | perl -p -e 's!^.+\@todo:?\s*! * !i;' | sort
 
 .PHONY: narf
 narf:
@@ -95,3 +95,7 @@ clean:
 .PHONY: realclean
 realclean: clean
 	$(Q)rm -rf ../itsalltext*.xpi docs
+
+## @todo [low] Build the extension by copying into a build directory.
+## @todo [low] Minimize built JavaScript.
+## @todo [low] Put contents into a .jar during build phase.
