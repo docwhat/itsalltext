@@ -203,7 +203,7 @@ function ItsAllTextOverlay() {
      */
     observe: function(aSubject, aTopic, aData) {
       if (aTopic != "nsPref:changed") {return;}
-      if (that.preferences.hasOwnProperty(aData)) {
+      if (that.preferences) {
         that.preferences[aData] = this._branch['get'+(this.types[aData])+'Pref'](aData);
       }
     }
