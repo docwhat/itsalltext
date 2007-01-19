@@ -57,14 +57,17 @@ version_check:
 	$(Q)echo "$^" | perl -p -e 's/ /\n/g;' \
     | zip $@ -@
 
-docs: $(SOURCES_JS)
-	$(Q)echo Creating $@ ...
-	$(Q)jsdoc --directory "$@" \
+.PHONY: docs
+docs: docs/.stamp
+docs/.stamp: $(SOURCES_JS)
+	$(Q)echo Creating docs ...
+	$(Q)jsdoc --directory docs \
 	--project-name "It's All Text - A Firefox Extension" \
 	--logo chrome/content/icon.png \
 	--package-naming \
 	--private \
-	$(SOURCES_JS)
+	$^
+	$(Q)touch "$@"
 
 .PHONY: lint
 lint: lint.log
