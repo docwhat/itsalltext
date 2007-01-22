@@ -1,4 +1,5 @@
 // @todo [low] Use the EDITOR environment variable for default editor.
+// @todo [med] Redo the preferences dialog to look better.
 /**
  * Open a filepicker to select the value of the editor.
  */
@@ -48,6 +49,25 @@ function pref_onload() {
     var editor = document.getElementById('editor');
     editor.style.color = 'black';
     editor.style.backgroundColor = '#fb4';
-    setHelp("I was unable to run your editor, '"+editor.value+"'.  You the browse button to choose another editor and try again.");
+    var box = document.getElementById('help');
+    // Clean it out
+    while (box.firstChild) {
+      box.removeChild(box.firstChild);
+    }
+    var desc, textnode;
+    message = [];
+    desc = document.createElement('description');
+    textnode = document.createTextNode(["I was unable to run your editor, '",
+                                        editor.value,
+                                        "'.  Use the browse button to choose another editor and try again. "].join(''));
+    desc.appendChild(textnode);
+    desc.style.maxWidth = '18em';
+    box.appendChild(desc);
+
+    desc = document.createElement('description');
+    textnode = document.createTextNode("If you use Mac OS X, then you'll need to use the binary installed by your editor in /usr/bin OR you can try to find the binary in the NAME.app/Contents/MacOS/ directory.");
+    desc.appendChild(textnode);
+    desc.style.maxWidth = '18em';
+    box.appendChild(desc);
   }
 }

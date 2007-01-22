@@ -8,7 +8,7 @@
 
 <script type="application/x-javascript" src="preferences.js"/>
  
-<prefpane id="itsalltext-pane" label="It's All Text Preferences">
+<prefpane id="itsalltext-pane" label="It's All Text Preferences" flex="1">
   <preferences>
     <preference id="pref_charset"
                 name="extensions.itsalltext.charset" type="string"/>
@@ -20,8 +20,8 @@
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
 
-  <hbox>
-    <vbox> 
+  <hbox flex="1">
+    <vbox flex="1"> 
       <hbox align="right">
         <label control="editor" value="Editor: "/>
         <textbox preference="pref_editor" id="editor" size="20" readonly="false"
@@ -44,10 +44,9 @@
                value="Enable Debugging: "/>
         <checkbox preference="pref_debug" id="debug" tabindex="4"/>
       </hbox>
+      <spacer flex="2"/>
     </vbox>
-    <vbox>
-      <description id="help" style="max-width: 15em;">
-      </description>
+    <vbox id="help" flex="1">
     </vbox>
   </hbox>
 </prefpane>
