@@ -666,18 +666,20 @@ function ItsAllTextOverlay() {
       return; // Ignore these URLs
     }
 
-    var id = null;
-    that.refreshDocument(doc);
-    id = setInterval(function() {
+    // @todo the referesher needs to be one single function for all windows.
+    var refresher;
+    refresher = function() {
       if (doc.location) {
-        that.debug('document %s %o "%s"', id, doc, doc.URL);
+        that.debug('document %s %o "%s"', refresher.id, doc, doc.URL);
         that.refreshDocument(doc);
       } else {
-        that.debug('document %s (cancelled)', id);
+        that.debug('document %s (cancelled)', refresher.id);
         that.cleanCacheObjs();
-        clearInterval(id);
+        clearInterval(refresher.id);
       }
-    }, that.getRefresh());
+    };
+    that.refreshDocument(doc);
+    refresher.id = setInterval(refresher, that.getRefresh());
 
     return;
   };
