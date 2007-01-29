@@ -512,6 +512,7 @@ function ItsAllTextOverlay() {
       if (gumdrop === null || n === null || parent === null) { return; }
       gumdrop.style.bottom  = '0px';
       gumdrop.style.right   = (0-n.offsetWidth) + 'px';
+      // @todo [high] Shouldn't show gumdrop if the textarea isn't showing.
     };
  
   }
