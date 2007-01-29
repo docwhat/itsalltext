@@ -636,7 +636,7 @@ function ItsAllTextOverlay() {
 
     gumdrop.style.width            = width+'px';
     gumdrop.style.height           = height+'px';
-    gumdrop.style.margin           = ['-',height/2,'px -',width/2,'px'].join('');
+    gumdrop.style.margin           = ['0 -',width,'px'].join('');
 
     // Insert it into the document
     var nextSibling = node.nextSibling;
