@@ -1,4 +1,5 @@
 // @todo [low] Use the EDITOR environment variable for default editor.
+// @todo [med] Try getting the editor from view_source.editor.path if not set.
 // @todo [med] Redo the preferences dialog to look better.
 /**
  * Open a filepicker to select the value of the editor.
