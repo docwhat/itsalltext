@@ -380,7 +380,8 @@ function ItsAllTextOverlay() {
     // @todo [idea] Pass in the line number to the editor, arbitrary command?
     // @todo [high] On edit, let user pick the file extension.
     // @todo [idea] allow the user to pick an alternative editor?
-    self.edit = function() {
+    self.edit = function(retried) {
+      if (typeof(retried) == 'undefined') { retried = false };
       if (self.node.nodeName != "TEXTAREA") { return; }
       var filename = self.write();
       self.initial_color = self.node.style.backgroundColor;
@@ -406,6 +407,9 @@ function ItsAllTextOverlay() {
                           "Preferences", 
                           "chrome,titlebar,toolbar,centerscreen,modal",
                           "badeditor");
+        if (!retried) {
+          self.edit(true); // Try one more time.
+        }
       }
     };
 
@@ -657,24 +661,27 @@ function ItsAllTextOverlay() {
   that.onDOMContentLoad = function(event) {
     if (event.originalTarget.nodeName != "#document") { return; }
     var doc = event.originalTarget;
-    function startswith(needle, haystack) {
-      needle   = needle.toString();
-      haystack = haystack.toString();
-      return haystack.substring(0,needle.length) == needle;
-    }
-    if (startswith('chrome://', doc.URL) ||
-        startswith('about:', doc.URL) ) {
-      return; // Ignore these URLs
+    /* Check that this is a document we want to play with. */
+    var contentType = doc.contentType;
+    var location = doc.location;
+    var is_usable = (contentType == 'text/html' ||
+                     contentType == 'text/xhtml') && 
+      location.protocol != 'about:' &&
+      location.protocol != 'chrome:';
+    if (!is_usable) { 
+      that.debug('ignoring: %o',doc);
+      return;
     }
 
     // @todo the referesher needs to be one single function for all windows.
+    // clean out the queue: while(q.length > 0 && typeof(q[0]) == 'undefined') { q.shift(); }
     var refresher;
     refresher = function() {
       if (doc.location) {
-        that.debug('document %s %o "%s"', refresher.id, doc, doc.URL);
+        that.debug('document id:%s %o', refresher.id, doc);
         that.refreshDocument(doc);
       } else {
-        that.debug('document %s (cancelled)', refresher.id);
+        that.debug('document id:%s (cancelled)', refresher.id);
         that.cleanCacheObjs();
         clearInterval(refresher.id);
       }
