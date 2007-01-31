@@ -74,13 +74,12 @@ lint: lint.log
 
 lint.log: $(SOURCES_JS)
 	$(Q)echo Linting source ...
-	$(Q)for jsfile in $^; do echo "jslint: $${jsfile}" ; jslint $${jsfile}; done > "$@" 2>&1
-	$(Q)if [ `egrep -v '^jslint: ' "$@" | wc -l` -eq 0 ]; \
-	 then echo "  ... pass" ; \
-	 else touch --date='1972-01-01' "$@"; \
-	   echo "  ... there were $$(egrep '^Lint at line ' $@ | wc -l) errors."; \
-	   false ;\
-	 fi
+	$(Q)jslint -p $^ > $@
+	$(Q)if [ 0 -ne `grep -vE 'jslint: No problems found in ' "$@" | wc -l` ]; \
+	then touch --date='1972-01-01' "$@"; \
+	     echo "  ... there were $$(grep -E '^lint at [^:]+:[0-9]+:[0-9]+' "$@" | wc -l) errors."; \
+	     false ;\
+	fi
 
 .PHONY: todo
 todo:
