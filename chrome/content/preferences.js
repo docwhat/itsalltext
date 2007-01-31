@@ -56,7 +56,6 @@ function pref_onload() {
       box.removeChild(box.firstChild);
     }
     var desc, textnode;
-    message = [];
     desc = document.createElement('description');
     textnode = document.createTextNode(["I was unable to run your editor, '",
                                         editor.value,
