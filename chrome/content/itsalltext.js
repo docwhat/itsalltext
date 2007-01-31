@@ -381,7 +381,7 @@ function ItsAllTextOverlay() {
     // @todo [high] On edit, let user pick the file extension.
     // @todo [idea] allow the user to pick an alternative editor?
     self.edit = function(retried) {
-      if (typeof(retried) == 'undefined') { retried = false };
+      if (typeof(retried) == 'undefined') { retried = false; }
       if (self.node.nodeName != "TEXTAREA") { return; }
       var filename = self.write();
       self.initial_color = self.node.style.backgroundColor;
@@ -425,17 +425,17 @@ function ItsAllTextOverlay() {
         fis.init(self.file, 0x01, parseInt('00400',8), 0); 
         // MODE_RDONLY | PERM_IRUSR
   
-        var is = Components.
+        var istream = Components.
           classes["@mozilla.org/intl/converter-input-stream;1"].
           createInstance(Components.interfaces.nsIConverterInputStream);
-        is.init(fis, that.getCharset(), 4096, DEFAULT_REPLACEMENT_CHARACTER);
+        istream.init(fis, that.getCharset(), 4096, DEFAULT_REPLACEMENT_CHARACTER);
   
         var str = {};
-        while (is.readString(4096, str) !== 0) {
+        while (istream.readString(4096, str) !== 0) {
           buffer.push(str.value);
         }
         
-        is.close();
+        istream.close();
         fis.close();
   
         self.timestamp = self.file.lastModifiedTime;
