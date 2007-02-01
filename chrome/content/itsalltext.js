@@ -83,6 +83,10 @@ function ItsAllTextOverlay() {
    */
   var MYSTRING = 'itsalltext';
 
+  var gumdrop_width  = 28; 
+  var gumdrop_height = 14;
+  var gumdrop_url    = 'chrome://itsalltext/content/gumdrop.png';
+
   /**
    * This is a handy debug message.  I'll remove it or disable it when
    * I release this.
@@ -513,14 +517,32 @@ function ItsAllTextOverlay() {
      */
     self.adjust = function() {
       var gumdrop  = self.button;
-      var n        = self.node;
-      var parent   = node.parentNode;
-      if (gumdrop === null || n === null || parent === null) { return; }
-      gumdrop.style.bottom  = '0px';
-      gumdrop.style.right   = (0-n.offsetWidth) + 'px';
-      // @todo [high] Shouldn't show gumdrop if the textarea isn't showing.
+      var node     = self.node;
+      var style    = gumdrop.style;
+      if (!gumdrop || !node) { return; }
+      var display  = '';
+      if (node.style.display == 'none') {
+        display = 'none';
+      }
+      if (style.display != display) {
+        style.display = display;
+      }
+      if (!style.left || !style.top ||
+          style.left == '0px' || style.top == '0px') {
+        var pos = that.getPageOffset(node);
+        gumdrop.style.left = (pos[0]+Math.max(1,node.offsetWidth-gumdrop_width))+'px';
+        gumdrop.style.top  = (pos[1]+node.offsetHeight)+'px';
+      }
     };
- 
+
+    self.mouseover = function(event) {
+      var style = self.button.style;
+      style.opacity = '0.7';
+    };
+    self.mouseout = function(event) {
+      var style = self.button.style;
+      style.opacity = '0.1';
+    }
   }
 
   // @todo [med] Profiling and optimization.
@@ -570,17 +592,6 @@ function ItsAllTextOverlay() {
     //that.debug('refreshNode():',cobj);
     if(!cobj) { return; }
 
-    if (that.getDebug() && cobj.button !== null) {
-      var opacity = parseFloat(cobj.button.style.opacity);
-      
-      if (opacity > 0.7 || opacity <= 0) {
-        opacity = 0.4;
-      } else {
-        opacity += 0.12;
-      }
-      cobj.button.style.opacity = opacity;
-    }
-
     cobj.update();
     that.addGumDrop(cobj);
   };
@@ -603,6 +614,23 @@ function ItsAllTextOverlay() {
   };
 
   /**
+   * Returns the real page offset for an element.
+   * @param {Object} node A DOM element.
+   * @return {Array} The X & Y page offsets
+   */
+  that.getPageOffset = function(node) {
+    var pos = [node.offsetLeft, node.offsetTop];
+    var pnode = node.offsetParent;
+    while(pnode) {
+      pos[0] += pnode.offsetLeft || 0;
+      pos[1] += pnode.offsetTop || 0;
+      pnode = pnode.offsetParent;
+    }
+    return pos;
+  };
+
+
+  /**
    * Add the gumdrop to a textarea.
    * @param {Object} cache_object The Cache Object that contains the node.
    */
@@ -620,7 +648,7 @@ function ItsAllTextOverlay() {
 
     var XHTMLNS = "http://www.w3.org/1999/xhtml";
     var gumdrop = doc.createElementNS(XHTMLNS, "img");
-    gumdrop.setAttribute('src', 'chrome://itsalltext/content/gumdrop.png');
+    gumdrop.setAttribute('src', gumdrop_url);
     if (this.getDebug()) {
       gumdrop.setAttribute('title', cache_object.node_id);
     } else {
@@ -632,18 +660,15 @@ function ItsAllTextOverlay() {
     gumdrop.addEventListener("click", function(ev){cache_object.edit();}, false);
 
     // Image Attributes
-    var width = 28; var height = 14;
-    gumdrop.style.opacity          = '0.5';
     gumdrop.style.cursor           = 'pointer';
     gumdrop.style.display          = 'block';
-    gumdrop.style.position         = 'relative';
+    gumdrop.style.position         = 'absolute';
     gumdrop.style.padding          = '0';
     gumdrop.style.border           = 'none';
     gumdrop.style.zIndex           = 2147483646; // Max Int - 1
 
-    gumdrop.style.width            = width+'px';
-    gumdrop.style.height           = height+'px';
-    gumdrop.style.margin           = ['0 -',width,'px'].join('');
+    gumdrop.style.width            = gumdrop_width+'px';
+    gumdrop.style.height           = gumdrop_height+'px';
 
     // Insert it into the document
     var nextSibling = node.nextSibling;
@@ -652,7 +677,11 @@ function ItsAllTextOverlay() {
     } else {
       node.parentNode.appendChild(gumdrop);
     }
-    // @todo [med] Have gumdrop fade in and out on mouseover
+    node.addEventListener("mouseover", cache_object.mouseover, false);
+    node.addEventListener("mouseout", cache_object.mouseout, false);
+    gumdrop.addEventListener("mouseover", cache_object.mouseover, false);
+    gumdrop.addEventListener("mouseout", cache_object.mouseout, false);
+    cache_object.mouseout(null);
     cache_object.adjust();
   };
 
