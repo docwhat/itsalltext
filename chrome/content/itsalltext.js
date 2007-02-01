@@ -205,6 +205,9 @@ function ItsAllTextOverlay() {
       if (aTopic != "nsPref:changed") {return;}
       if (that.preferences) {
         that.preferences[aData] = this._branch['get'+(this.types[aData])+'Pref'](aData);
+        if (aData == 'refresh') {
+          that.monitor.restart();
+        }
       }
     }
   };
@@ -223,8 +226,7 @@ function ItsAllTextOverlay() {
    */
   that.getRefresh = function() {
     var refresh = that.preferences.refresh;
-    var retval = Math.round((1000*refresh) + (1000*Math.random()));
-    //that.debug('refresh in',retval);
+    var retval = 1000*refresh;
     return retval;
 
   };
@@ -655,6 +657,72 @@ function ItsAllTextOverlay() {
   };
 
   /**
+   * This function is called regularly to watch changes to web documents.
+   */
+  that.monitor = {
+    id: null,
+    last_now:0,
+    documents: [],
+    /**
+     * Starts or restarts the document monitor.
+     */
+    restart: function() {
+      var rate = that.getRefresh();
+      var id   = that.monitor.id;
+      if (id) {
+        clearInterval(id);
+      }
+      that.monitor.id = setInterval(that.monitor.watcher, rate);
+    },
+    /**
+     * watches the document 'doc'.
+     * @param {Object} doc The document to watch.
+     */
+    watch: function(doc) {
+      that.refreshDocument(doc);
+      that.monitor.documents.push(doc);
+    },
+    /**
+     * Callback to be used by restart()
+     * @private
+     */
+    watcher: function(offset) {
+      var monitor = that.monitor;
+      var rate = that.getRefresh();
+      var now = Date.now();
+      if (now - monitor.last_now < Math.round(rate * 0.9)) {
+        that.debug('monitor.watcher(%o) -- skipping catchup refresh', offset);
+        return;
+      }
+      monitor.last_now = now;
+
+      /* Walk the documents looking for changes */
+      var documents = monitor.documents;
+      that.debug('monitor.watcher(%o)', offset, documents.length);
+      var i;
+      for(i in documents) {
+        var doc = documents[i];
+        that.refreshDocument(doc);
+        if (doc.location) {
+          that.debug('document %o', doc);
+          that.refreshDocument(doc);
+        } else {
+          that.debug('document (cancelled)');
+          that.cleanCacheObjs();
+          delete documents[i];
+        }
+      }
+
+      /* Remove deleted elements */
+      for(i=documents.length - 1; i >= 0; i--) {
+        if(typeof(documents[i]) == 'undefined') {
+          documents.splice(i,1);
+        }
+      }
+    }
+  };
+
+  /**
    * Callback whenever the DOM content in a window or tab is loaded.
    * @param {Object} event An event passed in.
    */
@@ -673,22 +741,7 @@ function ItsAllTextOverlay() {
       return;
     }
 
-    // @todo the referesher needs to be one single function for all windows.
-    // clean out the queue: while(q.length > 0 && typeof(q[0]) == 'undefined') { q.shift(); }
-    var refresher;
-    refresher = function() {
-      if (doc.location) {
-        that.debug('document id:%s %o', refresher.id, doc);
-        that.refreshDocument(doc);
-      } else {
-        that.debug('document id:%s (cancelled)', refresher.id);
-        that.cleanCacheObjs();
-        clearInterval(refresher.id);
-      }
-    };
-    that.refreshDocument(doc);
-    refresher.id = setInterval(refresher, that.getRefresh());
-
+    that.monitor.watch(doc);
     return;
   };
 
@@ -730,6 +783,8 @@ function ItsAllTextOverlay() {
     }
     document.getElementById("contentAreaContextMenu").
       addEventListener("popupshowing", that.onContextMenu, false);
+
+    that.monitor.restart();
   };
   
   // Start watching the preferences.
