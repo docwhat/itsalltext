@@ -10,6 +10,13 @@ Note to Mac OS X users: Most editors come with a component in
 strange, then create a shell script to do an "open -a /path/to/editor
 $*".
 
+****** 0.3.4 ******
+* Fade in and out gumdrops.
+* The gumdrop no longer alters the flow of the page.
+* it should behave much better under load.
+* Removed a memory leak.
+* Improved preferences a little.
+
 ****** 0.3.3 ******
 * Preferences popup if the editor doesn't work.
 * Deal with case where textarea.name is not unique

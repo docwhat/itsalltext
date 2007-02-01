@@ -46,6 +46,7 @@ all: lint docs
 release: lint version_check $(XPI_FILE)
 	$(Q)echo "Don't forget to:"
 	$(Q)echo " * update changelog.txt"
+	$(Q)echo " * commit the tag"
 	$(Q)echo " * bump the version number"
 
 .PHONY: version_check
