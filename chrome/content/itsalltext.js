@@ -58,7 +58,7 @@ function hashString(some_string) {
   return(retval.join(""));
 }
 
-function ItsAllTextOverlay() {
+function ItsAllText() {
   /**
    * This data is all private, which prevents security problems and it
    * prevents clutter and collection.
@@ -90,25 +90,39 @@ function ItsAllTextOverlay() {
   /**
    * This is a handy debug message.  I'll remove it or disable it when
    * I release this.
-   * @param {String} aMessage The message to log.
+   * @param {Object} message One or more objects can be passed in to display.
    */
   that.log = function() {
+    // idiom: Convert arguments to an array for easy handling.
     var args = Array.prototype.slice.apply(arguments,[0]);
     var consoleService = Components.
       classes["@mozilla.org/consoleservice;1"].
       getService(Components.interfaces.nsIConsoleService);
-    consoleService.logStringMessage("ItsAllTextOverlay: " + args.join(' '));
+    consoleService.logStringMessage("ItsAllText: " + args.join(' '));
   };
+
+  /**
+   * Uses log iff debugging is turned on.  Used for messages that need to
+   * globally logged (firebug only logs locally).
+   * @param {Object} message One or more objects can be passed in to display.
+   */
+  that.debuglog = function() {
+    if (that.preferences.debug) {
+      that.log.apply(that,arguments);
+    }
+  }
 
   /**
    * Displays debug information, if debugging is turned on.
    * Requires Firebug.
-   * @param Object message One or more objects can be passed in to display.
+   * @param {Object} message One or more objects can be passed in to display.
    */
   that.debug = function() {
     if (that.preferences.debug) {
       try { Firebug.Console.logFormatted(arguments); } 
-      catch(e) {}
+      catch(e) {
+        that.log.apply(that,arguments);
+      }
     }
   };
 
@@ -388,7 +402,8 @@ function ItsAllTextOverlay() {
     // @todo [idea] allow the user to pick an alternative editor?
     self.edit = function(retried) {
       if (typeof(retried) == 'undefined') { retried = false; }
-      if (self.node.nodeName != "TEXTAREA") { return; }
+      var nodeName = self.node.nodeName;
+      if (nodeName != "TEXTAREA" && nodeName != "TEXTBOX") { return; }
       var filename = self.write();
       self.initial_color = self.node.style.backgroundColor;
       try {
@@ -527,12 +542,13 @@ function ItsAllTextOverlay() {
       if (style.display != display) {
         style.display = display;
       }
-      if (!style.left || !style.top ||
-          style.left == '0px' || style.top == '0px') {
-        var pos = that.getPageOffset(el);
-        gumdrop.style.left = (pos[0]+Math.max(1,el.offsetWidth-gumdrop_width))+'px';
-        gumdrop.style.top  = (pos[1]+el.offsetHeight)+'px';
-      }
+
+      /* Reposition the gumdrops incase the dom changed. */
+      var pos = that.getPageOffset(el);
+      var left = (pos[0]+Math.max(1,el.offsetWidth-gumdrop_width))+'px';
+      var top  = (pos[1]+el.offsetHeight)+'px';
+      if(style.left != left) { style.left = left; }
+      if(style.top != top) { style.top = top; }
     };
 
     self.mouseover = function(event) {
@@ -580,7 +596,7 @@ function ItsAllTextOverlay() {
         count += 1;
       }
     }
-    that.debug('cache count: %s', count);
+    that.debuglog('cache count:', count);
   };
 
   /**
@@ -589,7 +605,6 @@ function ItsAllTextOverlay() {
    */
   that.refreshTextarea = function(node) {
     var cobj = that.getCacheObj(node);
-    //that.debug('refreshNode():',cobj);
     if(!cobj) { return; }
 
     cobj.update();
@@ -608,6 +623,10 @@ function ItsAllTextOverlay() {
     // @todo [high] Confirm that we find textareas inside iframes and frames.
     //that.debug('refreshDocument()',doc.URL);
     var nodes = doc.getElementsByTagName('textarea');
+    for(var i=0; i < nodes.length; i++) {
+      that.refreshTextarea(nodes[i]);
+    }
+    var nodes = doc.getElementsByTagName('textbox');
     for(var i=0; i < nodes.length; i++) {
       that.refreshTextarea(nodes[i]);
     }
@@ -720,32 +739,35 @@ function ItsAllTextOverlay() {
       var rate = that.getRefresh();
       var now = Date.now();
       if (now - monitor.last_now < Math.round(rate * 0.9)) {
-        that.debug('monitor.watcher(%o) -- skipping catchup refresh', offset);
+        that.debuglog('monitor.watcher(',offset,') -- skipping catchup refresh');
         return;
       }
       monitor.last_now = now;
 
       /* Walk the documents looking for changes */
       var documents = monitor.documents;
-      that.debug('monitor.watcher(%o)', offset, documents.length);
+      that.debuglog('monitor.watcher(',offset,'): ', documents.length);
       var i;
+      var did_delete = false;
       for(i in documents) {
         var doc = documents[i];
         that.refreshDocument(doc);
         if (doc.location) {
-          that.debug('document %o', doc);
+          that.debuglog('refreshing', doc.location);
           that.refreshDocument(doc);
         } else {
-          that.debug('document (cancelled)');
-          that.cleanCacheObjs();
           delete documents[i];
+          did_delete = true;
         }
       }
 
-      /* Remove deleted elements */
-      for(i=documents.length - 1; i >= 0; i--) {
-        if(typeof(documents[i]) == 'undefined') {
-          documents.splice(i,1);
+      if(did_delete) {
+        /* Remove deleted elements */
+        that.cleanCacheObjs();
+        for(i=documents.length - 1; i >= 0; i--) {
+          if(typeof(documents[i]) == 'undefined') {
+            documents.splice(i,1);
+          }
         }
       }
     }
@@ -757,7 +779,7 @@ function ItsAllTextOverlay() {
    */
   that.onDOMContentLoad = function(event) {
     if (event.originalTarget.nodeName != "#document") { return; }
-    var doc = event.originalTarget;
+    var doc = event.originalTarget || document;
     /* Check that this is a document we want to play with. */
     var contentType = doc.contentType;
     var location = doc.location;
@@ -766,7 +788,7 @@ function ItsAllTextOverlay() {
       location.protocol != 'about:' &&
       location.protocol != 'chrome:';
     if (!is_usable) { 
-      that.debug('ignoring: %o',doc);
+      that.debuglog('ignoring:', location, contentType);
       return;
     }
 
@@ -804,16 +826,24 @@ function ItsAllTextOverlay() {
    * Initialize the module.  Should be called once, when a window is loaded.
    * @private
    */
-  var startup = function() {
+  var startup = function(event) {
+   that.debug("startup(): It's All Text! is watching this window...");
     var appcontent = document.getElementById("appcontent"); // The Browser
     if (appcontent) {
+      // Normal web-page.
       appcontent.addEventListener("DOMContentLoaded", that.onDOMContentLoad,
                                   true);
+    } else {
+      // A Chrome page of some sort -- run immediately.
+      that.onDOMContentLoad(event); 
     }
-    document.getElementById("contentAreaContextMenu").
-      addEventListener("popupshowing", that.onContextMenu, false);
+    // Attach the context menu, if we can.
+    var contentAreaContextMenu = document.getElementById("contentAreaContextMenu");
+    if (contentAreaContextMenu) {
+      contentAreaContextMenu.addEventListener("popupshowing",
+                                             that.onContextMenu, false);
+    }
 
-    that.monitor.restart();
   };
   
   // Start watching the preferences.
@@ -821,5 +851,8 @@ function ItsAllTextOverlay() {
   
   // Do the startup when things are loaded.
   window.addEventListener("load", startup, true);
+
+  // Start the monitor
+  that.monitor.restart();
 }
-var itsAllTextOverlay = new ItsAllTextOverlay();
+var itsAllText = new ItsAllText();
