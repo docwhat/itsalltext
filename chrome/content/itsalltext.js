@@ -110,7 +110,7 @@ function ItsAllText() {
     if (that.preferences.debug) {
       that.log.apply(that,arguments);
     }
-  }
+  };
 
   /**
    * Displays debug information, if debugging is turned on.
@@ -403,7 +403,7 @@ function ItsAllText() {
     self.edit = function(retried) {
       if (typeof(retried) == 'undefined') { retried = false; }
       var nodeName = self.node.nodeName;
-      if (nodeName != "TEXTAREA" && nodeName != "TEXTBOX") { return; }
+      if (nodeName != "TEXTAREA" /* incase I get chrome running && nodeName != "TEXTBOX"*/) { return; }
       var filename = self.write();
       self.initial_color = self.node.style.backgroundColor;
       try {
@@ -626,10 +626,12 @@ function ItsAllText() {
     for(var i=0; i < nodes.length; i++) {
       that.refreshTextarea(nodes[i]);
     }
-    var nodes = doc.getElementsByTagName('textbox');
+    /* Incase I get chrome running.
+    nodes = doc.getElementsByTagName('textbox');
     for(var i=0; i < nodes.length; i++) {
       that.refreshTextarea(nodes[i]);
     }
+    */
   };
 
   /**
@@ -834,7 +836,6 @@ function ItsAllText() {
       appcontent.addEventListener("DOMContentLoaded", that.onDOMContentLoad,
                                   true);
     } else {
-      // A Chrome page of some sort -- run immediately.
       that.onDOMContentLoad(event); 
     }
     // Attach the context menu, if we can.
@@ -843,7 +844,6 @@ function ItsAllText() {
       contentAreaContextMenu.addEventListener("popupshowing",
                                              that.onContextMenu, false);
     }
-
   };
   
   // Start watching the preferences.
