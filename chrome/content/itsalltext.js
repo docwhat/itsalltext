@@ -517,11 +517,11 @@ function ItsAllTextOverlay() {
      */
     self.adjust = function() {
       var gumdrop  = self.button;
-      var node     = self.node;
+      var el       = self.node;
       var style    = gumdrop.style;
-      if (!gumdrop || !node) { return; }
+      if (!gumdrop || !el) { return; }
       var display  = '';
-      if (node.style.display == 'none') {
+      if (el.style.display == 'none') {
         display = 'none';
       }
       if (style.display != display) {
@@ -529,9 +529,9 @@ function ItsAllTextOverlay() {
       }
       if (!style.left || !style.top ||
           style.left == '0px' || style.top == '0px') {
-        var pos = that.getPageOffset(node);
-        gumdrop.style.left = (pos[0]+Math.max(1,node.offsetWidth-gumdrop_width))+'px';
-        gumdrop.style.top  = (pos[1]+node.offsetHeight)+'px';
+        var pos = that.getPageOffset(el);
+        gumdrop.style.left = (pos[0]+Math.max(1,el.offsetWidth-gumdrop_width))+'px';
+        gumdrop.style.top  = (pos[1]+el.offsetHeight)+'px';
       }
     };
 
@@ -542,7 +542,7 @@ function ItsAllTextOverlay() {
     self.mouseout = function(event) {
       var style = self.button.style;
       style.opacity = '0.1';
-    }
+    };
   }
 
   // @todo [med] Profiling and optimization.
