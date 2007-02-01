@@ -167,6 +167,10 @@ function ItsAllText() {
   /* Clean the edit directory right now, on startup. */
   that.cleanEditDir();
 
+  /* Load the Color.js file used for the Fade Anything Technique into this object */
+  objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+  objScriptLoader.loadSubScript('chrome://itsalltext/content/Color.js', that);
+
   /**
    * Dictionary for storing the preferences in.
    * @type Hash
@@ -505,8 +509,8 @@ function ItsAllText() {
      * @param {int} delay  How long to wait between delay (microseconds).
      */
     self.fade = function(steps, delay) {
-      var colEnd = new Color(self.initial_color);
-      var colStart = new Color('yellow');//colEnd.invert();
+      var colEnd = new that.Color(self.initial_color);
+      var colStart = new that.Color('yellow');//colEnd.invert();
       var pallet = colStart.blend(colEnd, steps);
       setTimeout(self.fadeStep(pallet, 0, delay), delay);
     };

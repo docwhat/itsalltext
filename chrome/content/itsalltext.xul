@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/x-javascript" src="Color.js"/>
   <script type="application/x-javascript" src="itsalltext.js"/>
   <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
