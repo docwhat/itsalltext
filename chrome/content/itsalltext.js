@@ -168,7 +168,7 @@ function ItsAllText() {
   that.cleanEditDir();
 
   /* Load the Color.js file used for the Fade Anything Technique into this object */
-  objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+  var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
   objScriptLoader.loadSubScript('chrome://itsalltext/content/Color.js', that);
 
   /**
@@ -859,4 +859,5 @@ function ItsAllText() {
   // Start the monitor
   that.monitor.restart();
 }
-var itsAllText = new ItsAllText();
+
+top.ItsAllText = new ItsAllText();
