@@ -58,7 +58,7 @@ function hashString(some_string) {
     return(retval.join(""));
 }
 
-function ItsAllText() {
+var ItsAllText = function() {
     /**
      * This data is all private, which prevents security problems and it
      * prevents clutter and collection.
@@ -83,9 +83,18 @@ function ItsAllText() {
      */
     var MYSTRING = 'itsalltext';
 
-    var gumdrop_width  = 28; 
-    var gumdrop_height = 14;
+    /* Gumdrop Image URL */
     var gumdrop_url    = 'chrome://itsalltext/content/gumdrop.png';
+    /* Gumdrop Image Width */
+    var gumdrop_width  = 28; 
+    /* Gumdrop Image Height */
+    var gumdrop_height = 14;
+    
+    /* The XHTML Namespace */
+    var XHTMLNS = "http://www.w3.org/1999/xhtml";
+
+    /* The XUL Namespace */
+    var XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
     /**
      * This is a handy debug message.  I'll remove it or disable it when
@@ -406,8 +415,6 @@ function ItsAllText() {
         // @todo [idea] allow the user to pick an alternative editor?
         self.edit = function(retried) {
             if (typeof(retried) == 'undefined') { retried = false; }
-            var nodeName = self.node.nodeName;
-            if (nodeName != "TEXTAREA" /* incase I get chrome running && nodeName != "TEXTBOX"*/) { return; }
             var filename = self.write();
             self.initial_color = self.node.style.backgroundColor;
             try {
@@ -625,17 +632,14 @@ function ItsAllText() {
      */
     that.refreshDocument = function(doc) {
         // @todo [high] Confirm that we find textareas inside iframes and frames.
-        //that.debug('refreshDocument()',doc.URL);
         var nodes = doc.getElementsByTagName('textarea');
         for(var i=0; i < nodes.length; i++) {
             that.refreshTextarea(nodes[i]);
         }
-        /* Incase I get chrome running.
-           nodes = doc.getElementsByTagName('textbox');
-           for(var i=0; i < nodes.length; i++) {
-           that.refreshTextarea(nodes[i]);
-           }
-        */
+        nodes = doc.getElementsByTagName('textbox');
+        for(var i=0; i < nodes.length; i++) {
+            that.refreshTextarea(nodes[i]);
+        }
     };
 
     /**
@@ -671,7 +675,6 @@ function ItsAllText() {
         var offsetNode = node;
         if (!node.parentNode) { return; }
 
-        var XHTMLNS = "http://www.w3.org/1999/xhtml";
         var gumdrop = doc.createElementNS(XHTMLNS, "img");
         gumdrop.setAttribute('src', gumdrop_url);
         if (this.getDebug()) {
@@ -696,16 +699,21 @@ function ItsAllText() {
         gumdrop.style.height           = gumdrop_height+'px';
 
         // Insert it into the document
+        var parent = node.parentNode;
         var nextSibling = node.nextSibling;
+
         if (nextSibling) {
-            node.parentNode.insertBefore(gumdrop, nextSibling);
+            parent.insertBefore(gumdrop, nextSibling);
         } else {
-            node.parentNode.appendChild(gumdrop);
+            parent.appendChild(gumdrop);
         }
+
+        // Add mouseovers/outs
         node.addEventListener("mouseover", cache_object.mouseover, false);
         node.addEventListener("mouseout", cache_object.mouseout, false);
         gumdrop.addEventListener("mouseover", cache_object.mouseover, false);
         gumdrop.addEventListener("mouseout", cache_object.mouseout, false);
+
         cache_object.mouseout(null);
         cache_object.adjust();
     };
@@ -733,6 +741,19 @@ function ItsAllText() {
          * @param {Object} doc The document to watch.
          */
         watch: function(doc) {
+            /* Check that this is a document we want to play with. */
+            var contentType = doc.contentType;
+            var location = doc.location;
+            var is_html = (contentType == 'text/html' ||
+                           contentType == 'text/xhtml');
+            var is_xul  = (contentType == 'application/vnd.mozilla.xul+xml');
+            var is_usable = (is_html/* || is_xul*/) && 
+                location.protocol != 'about:';
+            if (!is_usable) { 
+                that.debuglog('watch(): ignoring -- ', location, contentType);
+                return;
+            }
+
             that.refreshDocument(doc);
             that.monitor.documents.push(doc);
         },
@@ -786,18 +807,6 @@ function ItsAllText() {
     that.onDOMContentLoad = function(event) {
         if (event.originalTarget.nodeName != "#document") { return; }
         var doc = event.originalTarget || document;
-        /* Check that this is a document we want to play with. */
-        var contentType = doc.contentType;
-        var location = doc.location;
-        var is_usable = (contentType == 'text/html' ||
-                         contentType == 'text/xhtml') && 
-            location.protocol != 'about:' &&
-            location.protocol != 'chrome:';
-        if (!is_usable) { 
-            that.debuglog('ignoring:', location, contentType);
-            return;
-        }
-
         that.monitor.watch(doc);
         return;
     };
@@ -860,4 +869,4 @@ function ItsAllText() {
     that.monitor.restart();
 }
 
-top.ItsAllText = new ItsAllText();
+ItsAllText = new ItsAllText();
