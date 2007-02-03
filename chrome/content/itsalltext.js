@@ -417,6 +417,8 @@ var ItsAllText = function() {
             if (typeof(retried) == 'undefined') { retried = false; }
             var filename = self.write();
             self.initial_color = self.node.style.backgroundColor;
+            self.is_moz = self.node.style.backgroundColor;
+            that.debuglog('narf:',self.initial_color);
             try {
                 var program = that.getEditor();
 
@@ -506,6 +508,7 @@ var ItsAllText = function() {
                 if (step < pallet.length) {
                     self.node.style.backgroundColor = pallet[step++].hex();
                     setTimeout(self.fadeStep(pallet, step, delay),delay);
+                    that.debuglog('narf:',self.node.style.backgroundColor);
                 }
             };
         };
@@ -614,12 +617,12 @@ var ItsAllText = function() {
      * Refresh Textarea.
      * @param {Object} node A specific textarea dom object to update.
      */
-    that.refreshTextarea = function(node) {
+    that.refreshTextarea = function(node, is_chrome) {
         var cobj = that.getCacheObj(node);
         if(!cobj) { return; }
 
         cobj.update();
-        that.addGumDrop(cobj);
+        if (!is_chrome) { that.addGumDrop(cobj); }
     };
 
     // @todo [med] If the textarea is focused, we should refresh it.
@@ -632,13 +635,15 @@ var ItsAllText = function() {
      */
     that.refreshDocument = function(doc) {
         // @todo [high] Confirm that we find textareas inside iframes and frames.
+        var is_chrome = (doc.location.protocol == 'chrome:');
         var nodes = doc.getElementsByTagName('textarea');
-        for(var i=0; i < nodes.length; i++) {
-            that.refreshTextarea(nodes[i]);
+        var i;
+        for(i=0; i < nodes.length; i++) {
+            that.refreshTextarea(nodes[i], is_chrome);
         }
         nodes = doc.getElementsByTagName('textbox');
-        for(var i=0; i < nodes.length; i++) {
-            that.refreshTextarea(nodes[i]);
+        for(i=0; i < nodes.length; i++) {
+            that.refreshTextarea(nodes[i], is_chrome);
         }
     };
 
@@ -740,18 +745,22 @@ var ItsAllText = function() {
          * watches the document 'doc'.
          * @param {Object} doc The document to watch.
          */
-        watch: function(doc) {
-            /* Check that this is a document we want to play with. */
-            var contentType = doc.contentType;
-            var location = doc.location;
-            var is_html = (contentType == 'text/html' ||
-                           contentType == 'text/xhtml');
-            var is_xul  = (contentType == 'application/vnd.mozilla.xul+xml');
-            var is_usable = (is_html/* || is_xul*/) && 
-                location.protocol != 'about:';
-            if (!is_usable) { 
-                that.debuglog('watch(): ignoring -- ', location, contentType);
-                return;
+        watch: function(doc, force) {
+            if (!force) {
+                /* Check that this is a document we want to play with. */
+                var contentType = doc.contentType;
+                var location = doc.location;
+                var is_html = (contentType=='text/html' ||
+                               contentType=='text/xhtml');
+                //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
+                var is_usable = (is_html) && 
+                    location.protocol != 'about:' &&
+                    location.protocol != 'chrome:';
+                if (!is_usable) { 
+                    that.debuglog('watch(): ignoring -- ',
+                                  location, contentType);
+                    return;
+                }
             }
 
             that.refreshDocument(doc);
@@ -867,6 +876,7 @@ var ItsAllText = function() {
 
     // Start the monitor
     that.monitor.restart();
-}
+};
 
 ItsAllText = new ItsAllText();
+
