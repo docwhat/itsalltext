@@ -10,6 +10,9 @@ Note to Mac OS X users: Most editors come with a component in
 strange, then create a shell script to do an "open -a /path/to/editor
 $*".
 
+****** 0.3.5 ******
+* Added API so that other extensions can have edit buttons!
+
 ****** 0.3.4 ******
 * Fade in and out gumdrops.
 * The gumdrop no longer alters the flow of the page.
