@@ -49,8 +49,14 @@
 
 })();
 
-
-ItsAllText.openEditor = function(id) {
+/**
+ * Use this to open an editor for a specific textarea or textbox with
+ * the id 'id'.  The file will have the extension 'extension'.  Include 
+ * the leading dot in the extension.
+ * @param {String} id The id of textarea or textbody that should be opened in the editor.
+ * @param {String} extension The extension of the file used as a temporary file. Example: '.css' (optional) 
+ */
+ItsAllText.openEditor = function(id, extension) {
     var node = document.getElementById(id);
     /* The only way I can adjust the background of the textbox is
      * to turn off the -moz-appearance attribute.
@@ -58,6 +64,6 @@ ItsAllText.openEditor = function(id) {
     node.style.MozAppearance = 'none';
     var cache_object = node && ItsAllText.getCacheObj(node);
     if(!cache_object) { return; }
-    cache_object.edit();
+    cache_object.edit(extension);
 };
 

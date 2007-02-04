@@ -184,7 +184,7 @@ var Color = function() {
                 pattern = key;
             }
         }
-      
+
         components = value.match(func[pattern]);
         var base = 10;
         var m = 1; // Multiplier for percentage values
