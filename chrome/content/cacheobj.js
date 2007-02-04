@@ -19,27 +19,34 @@ function CacheObj(node) {
     that.button = null;
     that.initial_color = 'transparent';
      
-    that.node_id = ItsAllText.getNodeIdentifier(node);
-    that.doc_id  = ItsAllText.getDocumentIdentifier(node.ownerDocument);
-    that.uid = that.hashString([ that.doc_id,
+    that.node_id = that.getNodeIdentifier(node);
+    var doc = node.ownerDocument;
+
+    /* This is a unique identifier for use on the web page to prevent the
+     * web page from knowing what it's connected to.
+     * @type String
+     */
+    that.uid = that.hashString([ doc.location.toString(),
                                  Math.random(),
                                  that.node_id ].join(':'));
-
-    that.filename = that.hashString([ that.doc_id,
-                                      that.node_id ].join(':'));
 
     node.setAttribute(ItsAllText.MYSTRING+'_UID', that.uid);
     ItsAllText.tracker[that.uid] = that;
     
+    /* Figure out where we will store the file.  While the filename can
+     * change, the directory that the file is stored in should not!
+     */
+    ItsAllText.debug('narf',doc, doc.location);
+
+    var hostname = doc.location.toString;
     /* Since the hash is supposed to be equally distributed, it shouldn't
      * matter how we slice it.  However, this does make it less unique.
      */
-
-    // @todo [security] Detect collisions using the raw key.
+    that.filename = that.hashString([ doc.location.toString(),
+                                      that.node_id ].join(':'));
     that.filename = that.filename.slice(0,15);
      
     var editdir = ItsAllText.getEditDir();
-    ItsAllText.debug('editdir',editdir.path);
 
     /* Get a file */
     that.file = Components.classes["@mozilla.org/file/local;1"].
@@ -71,6 +78,29 @@ function CacheObj(node) {
         var style = that.button.style;
         style.opacity = '0.1';
     };
+}
+
+
+/**
+ * Returns a unique identifier for the node, within the document.
+ * @returns {String} the unique identifier.
+ */
+CacheObj.prototype.getNodeIdentifier = function(node) {
+    var id   = node.getAttribute('id');
+    if (!id) {
+        var name = node.getAttribute('name');
+        var doc = node.ownerDocument.getElementsByTagName('html')[0];
+        var attr = ItsAllText.MYSTRING+'_id_serial';
+        
+        /* Get a serial that's unique to this document */
+        var serial = doc.getAttribute(attr);
+        if (serial) { serial = parseInt(serial, 10)+1;
+        } else { serial = 1; }
+        id = [ItsAllText.MYSTRING,'generated_id',name,serial].join('_');
+        doc.setAttribute(attr,serial);
+        node.setAttribute('id',id);
+    }
+    return id;
 };
 
 /**

@@ -242,39 +242,6 @@ var ItsAllText = function() {
         return that.preferences.debug;
     };
 
-    /**
-     * Returns a unique identifier for the node, within the document.
-     * @returns {String} the unique identifier.
-     */
-    that.getNodeIdentifier = function(node) {
-        var id   = node.getAttribute('id');
-        if (!id) {
-            var name = node.getAttribute('name');
-            var doc = node.ownerDocument.getElementsByTagName('html')[0];
-            var attr = that.MYSTRING+'_id_serial';
-        
-            /* Get a serial that's unique to this document */
-            var serial = doc.getAttribute(attr);
-            if (serial) { serial = parseInt(serial, 10)+1;
-            } else { serial = 1; }
-            id = [that.MYSTRING,'generated_id',name,serial].join('_');
-            doc.setAttribute(attr,serial);
-      
-            node.setAttribute('id',id);
-        }
-        return id;
-    };
-
-    /**
-     * Returns a unique identifier for the document.
-     * @returns {String} the unique identifier.
-     */
-    that.getDocumentIdentifier = function(doc) {
-        // @todo [low] getDocumentIdentifier should sort arguments and append the post data.
-        return doc.URL;
-    };
-
-
     // @todo [med] Profiling and optimization.
     
     /**
@@ -300,7 +267,7 @@ var ItsAllText = function() {
     that.cleanCacheObjs = function() {
         var count = 0;
         for(var id in that.tracker) {
-            var cobj = tracker[id];
+            var cobj = that.tracker[id];
             if (cobj.node.ownerDocument.location === null) {
                 that.debug('cleaning %s', id);
                 delete cobj.node;
@@ -335,6 +302,7 @@ var ItsAllText = function() {
      */
     that.refreshDocument = function(doc) {
         // @todo [high] Confirm that we find textareas inside iframes and frames.
+        if(!doc.location) { return; } // it's being cached, but not shown.
         var is_chrome = (doc.location.protocol == 'chrome:');
         var nodes = doc.getElementsByTagName('textarea');
         var i;
@@ -427,23 +395,28 @@ var ItsAllText = function() {
             var did_delete = false;
             for(i in documents) {
                 var doc = documents[i];
-                that.refreshDocument(doc);
                 if (doc.location) {
                     that.debuglog('refreshing', doc.location);
                     that.refreshDocument(doc);
-                } else {
-                    delete documents[i];
-                    did_delete = true;
                 }
             }
-
-            if(did_delete) {
-                /* Remove deleted elements */
-                that.cleanCacheObjs();
-                for(i=documents.length - 1; i >= 0; i--) {
-                    if(typeof(documents[i]) == 'undefined') {
-                        documents.splice(i,1);
-                    }
+        },
+        /**
+         * Stops watching doc.
+         * @param {Object} doc The document to watch.
+         */
+        unwatch: function(doc) {
+            var documents = that.monitor.documents;
+            for(i in documents) {
+                if (documents[i] === doc) {
+                    that.debug('unwatching', doc);
+                    delete documents[i];
+                }
+            }
+            that.cleanCacheObjs();
+            for(i=documents.length - 1; i >= 0; i--) {
+                if(typeof(documents[i]) == 'undefined') {
+                    documents.splice(i,1);
                 }
             }
         }
@@ -513,6 +486,8 @@ var ItsAllText = function() {
   
     // Do the startup when things are loaded.
     window.addEventListener("load", startup, true);
+    // Do the startup when things are unloaded.
+    window.addEventListener("unload", function(event){that.monitor.unwatch(event.originalTarget||document);}, true);
 
     // Start the monitor
     that.monitor.restart();
