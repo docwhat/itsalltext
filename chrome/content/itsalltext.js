@@ -555,7 +555,7 @@ var ItsAllText = function() {
  * @param {Object} node A DOM Node to watch.
  */
 ItsAllText.prototype.CacheObj = function(node) {
-    var self = this;
+    var that = this;
 
     /* Gumdrop Image URL */
     var gumdrop_url    = 'chrome://itsalltext/content/gumdrop.png';
@@ -570,67 +570,67 @@ ItsAllText.prototype.CacheObj = function(node) {
     /* The XUL Namespace */
     var XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-    self.timestamp = 0;
-    self.size = 0;
-    self.node = node;
-    self.button = null;
-    self.initial_color = 'transparent';
+    that.timestamp = 0;
+    that.size = 0;
+    that.node = node;
+    that.button = null;
+    that.initial_color = 'transparent';
      
-    self.node_id = ItsAllText.getNodeIdentifier(node);
-    self.doc_id  = ItsAllText.getDocumentIdentifier(node.ownerDocument);
-    self.uid = hashString([ self.doc_id,
+    that.node_id = ItsAllText.getNodeIdentifier(node);
+    that.doc_id  = ItsAllText.getDocumentIdentifier(node.ownerDocument);
+    that.uid = hashString([ that.doc_id,
                             Math.random(),
-                            self.node_id ].join(':'));
+                            that.node_id ].join(':'));
 
-    self.filename = hashString([ self.doc_id,
-                                 self.node_id ].join(':'));
+    that.filename = hashString([ that.doc_id,
+                                 that.node_id ].join(':'));
 
-    node.setAttribute(ItsAllText.MYSTRING+'_UID', self.uid);
-    ItsAllText.cache[self.uid] = self;
+    node.setAttribute(ItsAllText.MYSTRING+'_UID', that.uid);
+    ItsAllText.cache[that.uid] = that;
     
     /* Since the hash is supposed to be equally distributed, it shouldn't
      * matter how we slice it.  However, this does make it less unique.
      */
     // @todo [security] Detect collisions using the raw key.
-    self.filename = self.filename.slice(0,15);
+    that.filename = that.filename.slice(0,15);
      
     var editdir = ItsAllText.getEditDir();
     ItsAllText.debug('editdir',editdir.path);
 
     /* Get a file */
-    self.file = Components.classes["@mozilla.org/file/local;1"].
+    that.file = Components.classes["@mozilla.org/file/local;1"].
         createInstance(Components.interfaces.nsILocalFile);
-    self.file.initWithFile(editdir);
-    self.file.append(self.filename);
+    that.file.initWithFile(editdir);
+    that.file.append(that.filename);
 
     /* Remove any existing files */
-    if (self.file.exists()) {
-        self.file.remove(false);
+    if (that.file.exists()) {
+        that.file.remove(false);
     }
 
     /**
      * Convert to this object to a useful string.
      * @returns {String} A string representation of this object.
      */
-    self.toString = function() {
+    that.toString = function() {
         return [ "CacheObj",
-                 " uid=",self.uid,
-                 " timestamp=",self.timestamp,
-                 " size=",self.size
+                 " uid=",that.uid,
+                 " timestamp=",that.timestamp,
+                 " size=",that.size
         ].join('');
     };
 
     /**
      * Write out the contents of the node.
      */
-    self.write = function() {
+    that.write = function() {
         try {
             var foStream = Components.
                 classes["@mozilla.org/network/file-output-stream;1"].
                 createInstance(Components.interfaces.nsIFileOutputStream);
              
             /* write, create, truncate */
-            foStream.init(self.file, 0x02 | 0x08 | 0x20, 
+            foStream.init(that.file, 0x02 | 0x08 | 0x20, 
                           parseInt('0600',8), 0); 
              
             /* We convert to charset */
@@ -639,17 +639,17 @@ ItsAllText.prototype.CacheObj = function(node) {
                 createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
             conv.charset = ItsAllText.getCharset();
              
-            var text = conv.ConvertFromUnicode(self.node.value);
+            var text = conv.ConvertFromUnicode(that.node.value);
             foStream.write(text, text.length);
             foStream.close();
              
             /* Reset Timestamp and filesize, to prevent a spurious refresh */
-            self.timestamp = self.file.lastModifiedTime;
-            self.size      = self.file.fileSize;
+            that.timestamp = that.file.lastModifiedTime;
+            that.size      = that.file.fileSize;
              
-            return self.file.path;
+            return that.file.path;
         } catch(e) {
-            ItsAllText.debug('write',self.file.path,e);
+            ItsAllText.debug('write',that.file.path,e);
             return null;
         }
     };
@@ -662,13 +662,12 @@ ItsAllText.prototype.CacheObj = function(node) {
      * @param {String} extension The extension of the file to edit.
      * @param {boolean} retried This is used internally.
      */
-    self.edit = function(extension, retried) {
+    that.edit = function(extension, retried) {
         extension = (typeof(extension) == 'undefined'? null : extension);
         if (typeof(retried) == 'undefined') { retried = false; }
-        var filename = self.write();
-        self.initial_color = self.node.style.backgroundColor;
-        self.is_moz = self.node.style.backgroundColor;
-        ItsAllText.debuglog('narf:',self.initial_color);
+        var filename = that.write();
+        that.initial_color = that.node.style.backgroundColor;
+        that.is_moz = that.node.style.backgroundColor;
         try {
             var program = ItsAllText.getEditor();
              
@@ -692,7 +691,7 @@ ItsAllText.prototype.CacheObj = function(node) {
                               "chrome,titlebar,toolbar,centerscreen,modal",
                               "badeditor");
             if (!retried) {
-                self.edit(extension, true); // Try one more time.
+                that.edit(extension, true); // Try one more time.
             }
         }
     };
@@ -700,7 +699,7 @@ ItsAllText.prototype.CacheObj = function(node) {
     /**
      * Read the file from disk.
      */
-    self.read = function() {
+    that.read = function() {
         /* read file, reset ts & size */
         var DEFAULT_REPLACEMENT_CHARACTER = 65533;
         var buffer = [];
@@ -709,7 +708,7 @@ ItsAllText.prototype.CacheObj = function(node) {
             var fis = Components.
                 classes["@mozilla.org/network/file-input-stream;1"].
                 createInstance(Components.interfaces.nsIFileInputStream);
-            fis.init(self.file, 0x01, parseInt('00400',8), 0); 
+            fis.init(that.file, 0x01, parseInt('00400',8), 0); 
             // MODE_RDONLY | PERM_IRUSR
              
             var istream = Components.
@@ -725,8 +724,8 @@ ItsAllText.prototype.CacheObj = function(node) {
             istream.close();
             fis.close();
              
-            self.timestamp = self.file.lastModifiedTime;
-            self.size      = self.file.fileSize;
+            that.timestamp = that.file.lastModifiedTime;
+            that.size      = that.file.fileSize;
              
             return buffer.join('');
         } catch(e) {
@@ -738,12 +737,12 @@ ItsAllText.prototype.CacheObj = function(node) {
      * Has the file object changed?
      * @returns {boolean} returns true if the file has changed on disk.
      */
-    self.hasChanged = function() {
+    that.hasChanged = function() {
         /* Check exists.  Check ts and size. */
-        if(!self.file.exists() ||
-           !self.file.isReadable() ||
-           (self.file.lastModifiedTime == self.timestamp && 
-            self.file.fileSize         == self.size)) {
+        if(!that.file.exists() ||
+           !that.file.isReadable() ||
+           (that.file.lastModifiedTime == that.timestamp && 
+            that.file.fileSize         == that.size)) {
             return false;
         } else {
             return true;
@@ -756,12 +755,11 @@ ItsAllText.prototype.CacheObj = function(node) {
      * @param {int}    step   Size of a step.
      * @param {delay}  delay  Delay in microseconds.
      */
-    self.fadeStep = function(pallet, step, delay) {
+    that.fadeStep = function(pallet, step, delay) {
         return function() {
             if (step < pallet.length) {
-                self.node.style.backgroundColor = pallet[step++].hex();
-                setTimeout(self.fadeStep(pallet, step, delay),delay);
-                ItsAllText.debuglog('narf:',self.node.style.backgroundColor);
+                that.node.style.backgroundColor = pallet[step++].hex();
+                setTimeout(that.fadeStep(pallet, step, delay),delay);
             }
         };
     };
@@ -771,23 +769,23 @@ ItsAllText.prototype.CacheObj = function(node) {
      * @param {int} steps  Number of steps in the transition.
      * @param {int} delay  How long to wait between delay (microseconds).
      */
-    self.fade = function(steps, delay) {
-        var colEnd = new ItsAllText.Color(self.initial_color);
+    that.fade = function(steps, delay) {
+        var colEnd = new ItsAllText.Color(that.initial_color);
         var colStart = new ItsAllText.Color('yellow');//colEnd.invert();
         var pallet = colStart.blend(colEnd, steps);
-        setTimeout(self.fadeStep(pallet, 0, delay), delay);
+        setTimeout(that.fadeStep(pallet, 0, delay), delay);
     };
 
     /**
      * Update the node from the file.
      * @returns {boolean} Returns true ifthe file changed.
      */
-    self.update = function() {
-        if (self.hasChanged()) {
-            var value = self.read();
+    that.update = function() {
+        if (that.hasChanged()) {
+            var value = that.read();
             if (value !== null) {
-                self.fade(15, 100);
-                self.node.value = value;
+                that.fade(15, 100);
+                that.node.value = value;
                 return true;
             }
         }
@@ -798,7 +796,7 @@ ItsAllText.prototype.CacheObj = function(node) {
      * Add the gumdrop to a textarea.
      * @param {Object} cache_object The Cache Object that contains the node.
      */
-    self.addGumDrop = function() {
+    that.addGumDrop = function() {
         var cache_object = this;
         if (cache_object.button !== null) {
             cache_object.adjust();
@@ -859,9 +857,9 @@ ItsAllText.prototype.CacheObj = function(node) {
     /**
      * Updates the position of the gumdrop, incase the textarea shifts around.
      */
-    self.adjust = function() {
-        var gumdrop  = self.button;
-        var el       = self.node;
+    that.adjust = function() {
+        var gumdrop  = that.button;
+        var el       = that.node;
         var style    = gumdrop.style;
         if (!gumdrop || !el) { return; }
         var display  = '';
@@ -885,8 +883,8 @@ ItsAllText.prototype.CacheObj = function(node) {
      * the mouse waved over it.
      * @param {Event} event The event object.
      */
-    self.mouseover = function(event) {
-        var style = self.button.style;
+    that.mouseover = function(event) {
+        var style = that.button.style;
         style.opacity = '0.7';
     };
 
@@ -895,8 +893,8 @@ ItsAllText.prototype.CacheObj = function(node) {
      * the mouse waved over it and the moved off.
      * @param {Event} event The event object.
      */
-    self.mouseout = function(event) {
-        var style = self.button.style;
+    that.mouseout = function(event) {
+        var style = that.button.style;
         style.opacity = '0.1';
     };
 };
