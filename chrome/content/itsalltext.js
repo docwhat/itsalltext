@@ -19,45 +19,6 @@
 
 // @todo [idea] dropdown list for charsets (utf-8, western-iso, default)?
 
-/**
- * Creates a mostly unique hash of a string
- * Most of this code is from:
- *    http://developer.mozilla.org/en/docs/nsICryptoHash
- * @param {String} some_string The string to hash.
- * @returns {String} a hashed string.
- */
-function hashString(some_string) {
-    var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-    converter.charset = "UTF-8";
-
-    /* result is the result of the hashing.  It's not yet a string,
-     * that'll be in retval.
-     * result.value will contain the array length
-     */
-    var result = {};
-  
-    /* data is an array of bytes */
-    var data = converter.convertToByteArray(some_string, result);
-    var ch   = Components.classes["@mozilla.org/security/hash;1"].createInstance(Components.interfaces.nsICryptoHash);
-  
-    ch.init(ch.MD5);
-    ch.update(data, data.length);
-    var hash = ch.finish(true);
-  
-    // return the two-digit hexadecimal code for a byte
-    var toHexString = function(charCode) {
-        return ("0" + charCode.toString(36)).slice(-2);
-    };
-  
-    // convert the binary hash data to a hex string.
-    var retval = [];
-    for(i in hash) {
-        retval[i] = toHexString(hash.charCodeAt(i));
-    }
-  
-    return(retval.join(""));
-}
-
 var ItsAllText = function() {
     /**
      * This data is all private, which prevents security problems and it
@@ -65,11 +26,12 @@ var ItsAllText = function() {
      * @type Object
      */
     var that = this;
+
     /**
-     * This holds a cache of all the textareas that we are watching.
+     * Used for tracking all the all the textareas that we are watching.
      * @type Hash
      */
-    that.cache = {};
+    that.tracker = {};
 
     /**
      * Keeps track of all the refreshes we are running.
@@ -82,6 +44,12 @@ var ItsAllText = function() {
      * @type String
      */
     that.MYSTRING = 'itsalltext';
+
+    /* The XHTML Namespace */
+    that.XHTMLNS = "http://www.w3.org/1999/xhtml";
+
+    /* The XUL Namespace */
+    that.XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
     /**
      * This is a handy debug message.  I'll remove it or disable it when
@@ -163,9 +131,10 @@ var ItsAllText = function() {
     /* Clean the edit directory right now, on startup. */
     that.cleanEditDir();
 
-    /* Load the Color.js file used for the Fade Anything Technique into this object */
-    var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
-    objScriptLoader.loadSubScript('chrome://itsalltext/content/Color.js', that);
+    /* Load the various bits needed to make this work. */
+    var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+    loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
+    loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
 
     /**
      * Dictionary for storing the preferences in.
@@ -317,7 +286,7 @@ var ItsAllText = function() {
     that.getCacheObj = function(node) {
         var cobj = null;
         if (node && node.hasAttribute(that.MYSTRING+"_UID")) {
-            cobj = that.cache[node.getAttribute(that.MYSTRING+"_UID")];
+            cobj = that.tracker[node.getAttribute(that.MYSTRING+"_UID")];
         }
         if (!cobj) {
             cobj = new ItsAllText.CacheObj(node);
@@ -330,18 +299,18 @@ var ItsAllText = function() {
      */
     that.cleanCacheObjs = function() {
         var count = 0;
-        for(var id in that.cache) {
-            var cobj = cache[id];
+        for(var id in that.tracker) {
+            var cobj = tracker[id];
             if (cobj.node.ownerDocument.location === null) {
                 that.debug('cleaning %s', id);
                 delete cobj.node;
                 delete cobj.button;
-                delete that.cache[id];
+                delete that.tracker[id];
             } else {
                 count += 1;
             }
         }
-        that.debuglog('cache count:', count);
+        that.debuglog('tracker count:', count);
     };
 
     /**
@@ -548,357 +517,6 @@ var ItsAllText = function() {
     // Start the monitor
     that.monitor.restart();
 };
-
-/**
- * A Cache object is used to manage the node and the file behind it.
- * @constructor
- * @param {Object} node A DOM Node to watch.
- */
-ItsAllText.prototype.CacheObj = function(node) {
-    var that = this;
-
-    /* Gumdrop Image URL */
-    var gumdrop_url    = 'chrome://itsalltext/content/gumdrop.png';
-    /* Gumdrop Image Width */
-    var gumdrop_width  = 28; 
-    /* Gumdrop Image Height */
-    var gumdrop_height = 14;
-
-    /* The XHTML Namespace */
-    var XHTMLNS = "http://www.w3.org/1999/xhtml";
-
-    /* The XUL Namespace */
-    var XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-    that.timestamp = 0;
-    that.size = 0;
-    that.node = node;
-    that.button = null;
-    that.initial_color = 'transparent';
-     
-    that.node_id = ItsAllText.getNodeIdentifier(node);
-    that.doc_id  = ItsAllText.getDocumentIdentifier(node.ownerDocument);
-    that.uid = hashString([ that.doc_id,
-                            Math.random(),
-                            that.node_id ].join(':'));
-
-    that.filename = hashString([ that.doc_id,
-                                 that.node_id ].join(':'));
-
-    node.setAttribute(ItsAllText.MYSTRING+'_UID', that.uid);
-    ItsAllText.cache[that.uid] = that;
-    
-    /* Since the hash is supposed to be equally distributed, it shouldn't
-     * matter how we slice it.  However, this does make it less unique.
-     */
-    // @todo [security] Detect collisions using the raw key.
-    that.filename = that.filename.slice(0,15);
-     
-    var editdir = ItsAllText.getEditDir();
-    ItsAllText.debug('editdir',editdir.path);
-
-    /* Get a file */
-    that.file = Components.classes["@mozilla.org/file/local;1"].
-        createInstance(Components.interfaces.nsILocalFile);
-    that.file.initWithFile(editdir);
-    that.file.append(that.filename);
-
-    /* Remove any existing files */
-    if (that.file.exists()) {
-        that.file.remove(false);
-    }
-
-    /**
-     * Convert to this object to a useful string.
-     * @returns {String} A string representation of this object.
-     */
-    that.toString = function() {
-        return [ "CacheObj",
-                 " uid=",that.uid,
-                 " timestamp=",that.timestamp,
-                 " size=",that.size
-        ].join('');
-    };
-
-    /**
-     * Write out the contents of the node.
-     */
-    that.write = function() {
-        try {
-            var foStream = Components.
-                classes["@mozilla.org/network/file-output-stream;1"].
-                createInstance(Components.interfaces.nsIFileOutputStream);
-             
-            /* write, create, truncate */
-            foStream.init(that.file, 0x02 | 0x08 | 0x20, 
-                          parseInt('0600',8), 0); 
-             
-            /* We convert to charset */
-            var conv = Components.
-                classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-            conv.charset = ItsAllText.getCharset();
-             
-            var text = conv.ConvertFromUnicode(that.node.value);
-            foStream.write(text, text.length);
-            foStream.close();
-             
-            /* Reset Timestamp and filesize, to prevent a spurious refresh */
-            that.timestamp = that.file.lastModifiedTime;
-            that.size      = that.file.fileSize;
-             
-            return that.file.path;
-        } catch(e) {
-            ItsAllText.debug('write',that.file.path,e);
-            return null;
-        }
-    };
-     
-    // @todo [idea] Pass in the line number to the editor, arbitrary command?
-    // @todo [high] On edit, let user pick the file extension.
-    // @todo [idea] allow the user to pick an alternative editor?
-    /**
-     * Edit a textarea as a file.
-     * @param {String} extension The extension of the file to edit.
-     * @param {boolean} retried This is used internally.
-     */
-    that.edit = function(extension, retried) {
-        extension = (typeof(extension) == 'undefined'? null : extension);
-        if (typeof(retried) == 'undefined') { retried = false; }
-        var filename = that.write();
-        that.initial_color = that.node.style.backgroundColor;
-        that.is_moz = that.node.style.backgroundColor;
-        try {
-            var program = ItsAllText.getEditor();
-             
-            // create an nsIProcess
-            var process = Components.
-                classes["@mozilla.org/process/util;1"].
-                createInstance(Components.interfaces.nsIProcess);
-            process.init(program);
-             
-            // Run the process.
-            // If first param is true, calling thread will be blocked until
-            // called process terminates.
-            // Second and third params are used to pass command-line arguments
-            // to the process.
-            var args = [filename];
-            var result = {};
-            process.run(false, args, args.length, result);
-        } catch(e) {
-            window.openDialog('chrome://itsalltext/chrome/preferences.xul',
-                              "Preferences", 
-                              "chrome,titlebar,toolbar,centerscreen,modal",
-                              "badeditor");
-            if (!retried) {
-                that.edit(extension, true); // Try one more time.
-            }
-        }
-    };
-
-    /**
-     * Read the file from disk.
-     */
-    that.read = function() {
-        /* read file, reset ts & size */
-        var DEFAULT_REPLACEMENT_CHARACTER = 65533;
-        var buffer = [];
-         
-        try {
-            var fis = Components.
-                classes["@mozilla.org/network/file-input-stream;1"].
-                createInstance(Components.interfaces.nsIFileInputStream);
-            fis.init(that.file, 0x01, parseInt('00400',8), 0); 
-            // MODE_RDONLY | PERM_IRUSR
-             
-            var istream = Components.
-                classes["@mozilla.org/intl/converter-input-stream;1"].
-                createInstance(Components.interfaces.nsIConverterInputStream);
-            istream.init(fis, ItsAllText.getCharset(), 4096, DEFAULT_REPLACEMENT_CHARACTER);
-             
-            var str = {};
-            while (istream.readString(4096, str) !== 0) {
-                buffer.push(str.value);
-            }
-        
-            istream.close();
-            fis.close();
-             
-            that.timestamp = that.file.lastModifiedTime;
-            that.size      = that.file.fileSize;
-             
-            return buffer.join('');
-        } catch(e) {
-            return null;
-        }
-    };
-
-    /**
-     * Has the file object changed?
-     * @returns {boolean} returns true if the file has changed on disk.
-     */
-    that.hasChanged = function() {
-        /* Check exists.  Check ts and size. */
-        if(!that.file.exists() ||
-           !that.file.isReadable() ||
-           (that.file.lastModifiedTime == that.timestamp && 
-            that.file.fileSize         == that.size)) {
-            return false;
-        } else {
-            return true;
-        }
-    };
-
-    /**
-     * Part of the fading technique.
-     * @param {Object} pallet A Color blend pallet object.
-     * @param {int}    step   Size of a step.
-     * @param {delay}  delay  Delay in microseconds.
-     */
-    that.fadeStep = function(pallet, step, delay) {
-        return function() {
-            if (step < pallet.length) {
-                that.node.style.backgroundColor = pallet[step++].hex();
-                setTimeout(that.fadeStep(pallet, step, delay),delay);
-            }
-        };
-    };
-
-    /**
-     * Node fade technique.
-     * @param {int} steps  Number of steps in the transition.
-     * @param {int} delay  How long to wait between delay (microseconds).
-     */
-    that.fade = function(steps, delay) {
-        var colEnd = new ItsAllText.Color(that.initial_color);
-        var colStart = new ItsAllText.Color('yellow');//colEnd.invert();
-        var pallet = colStart.blend(colEnd, steps);
-        setTimeout(that.fadeStep(pallet, 0, delay), delay);
-    };
-
-    /**
-     * Update the node from the file.
-     * @returns {boolean} Returns true ifthe file changed.
-     */
-    that.update = function() {
-        if (that.hasChanged()) {
-            var value = that.read();
-            if (value !== null) {
-                that.fade(15, 100);
-                that.node.value = value;
-                return true;
-            }
-        }
-        return false; // If we fall through, we 
-    };
-
-    /**
-     * Add the gumdrop to a textarea.
-     * @param {Object} cache_object The Cache Object that contains the node.
-     */
-    that.addGumDrop = function() {
-        var cache_object = this;
-        if (cache_object.button !== null) {
-            cache_object.adjust();
-            return; /*already done*/
-        }
-        ItsAllText.debug('addGumDrop',cache_object);
-
-        var node = cache_object.node;
-        var doc = node.ownerDocument;
-        var offsetNode = node;
-        if (!node.parentNode) { return; }
-
-        var gumdrop = doc.createElementNS(XHTMLNS, "img");
-        gumdrop.setAttribute('src', gumdrop_url);
-        if (ItsAllText.getDebug()) {
-            gumdrop.setAttribute('title', cache_object.node_id);
-        } else {
-            gumdrop.setAttribute('title', "It's All Text!");
-        }
-        cache_object.button = gumdrop; // Store it for easy finding in the future.
-
-        // Image Attributes
-        gumdrop.style.cursor           = 'pointer';
-        gumdrop.style.display          = 'block';
-        gumdrop.style.position         = 'absolute';
-        gumdrop.style.padding          = '0';
-        gumdrop.style.border           = 'none';
-        gumdrop.style.zIndex           = 2147483646; // Max Int - 1
-
-        gumdrop.style.width            = gumdrop_width+'px';
-        gumdrop.style.height           = gumdrop_height+'px';
-
-        // Click event handler
-        gumdrop.addEventListener("click",
-                                 function(ev){ cache_object.edit('.txt'); },
-                                 false);
-
-        // Insert it into the document
-        var parent = node.parentNode;
-        var nextSibling = node.nextSibling;
-
-        if (nextSibling) {
-            parent.insertBefore(gumdrop, nextSibling);
-        } else {
-            parent.appendChild(gumdrop);
-        }
-
-        // Add mouseovers/outs
-        node.addEventListener("mouseover",    cache_object.mouseover, false);
-        node.addEventListener("mouseout",     cache_object.mouseout, false);
-        gumdrop.addEventListener("mouseover", cache_object.mouseover, false);
-        gumdrop.addEventListener("mouseout",  cache_object.mouseout, false);
-            
-        cache_object.mouseout(null);
-        cache_object.adjust();
-    };
-
-    /**
-     * Updates the position of the gumdrop, incase the textarea shifts around.
-     */
-    that.adjust = function() {
-        var gumdrop  = that.button;
-        var el       = that.node;
-        var style    = gumdrop.style;
-        if (!gumdrop || !el) { return; }
-        var display  = '';
-        if (el.style.display == 'none') {
-            display = 'none';
-        }
-        if (style.display != display) {
-            style.display = display;
-        }
-
-        /* Reposition the gumdrops incase the dom changed. */
-        var pos  = ItsAllText.getPageOffset(el);
-        var left = (pos[0]+Math.max(1,el.offsetWidth-gumdrop_width))+'px';
-        var top  = (pos[1]+el.offsetHeight)+'px';
-        if(style.left != left) { style.left = left; }
-        if(style.top != top) { style.top = top; }
-    };
-
-    /**
-     * A callback for when the textarea/textbox or button has 
-     * the mouse waved over it.
-     * @param {Event} event The event object.
-     */
-    that.mouseover = function(event) {
-        var style = that.button.style;
-        style.opacity = '0.7';
-    };
-
-    /**
-     * A callback for when the textarea/textbox or button has 
-     * the mouse waved over it and the moved off.
-     * @param {Event} event The event object.
-     */
-    that.mouseout = function(event) {
-        var style = that.button.style;
-        style.opacity = '0.1';
-    };
-};
-
 
 ItsAllText = new ItsAllText();
 
