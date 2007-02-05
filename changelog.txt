@@ -10,8 +10,10 @@ Note to Mac OS X users: Most editors come with a component in
 strange, then create a shell script to do an "open -a /path/to/editor
 $*".
 
-****** 0.3.5 ******
+****** 0.4.0 ******
 * Added API so that other extensions can have edit buttons!
+* Allow the extension of the file to be set.
+* Added the hostname to the file, so that names aren't ONLY a hash.
 
 ****** 0.3.4 ******
 * Fade in and out gumdrops.
