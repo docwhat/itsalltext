@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// @todo [idea] dropdown list for charsets (utf-8, western-iso, default)?
+// @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
 
 var ItsAllText = function() {
     /**
@@ -114,6 +114,7 @@ var ItsAllText = function() {
      * Cleans out the edit directory, deleting all files.
      */
     that.cleanEditDir = function() {
+        var last_week = Date.now() - (1000*60*60*24*7);
         var fobj = that.getEditDir();
         //return dir.directoryEntries;
         // file is the given directory (nsIFile)
@@ -121,14 +122,17 @@ var ItsAllText = function() {
         while (entries.hasMoreElements()) {
             var entry = entries.getNext();
             entry.QueryInterface(Components.interfaces.nsIFile);
-            try{
-                entry.remove(false);
-            } catch(e) {
-                that.debug('unable to remove',entry,'error:',e);
+            if(entry.lastModifiedTime < last_week) {
+                try{
+                    entry.remove(false);
+                } catch(e) {
+                    that.debug('unable to remove',entry,'because:',e);
+                }
             }
         }
     };
-    /* Clean the edit directory right now, on startup. */
+
+    /* Clean the edit directory whenever we create a new window. */
     that.cleanEditDir();
 
     /* Load the various bits needed to make this work. */
@@ -242,7 +246,7 @@ var ItsAllText = function() {
         return that.preferences.debug;
     };
 
-    // @todo [med] Profiling and optimization.
+    // @todo [3] Profiling and optimization.
     
     /**
      * Returns a cache object
@@ -292,16 +296,15 @@ var ItsAllText = function() {
         if (!is_chrome) { cobj.addGumDrop(); }
     };
 
-    // @todo [med] If the textarea is focused, we should refresh it.
-    // @todo [low] When the editor quits, we should refresh the textarea.
-    // @todo [idea] support for input elements as well?
+    // @todo [5] Refresh textarea on editor quit.
+    // @todo [9] IDEA: support for input elements as well?
 
     /**
      * Refresh Document.
      * @param {Object} doc The document to refresh.
      */
     that.refreshDocument = function(doc) {
-        // @todo [high] Confirm that we find textareas inside iframes and frames.
+        // @todo [1] Confirm that we find textareas inside iframes and frames.
         if(!doc.location) { return; } // it's being cached, but not shown.
         var is_chrome = (doc.location.protocol == 'chrome:');
         var nodes = doc.getElementsByTagName('textarea');

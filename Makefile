@@ -99,6 +99,6 @@ clean:
 realclean: clean
 	$(Q)rm -rf ../itsalltext*.xpi docs
 
-## @todo [low] Build the extension by copying into a build directory.
-## @todo [low] Minimize built JavaScript.
-## @todo [low] Put contents into a .jar during build phase.
+## @todo [5] Build the extension by copying into a build directory.
+## @todo [5] Minimize built JavaScript.
+## @todo [5] Put contents into a .jar during build phase.

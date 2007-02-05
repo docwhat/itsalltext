@@ -1,6 +1,5 @@
-// @todo [low] Use the EDITOR environment variable for default editor.
-// @todo [med] Try getting the editor from view_source.editor.path if not set.
-// @todo [med] Redo the preferences dialog to look better.
+// @todo [6] Better strategy for getting the default editor: EDITOR env variable or view_source.editor.path
+// @todo [3] Preference dialog redesign
 /**
  * Open a filepicker to select the value of the editor.
  */

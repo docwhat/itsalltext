@@ -29,6 +29,7 @@ function CacheObj(node) {
     that.uid = that.hashString([ doc.location.toString(),
                                  Math.random(),
                                  that.node_id ].join(':'));
+    // @todo [security] Add a serial to the uid hash.
 
     node.setAttribute(ItsAllText.MYSTRING+'_UID', that.uid);
     ItsAllText.tracker[that.uid] = that;
@@ -36,28 +37,26 @@ function CacheObj(node) {
     /* Figure out where we will store the file.  While the filename can
      * change, the directory that the file is stored in should not!
      */
-    ItsAllText.debug('narf',doc, doc.location);
-
-    var hostname = doc.location.toString;
-    /* Since the hash is supposed to be equally distributed, it shouldn't
-     * matter how we slice it.  However, this does make it less unique.
+    var host = window.escape(doc.location.hostname);
+    var hash = that.hashString([ doc.location.protocol,
+                                 doc.location.port,
+                                 doc.location.search,
+                                 doc.location.pathname,
+                                 doc.location.hash,
+                                 that.node_id ].join(':'));
+    that.base_filename = [host, hash.slice(0,10)].join('.');
+    /* The current extension.
+     * @type String
      */
-    that.filename = that.hashString([ doc.location.toString(),
-                                      that.node_id ].join(':'));
-    that.filename = that.filename.slice(0,15);
-     
-    var editdir = ItsAllText.getEditDir();
+    that.extension = null;
 
-    /* Get a file */
-    that.file = Components.classes["@mozilla.org/file/local;1"].
-        createInstance(Components.interfaces.nsILocalFile);
-    that.file.initWithFile(editdir);
-    that.file.append(that.filename);
+    /* Stores an nsILocalFile pointing to the current filename.
+     * @type nsILocalFile
+     */
+    that.file = null;
 
-    /* Remove any existing files */
-    if (that.file.exists()) {
-        that.file.remove(false);
-    }
+    /* Set the default extension and create the nsIFile object. */
+    that.setExtension('.txt');
 
     /**
      * A callback for when the textarea/textbox or button has 
@@ -67,6 +66,7 @@ function CacheObj(node) {
     that.mouseover = function(event) {
         var style = that.button.style;
         style.opacity = '0.7';
+        ItsAllText.refreshTextarea(that.node);
     };
 
     /**
@@ -80,6 +80,24 @@ function CacheObj(node) {
     };
 }
 
+/**
+ * Set the extension for the file to ext.
+ * @param {String} ext The extension.  Must include the dot.  Example: .txt
+ */
+CacheObj.prototype.setExtension = function(ext) {
+    if (ext == this.extension) {
+        return; /* It's already set.  No problem. */
+    }
+
+    /* Create the nsIFile object */
+    var file = Components.classes["@mozilla.org/file/local;1"].
+        createInstance(Components.interfaces.nsILocalFile);
+    file.initWithFile(ItsAllText.getEditDir());
+    file.append([this.base_filename,ext].join(''));
+
+    this.extension = ext;
+    this.file = file;
+};
 
 /**
  * Returns a unique identifier for the node, within the document.
@@ -119,46 +137,48 @@ CacheObj.prototype.toString = function() {
  * Write out the contents of the node.
  */
 CacheObj.prototype.write = function() {
-    try {
-        var foStream = Components.
-            classes["@mozilla.org/network/file-output-stream;1"].
-            createInstance(Components.interfaces.nsIFileOutputStream);
+    var foStream = Components.
+        classes["@mozilla.org/network/file-output-stream;1"].
+        createInstance(Components.interfaces.nsIFileOutputStream);
              
-        /* write, create, truncate */
-        foStream.init(this.file, 0x02 | 0x08 | 0x20, 
-                      parseInt('0600',8), 0); 
+    /* write, create, truncate */
+    foStream.init(this.file, 0x02 | 0x08 | 0x20, 
+                  parseInt('0600',8), 0); 
              
-        /* We convert to charset */
-        var conv = Components.
-            classes["@mozilla.org/intl/scriptableunicodeconverter"].
-            createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-        conv.charset = ItsAllText.getCharset();
+    /* We convert to charset */
+    var conv = Components.
+        classes["@mozilla.org/intl/scriptableunicodeconverter"].
+        createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+    conv.charset = ItsAllText.getCharset();
              
-        var text = conv.ConvertFromUnicode(this.node.value);
-        foStream.write(text, text.length);
-        foStream.close();
+    var text = conv.ConvertFromUnicode(this.node.value);
+    foStream.write(text, text.length);
+    foStream.close();
              
-        /* Reset Timestamp and filesize, to prevent a spurious refresh */
-        this.timestamp = this.file.lastModifiedTime;
-        this.size      = this.file.fileSize;
+    /* Reset Timestamp and filesize, to prevent a spurious refresh */
+    this.timestamp = this.file.lastModifiedTime;
+    this.size      = this.file.fileSize;
+
+    /* Register the file to be deleted on app exit. */
+    Components.classes["@mozilla.org/uriloader/external-helper-app-service;1"].
+        getService(Components.interfaces.nsPIExternalAppLauncher).
+        deleteTemporaryFileOnExit(this.file);
              
-        return this.file.path;
-    } catch(e) {
-        ItsAllText.debug('write',this.file.path,e);
-        return null;
-    }
+    return this.file.path;
 };
      
-// @todo [idea] Pass in the line number to the editor, arbitrary command?
-// @todo [high] On edit, let user pick the file extension.
-// @todo [idea] allow the user to pick an alternative editor?
+// @todo [9] IDEA: Pass in the line number to the editor, arbitrary command?
+// @todo [1] On edit, let user pick the file extension.
+// @todo [9] IDEA: Allow the user to pick an alternative editor?
 /**
  * Edit a textarea as a file.
  * @param {String} extension The extension of the file to edit.
  * @param {boolean} retried This is used internally.
  */
 CacheObj.prototype.edit = function(extension, retried) {
-    extension = (typeof(extension) == 'undefined'? null : extension);
+    if (typeof(extension) == 'string') {
+        this.setExtension(extension);
+    }
     if (typeof(retried) == 'undefined') { retried = false; }
     var filename = this.write();
     this.initial_color = this.node.style.backgroundColor;
