@@ -20,8 +20,7 @@
 
   If you don't want your button or menu item to show up when It's All Text!
   isn't installed, then give it the class "ShowForItsAllText" and set
-  the style (on the element, not in a stylesheet) to none.  This only works
-  for nodes in the main document.
+  the style to 'none'.
 
   Example:
       <hbox>
@@ -53,7 +52,7 @@
             var classes = node.className.split(/ +/);
             for(i in classes) {
                 if(classes[i] == "ShowForItsAllText") {
-                    node.style.display = '';
+                    node.style.display = '-moz-box';
                     break;
                 }
             }
@@ -62,4 +61,23 @@
     };
     window.addEventListener("load", onload, true);
 })();
+
+/**
+ * This is part of the public XUL API.
+ * Use this to open an editor for a specific textarea or textbox with
+ * the id 'id'.  The file will have the extension 'extension'.  Include 
+ * the leading dot in the extension.
+ * @param {String} id The id of textarea or textbody that should be opened in the editor.
+ * @param {String} extension The extension of the file used as a temporary file. Example: '.css' (optional) 
+ */
+ItsAllText.openEditor = function(id, extension) {
+    var node = document.getElementById(id);
+    /* The only way I can adjust the background of the textbox is
+     * to turn off the -moz-appearance attribute.
+     */
+    node.style.MozAppearance = 'none';
+    var cache_object = node && ItsAllText.getCacheObj(node);
+    if(!cache_object) { return; }
+    cache_object.edit(extension);
+};
 
