@@ -111,18 +111,17 @@ var ItsAllText = function() {
     };
 
     /**
-     * Cleans out the edit directory, deleting all files.
+     * Cleans out the edit directory, deleting all old files.
      */
-    that.cleanEditDir = function() {
+    that.cleanEditDir = function(force) {
+        force = (force && typeof(force) != 'undefined');
         var last_week = Date.now() - (1000*60*60*24*7);
         var fobj = that.getEditDir();
-        //return dir.directoryEntries;
-        // file is the given directory (nsIFile)
         var entries = fobj.directoryEntries;
         while (entries.hasMoreElements()) {
             var entry = entries.getNext();
             entry.QueryInterface(Components.interfaces.nsIFile);
-            if(entry.lastModifiedTime < last_week) {
+            if(force || entry.lastModifiedTime < last_week) {
                 try{
                     entry.remove(false);
                 } catch(e) {

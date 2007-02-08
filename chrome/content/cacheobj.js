@@ -18,6 +18,7 @@ function CacheObj(node) {
     that.node = node;
     that.button = null;
     that.initial_color = 'transparent';
+    that._is_watching = false;
      
     that.node_id = that.getNodeIdentifier(node);
     var doc = node.ownerDocument;
@@ -200,6 +201,7 @@ CacheObj.prototype.edit = function(extension, retried) {
         var args = [filename];
         var result = {};
         process.run(false, args, args.length, result);
+        this._is_watching = true;
     } catch(e) {
         window.openDialog('chrome://itsalltext/chrome/preferences.xul',
                           "Preferences", 
@@ -209,6 +211,21 @@ CacheObj.prototype.edit = function(extension, retried) {
             this.edit(extension, true); // Try one more time.
         }
     }
+};
+
+/**
+ * Delete the file from disk.
+ */
+CacheObj.prototype.delete = function() {
+    if(this.file.exists()) {
+        try {
+            this.file.remove();
+        } catch(e) {
+            that.debug('delete(',this.file.path,'): ',e);
+            return false;
+        }
+    }
+    return true;
 };
 
 /**
@@ -254,7 +271,8 @@ CacheObj.prototype.read = function() {
  */
  CacheObj.prototype.hasChanged = function() {
      /* Check exists.  Check ts and size. */
-     if(!this.file.exists() ||
+     if(!this._is_watching ||
+        !this.file.exists() ||
         !this.file.isReadable() ||
         (this.file.lastModifiedTime == this.timestamp && 
          this.file.fileSize         == this.size)) {
