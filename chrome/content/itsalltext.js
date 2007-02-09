@@ -489,7 +489,7 @@ var ItsAllText = function() {
     // Do the startup when things are loaded.
     window.addEventListener("load", startup, true);
     // Do the startup when things are unloaded.
-    window.addEventListener("unload", function(event){that.monitor.unwatch(event.originalTarget||document);}, true);
+    window.addEventListener("unload", function(event){that.monitor.unwatch(event.originalTarget||document); that.preference_observer.unregister();}, true);
 
     // Start the monitor
     that.monitor.restart();
