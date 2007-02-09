@@ -103,3 +103,4 @@ realclean: clean
 ## @todo [5] Minimize built JavaScript.
 ## @todo [5] Put contents into a .jar during build phase.
 ## @todo [3] Browse button should start in directory of current editor choice.
+## @todo [3] Don't monitor when page is in cache.
