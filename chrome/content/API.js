@@ -8,24 +8,32 @@
   If "It's All Text!" isn't installed in the browser, it will fail safely.
   It only generates an info message in the error console.
 
-  Then you need to create a way to call ItsAllText.openEditor().
-  Usage:
-    ItsAllText.openEditor('id-of-your-textbox');
-      or
-    ItsAllText.openEditor('id-of-your-textbox', '.extension');
-  The string 'id-of-your-textbox' should be the id of the textbox
-  you want to be editable.
-  The optional string '.extension' should be the suggested extension
-  for the textfile. Include the dot at the beginning.
+  You then have two choices.  You can call ItsAllTextopenEditor() directly
+  via JavaScript or you can add one or two attributes to a XUL element and
+  it'll automatically be set up right.
 
-  If you don't want your button or menu item to show up when It's All Text!
-  isn't installed, then give it the class "ShowForItsAllText" and set
-  the style to 'none'.
+  The suggested method is to add the correct attributes to your XUL item
+  and let It's All Text! do it for you.
+
+  Attributes:
+    'itsalltext-control' -- This should be set to the id of the textbox
+                            that you want to edit when command is executed
+                            on this XUL element. This is required.
+    'itsalltext-extension' -- This is the file extension.  Include the
+                              leading dot character.  Example: '.css'
+                              It defaults to '.txt' and is optional.
+
+  If you don't want this XUL element to be visible unless It's All Text!
+  is installed, then you should set it's CSS style display to 'none'.
 
   Example:
       <hbox>
         <spacer flex="1"/>
-        <button label="It's All Text!" class="ShowForItsAllText" style="display: none;" oncommand="ItsAllText.openEditor('code', '.c');"/>
+        <button label="It's All Text!"
+                itsalltext-control="code"
+                itsalltext-extension=".css"
+                style="display: none;"
+        />
       </hbox>
 
  */
@@ -41,21 +49,24 @@
 
         /* Turn on all the hidden CSS */
         var nodes = [];
-        var nodesIter = document.evaluate("//node()[@class]", document, null, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null); 
+        var nodesIter = document.evaluate("//node()[@itsalltext-control]",
+                                          document, null,
+                                          XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null); 
+
         var node = nodesIter.iterateNext(); 
         while (node) {
             nodes.push(node);
             node = nodesIter.iterateNext();
         }
+        var command = function(event) {
+            ItsAllText.openEditor( this.getAttribute("itsalltext-control"),
+                                   this.getAttribute("itsalltext-extension") );
+            return false;
+        };
         for(i in nodes) {
             node = nodes[i];
-            var classes = node.className.split(/ +/);
-            for(i in classes) {
-                if(classes[i] == "ShowForItsAllText") {
-                    node.style.display = '-moz-box';
-                    break;
-                }
-            }
+            node.addEventListener('command', command, true);
+            node.style.display = '-moz-box';
         }
 
     };
