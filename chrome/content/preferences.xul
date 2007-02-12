@@ -22,37 +22,55 @@
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
 
-  <hbox flex="1">
-    <vbox flex="1"> 
-      <hbox align="right">
-        <label control="editor" value="Editor: "/>
-        <textbox preference="pref_editor" id="editor" size="20" readonly="false"
-         style="-moz-appearance: none !important; background: inherit;" />
-        <button oncommand="pref_editor_select();" label="Browse" id="browse"
-        accesskey="b" tabindex="1"/>
-      </hbox>
-      <hbox align="right">
-        <label control="seconds" value="Seconds between refreshing: "/>
-        <textbox preference="pref_seconds" id="seconds" size="2"
-        maxlength="2" tabindex="2"/>
-      </hbox>
-      <hbox align="right">
-        <label control="charset"
-               value="Character Set (default: UTF-8): "/>
-        <textbox preference="pref_charset" id="charset" size="8" tabindex="3"/>
-      </hbox>
-      <hbox align="right">
-        <label control="charset"
-               value="File Extensions: "/>
-        <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4"/>
-      </hbox>
-      <hbox align="right">
-        <label control="debug"
-               value="Enable Debugging: "/>
-        <checkbox preference="pref_debug" id="debug" tabindex="5"/>
-      </hbox>
-      <spacer flex="2"/>
-    </vbox>
+  <hbox>
+    <grid>
+      <columns>
+        <column/>
+        <column/>
+      </columns>
+      <rows>
+        <row align="center">
+          <label control="editor" value="Editor:"/>
+          <vbox>
+            <textbox preference="pref_editor" id="editor" size="20" readonly="false"
+             style="-moz-appearance: none !important; background:
+             inherit;" />
+            <hbox align="right">
+              <spacer/>
+              <button oncommand="pref_editor_select();" label="Browse"
+              id="browse" accesskey="b" tabindex="1"/>
+            </hbox>
+          </vbox>
+        </row>
+        <row align="center">
+          <label control="seconds" value="Seconds between refreshing:"/>
+          <hbox>
+            <textbox preference="pref_seconds" id="seconds" size="2"
+            maxlength="2" tabindex="2"/>
+            <spacer/>
+          </hbox>
+        </row>
+        <row align="center">
+          <label control="charset"
+                 value="Character Set (default: UTF-8):"/>
+          <hbox>
+            <textbox preference="pref_charset" id="charset" size="8" tabindex="3"/>
+            <spacer/>
+          </hbox>
+        </row>
+        <row align="center">
+          <label control="charset"
+                 value="File Extensions:"/>
+          <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4"/>
+        </row>
+        <row align="center">
+          <label control="debug"
+                 value="Debugging:"/>
+          <checkbox preference="pref_debug" id="debug" tabindex="5"
+          label="Remove all bugs"/>
+        </row>
+      </rows>
+    </grid>
     <vbox id="help" flex="1">
     </vbox>
   </hbox>
