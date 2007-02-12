@@ -93,6 +93,7 @@ narf:
 
 .PHONY: clean
 clean:
+	$(Q)find -name '*.orig' -print0 | xargs -0 --no-run-if-empty rm
 	$(Q)rm -rf $(XPI_FILE) *.log
 
 .PHONY: realclean
