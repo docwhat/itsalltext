@@ -17,6 +17,7 @@ $*".
 * We now have extension settings.
 * Extensions can make use of It's All Text! as well (see API.js).
 * cleaned up preferences layout.
+* Found and fixed a memory leak in the preference observer.
 
 ****** 0.3.4 ******
 * Fade in and out gumdrops.

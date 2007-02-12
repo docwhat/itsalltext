@@ -12,8 +12,8 @@
   via JavaScript or you can add one or two attributes to a XUL element and
   it'll automatically be set up right.
 
-  The suggested method is to add the correct attributes to your XUL item
-  and let It's All Text! do it for you.
+  The suggested method is to add the correct attributes to your XUL button 
+  or menuitem and let "It's All Text!" do it for you.
 
   Attributes:
     'itsalltext-control' -- This should be set to the id of the textbox
@@ -23,10 +23,10 @@
                               leading dot character.  Example: '.css'
                               It defaults to '.txt' and is optional.
 
-  If you don't want this XUL element to be visible unless It's All Text!
+  If you don't want this XUL element to be visible unless "It's All Text!"
   is installed, then you should set it's CSS style display to 'none'.
 
-  Example:
+  Example using attributes (recommended method):
       <hbox>
         <spacer flex="1"/>
         <button label="It's All Text!"
@@ -35,6 +35,11 @@
                 style="display: none;"
         />
       </hbox>
+
+  Example calling openEditor() directly:
+     if(some_condition && ItsAllText) {
+         ItsAllText.openEditor('id-of-textarea', '.extension');
+     }
 
  */
 
