@@ -102,5 +102,4 @@ realclean: clean
 ## @todo [5] [make] Do a proper build in another directory.
 ## @todo [5] [make] Minimize JavaScript.
 ## @todo [5] [make] Put contents into a .jar.
-## @todo [3] Browse button should start in directory of current editor choice.
 ## @todo [3] Don't monitor when page is in cache.
