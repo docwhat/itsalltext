@@ -1,11 +1,10 @@
 // @todo [6] [pref] Better strategy for getting the default editor: EDITOR env variable or view_source.editor.path
 // @todo [3] [pref] Preference dialog redesign
-// @todo [3] [pref] Browse button should start in directory of current editor choice.
 /**
  * Open a filepicker to select the value of the editor.
  */
 function pref_editor_select() {  
-    // Note: If jslint could, we'd use const here
+    var pref_editor = document.getElementById('pref_editor');
     var nsIFilePicker = Components.interfaces.nsIFilePicker;
  
     var fp = Components.classes["@mozilla.org/filepicker;1"].
@@ -16,18 +15,18 @@ function pref_editor_select() {
     var initdir = Components.classes["@mozilla.org/file/local;1"].
         createInstance(Components.interfaces.nsILocalFile);
     try {
-        initdir.initWithPath('/usr/bin');
+        initdir.initWithPath(pref_editor.value);
+        initdir = initdir.parent;
         if (initdir.exists() && initdir.isDirectory()) {
             fp.displayDirectory = initdir;
         }
     } catch(e) {
-        // Ignore error - /usr/bin only useful for unix boxen.
+        // Ignore error, the pref may not have been set or who knows.
     }
   
     var rv = fp.show();
     if (rv == nsIFilePicker.returnOK) {
         var file = fp.file;
-        var pref_editor = document.getElementById('pref_editor');
         pref_editor.value = file.path;
         var editor = document.getElementById('editor');
         editor.style.color = 'inherit';
