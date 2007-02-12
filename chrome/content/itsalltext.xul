@@ -2,20 +2,32 @@
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="itsalltext.js"/>
+
   <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
-     <menuitem id="its-all-text-edit" label="It's All Text" 
+     <menuitem id="itsalltext-menuitem" label="It's All Text!" 
                oncommand="itsAllTextOverlay.onEditNode(document.popupNode)"
                accesskey="i" />
   </popup>
 
-  <popupset>
-    <menupopup id="its-all-text-menu">
-      <menuitem label="Cut"/>
-      <menuitem label="Copy"/>
-      <menuitem label="Paste"/>
-    </menupopup>
-  </popupset>
+
+  <!-- The merge point is main-window -->
+  <window id="main-window">
+    <popupset id="itsalltext-optionmenu-set">
+      <popup id="itsalltext-optionmenu">
+        <menuitem label="New edit extension..."
+                  accesskey="n"
+                  oncommand="ItsAllText.menuNewExtEdit(event);" />
+        <menuseparator/>
+        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
+        <menuseparator/>
+        <menuitem label="Preferences"
+                  accesskey="p"
+                  oncommand="window.openDialog('chrome://itsalltext/chrome/preferences.xul', 'Preferences', 'chrome,titlebar,toolbar,centerscreen,modal', 'badeditor');"/>
+      </popup>
+    </popupset>
+  </window>
+
 </overlay>
 <!-- Local Variables: -->
 <!-- mode: xml -->

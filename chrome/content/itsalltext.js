@@ -1,6 +1,6 @@
 /*
  *  It's All Text - Easy external editing of web forms.
- *  Copyright (C) 2006 Christian Höltje
+ *  Copyright 2006 Christian Höltje
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -143,7 +143,28 @@ var ItsAllText = function() {
      * Dictionary for storing the preferences in.
      * @type Hash
      */
-    that.preferences = {};
+    that.preferences = {
+        /**
+         * Fetches the current value of the preference.
+         * @private
+         * @param {String} aData The name of the pref to fetch.
+         * @returns {Object} The value of the preference.
+         */
+        _get: function(aData) {
+            var po = that.preference_observer;
+            return po._branch['get'+(po.types[aData])+'Pref'](aData);
+        },
+
+        /**
+         * Sets the current preference.
+         * @param {String} aData The name of the pref to change.
+         * @param {Object} value The value to set.
+         */
+        _set: function(aData, value) {
+            var po = that.preference_observer;
+            return po._branch['set'+(po.types[aData])+'Pref'](aData, value);
+        }
+    };
 
     /**
      * A Preference Observer.
@@ -155,10 +176,11 @@ var ItsAllText = function() {
          * @type Hash
          */
         types: {
-            'charset': 'Char',
-            'editor':  'Char',
-            'refresh': 'Int',
-            'debug':   'Bool'
+            'charset':      'Char',
+            'editor':       'Char',
+            'refresh':      'Int',
+            'debug':        'Bool',
+            'extensions':   'Char'
         },
 
         /**
@@ -170,10 +192,11 @@ var ItsAllText = function() {
                 getService(Components.interfaces.nsIPrefService);
             this._branch = prefService.getBranch("extensions."+that.MYSTRING+".");
             this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
-            for(var type in this.types) {
-                that.preferences[type] = this._branch['get'+(this.types[type])+'Pref'](type);
-            }
             this._branch.addObserver("", this, false);
+            /* setup the preferences */
+            for(var type in this.types) {
+                that.preferences[type] = that.preferences._get(type);
+            }
         },
 
         /**
@@ -194,12 +217,12 @@ var ItsAllText = function() {
         observe: function(aSubject, aTopic, aData) {
             if (aTopic != "nsPref:changed") {return;}
             if (that.preferences) {
-                that.preferences[aData] = this._branch['get'+(this.types[aData])+'Pref'](aData);
+                that.preferences[aData] = that.preferences._get(aData);
                 if (aData == 'refresh') {
                     that.monitor.restart();
                 }
             }
-        }
+        }        
     };
 
     /**
@@ -243,6 +266,37 @@ var ItsAllText = function() {
      */
     that.getDebug = function() {
         return that.preferences.debug;
+    };
+
+    /**
+     * A Preference Option: The list of extensions
+     * @returns Array
+     */
+    that.getExtensions = function() {
+        var e = that.preferences.extensions.replace(/[\n\t ]+/g,'');
+        return e.split(',');
+    };
+
+    /**
+     * A Preference Option: Append an extension
+     * @returns Array
+     */
+    that.appendExtensions = function(ext) {
+        ext = ext.replace(/[\n\t ]+/g,'');
+        var current = that.getExtensions();
+        for(var i=0; i<current.length; i++) {
+            if(ext == current[i]) {
+                return; // Don't add a duplicate.
+            }
+        }
+        
+        var value = that.preferences.extensions;
+        if(value.replace(/[\t\n ]+/g) === '') {
+            value = ext;
+        } else {
+            value = [value,',',ext].join('');
+        }
+        that.preferences._set('extensions', value);
     };
 
     // @todo [3] Profiling and optimization.
@@ -455,10 +509,13 @@ var ItsAllText = function() {
      * @param {Object} event The event passed in by the event handler.
      */
     that.onContextMenu = function(event) {
-        that.debug('onContextMenu',document.popupNode.nodeName);
-        document.getElementById("its-all-text-edit").
-            setAttribute('disabled', (document.popupNode.nodeName != "TEXTAREA"));
-        return;
+        var tag = document.popupNode.nodeName.toLowerCase();
+
+        that.debug('onContextMenu', tag);
+        document.getElementById("itsalltext-menuitem").
+            setAttribute('hidden', (tag != "textarea" &&
+                                    tag != "textbox"));
+        return true;
     };
 
     /**
@@ -467,6 +524,9 @@ var ItsAllText = function() {
      */
     var startup = function(event) {
         that.debug("startup(): It's All Text! is watching this window...");
+        // Start watching the preferences.
+        that.preference_observer.register();
+
         var appcontent = document.getElementById("appcontent"); // The Browser
         if (appcontent) {
             // Normal web-page.
@@ -483,9 +543,6 @@ var ItsAllText = function() {
         }
     };
   
-    // Start watching the preferences.
-    that.preference_observer.register();
-
     // Do the startup when things are loaded.
     window.addEventListener("load", startup, true);
     // Do the startup when things are unloaded.
@@ -493,6 +550,70 @@ var ItsAllText = function() {
 
     // Start the monitor
     that.monitor.restart();
+};
+
+/**
+ * The command that is called when picking a new extension.
+ * @param {Event} event
+ */
+ItsAllText.prototype.menuNewExtEdit = function(event) {
+    // @todo [1] menuNewExtEdit is non-functional
+    var that = this;
+    var uid = this._current_uid;
+    var cobj = that.tracker[uid];
+
+    var params = {out:null};       
+    window.openDialog("chrome://itsalltext/chrome/newextension.xul", "",
+    "chrome, dialog, modal, resizable=yes", params).focus();
+    if (params.out) {
+        var ext = params.out.extension.replace(/[\n\t ]+/g,'');
+        if(params.out.do_save) {
+            that.appendExtensions(ext);
+        }
+        cobj.edit(ext);
+    }
+};
+
+/**
+ * The command that is called when selecting an existing extension.
+ * @param {Event} event
+ */
+ItsAllText.prototype.menuExtEdit = function(event) {
+    var that = this;
+    var uid = this._current_uid;
+    var ext = event.target.getAttribute('label');
+    var cobj = that.tracker[uid];
+    cobj.edit(ext);
+};
+
+/**
+ * Rebuilds the option menu, to reflect the current list of extensions.
+ * @private
+ * @param {String} uid The UID to show in the option menu.
+ */
+ItsAllText.prototype.rebuildOptionMenu = function(uid) {
+    var i;
+    var that = this;
+    var exts = that.getExtensions();
+    var menu = document.getElementById('itsalltext-optionmenu');
+    var items = menu.childNodes;
+    var len   = items.length - 2; // ignore the pref and separator
+    var sep   = items[len];
+    var start = 2;
+    var node;
+    that._current_uid = uid;
+    
+    for(i = len-1; i >= start; i--) {
+        menu.removeChild(items[i]);
+    }
+    for(i=0; i<exts.length; i++) {
+        node = document.createElementNS(that.XULNS, 'menuitem');
+        node.setAttribute('label', exts[i]);
+        node.addEventListener('command', function(event){return that.menuExtEdit(event);}, false);
+        menu.insertBefore(node, sep);
+
+    }
+    return menu;
 };
 
 ItsAllText = new ItsAllText();

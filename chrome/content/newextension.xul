@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<dialog
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  id="ItsAllTextNewExtension"
+  title="It's All Text! New Extension"
+  ondialogaccept="return onOK();"
+  persist="screenX screenY width height"
+  windowtype="ItsAllTextWindowType">
+
+  <script type="application/x-javascript" src="chrome://itsalltext/content/newextension.js"/>
+  <grid>
+    <columns><column/><column/></columns>
+    <rows>
+      <row align="center"><label value="Extension (with leading dot):"/><textbox id="new_ext" value=".txt"/></row>
+      <row align="center"><spacer/><checkbox id="do_save" label="Save for future use"/></row>
+    </rows>
+  </grid>
+</dialog>
+<!-- Local Variables: -->
+<!-- mode: xml -->
+<!-- End: -->

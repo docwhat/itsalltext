@@ -16,6 +16,8 @@
                 name="extensions.itsalltext.editor" type="string"/>
     <preference id="pref_seconds"
                 name="extensions.itsalltext.refresh" type="int"/>
+    <preference id="pref_extensions"
+                name="extensions.itsalltext.extensions" type="string"/>
     <preference id="pref_debug"
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
@@ -40,9 +42,14 @@
         <textbox preference="pref_charset" id="charset" size="8" tabindex="3"/>
       </hbox>
       <hbox align="right">
+        <label control="charset"
+               value="File Extensions: "/>
+        <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4"/>
+      </hbox>
+      <hbox align="right">
         <label control="debug"
                value="Enable Debugging: "/>
-        <checkbox preference="pref_debug" id="debug" tabindex="4"/>
+        <checkbox preference="pref_debug" id="debug" tabindex="5"/>
       </hbox>
       <spacer flex="2"/>
     </vbox>

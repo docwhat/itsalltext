@@ -216,12 +216,12 @@ CacheObj.prototype.edit = function(extension, retried) {
 /**
  * Delete the file from disk.
  */
-CacheObj.prototype.delete = function() {
+CacheObj.prototype.remove = function() {
     if(this.file.exists()) {
         try {
             this.file.remove();
         } catch(e) {
-            that.debug('delete(',this.file.path,'): ',e);
+            that.debug('remove(',this.file.path,'): ',e);
             return false;
         }
     }
@@ -362,11 +362,29 @@ CacheObj.prototype.addGumDrop = function() {
     
     gumdrop.style.width            = this.gumdrop_width+'px';
     gumdrop.style.height           = this.gumdrop_height+'px';
+
+    gumdrop.setAttribute(ItsAllText.MYSTRING+'_UID', cache_object.uid);
+
+    var clickfun = function(event) {
+        var use_context  = event.ctrlKey || event.altKey;
+        var use_cutpaste = event.shiftKey;
+        if (use_context) {
+            var w = document.getElementById("main-window");
+            ItsAllText.debug('mouse: use_context',event.screenX,event.screenY);
+            var target = ItsAllText.rebuildOptionMenu(cache_object.uid);
+            target.showPopup(w, event.screenX, event.screenY,
+                             "popup", null, null);
+        } else if(use_cutpaste) {
+            ItsAllText.debug('mouse: use_cutpaste');
+        } else {
+            cache_object.edit('.txt');
+        }
+        event.stopPropagation();
+        return false;
+    };
     
     // Click event handler
-    gumdrop.addEventListener("click",
-                             function(ev){ cache_object.edit('.txt'); },
-                             false);
+    gumdrop.addEventListener("click", clickfun, false);
     
     // Insert it into the document
     var parent = node.parentNode;
