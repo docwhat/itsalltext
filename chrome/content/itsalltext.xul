@@ -23,7 +23,7 @@
         <menuseparator/>
         <menuitem label="Preferences"
                   accesskey="p"
-                  oncommand="window.openDialog('chrome://itsalltext/chrome/preferences.xul', 'Preferences', 'chrome,titlebar,toolbar,centerscreen,modal', 'badeditor');"/>
+                  oncommand="window.openDialog('chrome://itsalltext/chrome/preferences.xul', 'Preferences', 'chrome,titlebar,toolbar,centerscreen,modal');"/>
       </popup>
     </popupset>
   </window>
