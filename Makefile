@@ -89,7 +89,7 @@ todo:
 
 .PHONY: narf
 narf:
-	$(Q)grep -nri 'narf' [a-z0-9]*
+	$(Q)grep -nri 'narf' [a-z0-9]* ; test $$? = 1
 
 .PHONY: clean
 clean:
