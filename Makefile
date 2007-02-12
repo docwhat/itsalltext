@@ -99,8 +99,8 @@ clean:
 realclean: clean
 	$(Q)rm -rf ../itsalltext*.xpi docs
 
-## @todo [5] Build the extension by copying into a build directory.
-## @todo [5] Minimize built JavaScript.
-## @todo [5] Put contents into a .jar during build phase.
+## @todo [5] [make] Do a proper build in another directory.
+## @todo [5] [make] Minimize JavaScript.
+## @todo [5] [make] Put contents into a .jar.
 ## @todo [3] Browse button should start in directory of current editor choice.
 ## @todo [3] Don't monitor when page is in cache.

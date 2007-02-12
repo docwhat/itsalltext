@@ -557,7 +557,6 @@ var ItsAllText = function() {
  * @param {Event} event
  */
 ItsAllText.prototype.menuNewExtEdit = function(event) {
-    // @todo [1] menuNewExtEdit is non-functional
     var that = this;
     var uid = this._current_uid;
     var cobj = that.tracker[uid];

@@ -169,7 +169,6 @@ CacheObj.prototype.write = function() {
 };
      
 // @todo [9] IDEA: Pass in the line number to the editor, arbitrary command?
-// @todo [1] On edit, let user pick the file extension.
 // @todo [9] IDEA: Allow the user to pick an alternative editor?
 /**
  * Edit a textarea as a file.
@@ -377,6 +376,7 @@ CacheObj.prototype.addGumDrop = function() {
         } else if(use_cutpaste) {
             ItsAllText.debug('mouse: use_cutpaste');
         } else {
+            // @todo [7] Store the last used extension and reuse it.
             cache_object.edit('.txt');
         }
         event.stopPropagation();
