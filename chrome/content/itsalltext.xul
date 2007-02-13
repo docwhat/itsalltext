@@ -6,7 +6,7 @@
   <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
      <menuitem id="itsalltext-menuitem" label="It's All Text!" 
-               oncommand="itsAllTextOverlay.onEditNode(document.popupNode)"
+               oncommand="ItsAllText.onEditNode(document.popupNode)"
                accesskey="i" />
   </popup>
 
