@@ -12,6 +12,7 @@ $*".
 
 ****** 0.4.2 ******
 * Stupid bugs fixed.
+* The popup positions right in XP.
 
 ****** 0.4.0 ******
 * Added API so that other extensions can have edit buttons!

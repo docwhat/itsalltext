@@ -368,11 +368,10 @@ CacheObj.prototype.addGumDrop = function() {
         var use_context  = event.ctrlKey || event.altKey;
         var use_cutpaste = event.shiftKey;
         if (use_context) {
-            var w = document.getElementById("main-window");
-            ItsAllText.debug('mouse: use_context',event.screenX,event.screenY);
             var target = ItsAllText.rebuildOptionMenu(cache_object.uid);
-            target.showPopup(w, event.screenX, event.screenY,
-                             "popup", null, null);
+            target.showPopup(document.documentElement,
+                             event.screenX, event.screenY,
+                             "bottomleft", "topleft");
         } else if(use_cutpaste) {
             ItsAllText.debug('mouse: use_cutpaste');
         } else {
