@@ -57,7 +57,11 @@ function CacheObj(node) {
     that.file = null;
 
     /* Set the default extension and create the nsIFile object. */
-    that.setExtension('.txt');
+    var extension = node.getAttribute('itsalltext-extension');
+    if (typeof(extension) != 'string' || !extension.match(/^[.a-z0-9]+$/i)) {
+        extension = '.txt';
+    }
+    that.setExtension(extension);
 
     /**
      * A callback for when the textarea/textbox or button has 
@@ -375,8 +379,7 @@ CacheObj.prototype.addGumDrop = function() {
         } else if(use_cutpaste) {
             ItsAllText.debug('mouse: use_cutpaste');
         } else {
-            // @todo [7] Store the last used extension and reuse it.
-            cache_object.edit('.txt');
+            cache_object.edit();
         }
         event.stopPropagation();
         return false;

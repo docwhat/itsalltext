@@ -13,6 +13,9 @@ $*".
 ****** 0.4.2 ******
 * Stupid bugs fixed.
 * The popup positions right in XP.
+* The default extension can be set by the web-page designer via:
+  itsalltext-extension=".extension"
+* The chosen extension is remembered for the life of the page.
 
 ****** 0.4.0 ******
 * Added API so that other extensions can have edit buttons!
