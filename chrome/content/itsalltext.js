@@ -51,6 +51,33 @@ var ItsAllText = function() {
     /* The XUL Namespace */
     that.XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
+
+    var string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"].
+        getService(Components.interfaces.nsIStringBundleService);
+    /**
+     * A localization bundle.  Use it like so:
+     * ItsAllText.locale.getStringFromName('blah');
+     */
+    that.locale = string_bundle.createBundle("chrome://itsalltext/locale/itsalltext.properties");
+    /**
+     * Formats a locale string, replacing $N with the arguments in arr.
+     * @param {String} name Locale property name
+     * @param {Array} arr Array of strings to replace in the string.
+     * @returns String
+     */
+    that.localeFormat = function(name, arr) {
+        return this.locale.formatStringFromName(name, arr, arr.length);
+    };
+    /**
+     * Returns the locale string matching name.
+     * @param {String} name Locale property name
+     * @returns String
+     */
+    that.localeString = function(name) {
+        return this.locale.GetStringFromName(name);
+    }
+        
+
     /**
      * This is a handy debug message.  I'll remove it or disable it when
      * I release this.
@@ -105,7 +132,7 @@ var ItsAllText = function() {
                         parseInt('0700',8));
         }
         if (!fobj.isDirectory()) {
-            that.error('Having a problem finding or creating directory: '+fobj.path);
+            that.error(that.localeFormat('problem_making_directory', [fobj.path]));
         }
         return fobj;
     };
@@ -239,6 +266,10 @@ var ItsAllText = function() {
      */
     that.getRefresh = function() {
         var refresh = that.preferences.refresh;
+        if (!refresh || refresh < 1) {
+            that.debug('Invalid refresh gotten:',refresh);
+            refresh = 1;
+        }
         var retval = 1000*refresh;
         return retval;
 

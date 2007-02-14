@@ -7,11 +7,11 @@ function CacheObj(node) {
     var that = this;
 
     /* Gumdrop Image URL */
-    that.gumdrop_url    = 'chrome://itsalltext/content/gumdrop.png';
+    that.gumdrop_url    = 'chrome://itsalltext/locale/gumdrop.png';
     /* Gumdrop Image Width */
-    that.gumdrop_width  = 28; 
+    that.gumdrop_width  = ItsAllText.localeString('gumdrop.width'); 
     /* Gumdrop Image Height */
-    that.gumdrop_height = 14;
+    that.gumdrop_height = ItsAllText.localeString('gumdrop.height');
 
     that.timestamp = 0;
     that.size = 0;
@@ -206,11 +206,11 @@ CacheObj.prototype.edit = function(extension, retried) {
         process.run(false, args, args.length, result);
         this._is_watching = true;
     } catch(e) {
-        window.openDialog('chrome://itsalltext/chrome/preferences.xul',
-                          "Preferences", 
-                          "chrome,titlebar,toolbar,centerscreen,modal",
-                          "badeditor");
         if (!retried) {
+            window.openDialog('chrome://itsalltext/chrome/preferences.xul',
+                              ItsAllText.localeString('no_editor_pref'), 
+                              "chrome,titlebar,toolbar,centerscreen,modal",
+                              "badeditor");
             this.edit(extension, true); // Try one more time.
         }
     }
@@ -351,7 +351,7 @@ CacheObj.prototype.addGumDrop = function() {
     if (ItsAllText.getDebug()) {
         gumdrop.setAttribute('title', cache_object.node_id);
     } else {
-        gumdrop.setAttribute('title', "It's All Text!");
+        gumdrop.setAttribute('title', ItsAllText.localeString('program_name'));
     }
     cache_object.button = gumdrop; // Store it for easy finding in the future.
     
