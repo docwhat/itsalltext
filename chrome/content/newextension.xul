@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+
+<!DOCTYPE prefwindow SYSTEM "chrome://itsalltext/locale/newextension.dtd" >
 <dialog
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
   id="ItsAllTextNewExtension"
-  title="It's All Text! New Extension"
+  title="&title;"
   ondialogaccept="return onOK();"
   persist="screenX screenY width height"
   windowtype="ItsAllTextWindowType">
@@ -16,12 +18,12 @@
     </columns>
     <rows>
       <row align="center">
-        <label value="Extension (with leading dot):"/>
+        <label value="&extension.label;"/>
         <textbox id="new_ext" value=".txt"/>
       </row>
       <row align="center">
         <spacer/>
-        <checkbox id="do_save" label="Save for future use"/>
+        <checkbox id="do_save" label="&save.label;"/>
       </row>
     </rows>
   </grid>

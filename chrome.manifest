@@ -1,3 +1,4 @@
 content itsalltext chrome/content/
+locale itsalltext en-US chrome/locale/en-US/
 
 overlay chrome://browser/content/browser.xul chrome://itsalltext/content/itsalltext.xul

@@ -1,14 +1,19 @@
 // @todo [6] [pref] Better strategy for getting the default editor: EDITOR env variable or view_source.editor.path
+
 /**
  * Open a filepicker to select the value of the editor.
  */
 function pref_editor_select() {  
+    var locale = document.getElementById("strings");
+
     var pref_editor = document.getElementById('pref_editor');
     var nsIFilePicker = Components.interfaces.nsIFilePicker;
  
     var fp = Components.classes["@mozilla.org/filepicker;1"].
         createInstance(nsIFilePicker);
-    fp.init(window, "Choose your editor", nsIFilePicker.modeOpen);
+    fp.init(window,
+            locale.getString('picker.window.title'),
+            nsIFilePicker.modeOpen);
     fp.appendFilters(nsIFilePicker.filterApps);
 
     var initdir = Components.classes["@mozilla.org/file/local;1"].
@@ -43,6 +48,7 @@ function setHelp(text) {
 }
 
 function pref_onload() {
+    var locale = document.getElementById("strings");
     document.getElementById('browse').focus();
     if (window['arguments'] && window['arguments'][0] && window['arguments'][0] == 'badeditor') {
         var editor = document.getElementById('editor');
@@ -54,15 +60,13 @@ function pref_onload() {
             box.removeChild(box.firstChild);
         }
         var desc = document.createElement('description');
-        var textnode = document.createTextNode(["I was unable to run your editor, '",
-                                                editor.value,
-                                                "'.  Use the browse button to choose another editor and try again. "].join(''));
+        var textnode = document.createTextNode(locale.getFormattedString('problem.editor', [editor.value]));
         desc.appendChild(textnode);
         desc.style.maxWidth = '18em';
         box.appendChild(desc);
 
         desc = document.createElement('description');
-        textnode = document.createTextNode("If you use Mac OS X, then you'll need to use the binary installed by your editor in /usr/bin OR you can try to find the binary in the NAME.app/Contents/MacOS/ directory.");
+        textnode = document.createTextNode(locale.getString('mac.hint'));
         desc.appendChild(textnode);
         desc.style.maxWidth = '18em';
         box.appendChild(desc);

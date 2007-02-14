@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!DOCTYPE overlay SYSTEM "chrome://itsalltext/locale/itsalltext.dtd" >
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/x-javascript" src="itsalltext.js"/>
+  <script type="application/x-javascript" src="itsalltext.js" />
 
   <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
-     <menuitem id="itsalltext-menuitem" label="It's All Text!" 
+     <menuitem id="itsalltext-menuitem" label="&top.label;" 
                oncommand="ItsAllText.onEditNode(document.popupNode)"
-               accesskey="i" />
+               accesskey="&top.key;" />
   </popup>
 
 
@@ -15,14 +16,14 @@
   <window id="main-window">
     <popupset id="itsalltext-optionmenu-set">
       <popup id="itsalltext-optionmenu">
-        <menuitem label="New edit extension..."
-                  accesskey="n"
+        <menuitem label="&newext.label;"
+                  accesskey="&newext.key;"
                   oncommand="ItsAllText.menuNewExtEdit(event);" />
         <menuseparator/>
         <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
         <menuseparator/>
-        <menuitem label="Preferences"
-                  accesskey="p"
+        <menuitem label="&pref.label;"
+                  accesskey="&pref.key;"
                   oncommand="window.openDialog('chrome://itsalltext/chrome/preferences.xul', 'Preferences', 'chrome,titlebar,toolbar,centerscreen,modal');"/>
       </popup>
     </popupset>

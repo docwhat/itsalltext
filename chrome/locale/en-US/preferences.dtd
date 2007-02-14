@@ -1,0 +1,8 @@
+<!ENTITY title            "It's All Text! Preferences">
+<!ENTITY editor.label     "Editor:">
+<!ENTITY picker.label     "Browse">
+<!ENTITY seconds.label    "Seconds between refreshing:">
+<!ENTITY charset.label    "Character Set (default: UTF-8):">
+<!ENTITY extensions.label "File Extensions:">
+<!ENTITY debug.label      "Debugging:">
+<!ENTITY debug.humor      "Remove all bugs">

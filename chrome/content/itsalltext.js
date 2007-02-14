@@ -468,6 +468,7 @@ var ItsAllText = function() {
         watcher: function(offset) {
             var monitor = that.monitor;
             var rate = that.getRefresh();
+            
             var now = Date.now();
             if (now - monitor.last_now < Math.round(rate * 0.9)) {
                 that.debuglog('monitor.watcher(',offset,') -- skipping catchup refresh');
@@ -553,10 +554,14 @@ var ItsAllText = function() {
      * Initialize the module.  Should be called once, when a window is loaded.
      * @private
      */
-    var startup = function(event) {
+    var windowload = function(event) {
         that.debug("startup(): It's All Text! is watching this window...");
+
         // Start watching the preferences.
         that.preference_observer.register();
+
+        // Start the monitor
+        that.monitor.restart();
 
         var appcontent = document.getElementById("appcontent"); // The Browser
         if (appcontent) {
@@ -575,12 +580,10 @@ var ItsAllText = function() {
     };
   
     // Do the startup when things are loaded.
-    window.addEventListener("load", startup, true);
+    window.addEventListener("load", windowload, true);
     // Do the startup when things are unloaded.
     window.addEventListener("unload", function(event){that.monitor.unwatch(event.originalTarget||document); that.preference_observer.unregister();}, true);
 
-    // Start the monitor
-    that.monitor.restart();
 };
 
 /**

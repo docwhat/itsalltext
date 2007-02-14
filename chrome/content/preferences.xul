@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
  
+<!DOCTYPE prefwindow SYSTEM "chrome://itsalltext/locale/preferences.dtd" >
 <prefwindow id="itsalltext-prefs"
-     title="It's All Text Preferences"
-     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-     onload="pref_onload();">
+         title="&title;"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        onload="pref_onload();">
 
 <script type="application/x-javascript" src="preferences.js"/>
+
+<stringbundleset id="strbundles">
+<stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties"/>
+</stringbundleset>
  
-<prefpane id="itsalltext-pane" label="It's All Text Preferences" flex="1">
+<prefpane id="itsalltext-pane" label="&title;" flex="1">
   <preferences>
     <preference id="pref_charset"
                 name="extensions.itsalltext.charset" type="string"/>
@@ -30,20 +35,20 @@
       </columns>
       <rows>
         <row align="center">
-          <label control="editor" value="Editor:"/>
+          <label control="editor" value="&editor.label;"/>
           <vbox>
             <textbox preference="pref_editor" id="editor" size="20" readonly="false"
              style="-moz-appearance: none !important; background:
              inherit;" />
             <hbox align="right">
               <spacer/>
-              <button oncommand="pref_editor_select();" label="Browse"
+              <button oncommand="pref_editor_select();" label="&picker.label;"
               id="browse" accesskey="b" tabindex="1"/>
             </hbox>
           </vbox>
         </row>
         <row align="center">
-          <label control="seconds" value="Seconds between refreshing:"/>
+          <label control="seconds" value="&seconds.label;"/>
           <hbox>
             <textbox preference="pref_seconds" id="seconds" size="2"
             maxlength="2" tabindex="2"/>
@@ -52,22 +57,22 @@
         </row>
         <row align="center">
           <label control="charset"
-                 value="Character Set (default: UTF-8):"/>
+                 value="&charset.label;"/>
           <hbox>
             <textbox preference="pref_charset" id="charset" size="8" tabindex="3"/>
             <spacer/>
           </hbox>
         </row>
         <row align="center">
-          <label control="charset"
-                 value="File Extensions:"/>
+          <label control="extensions"
+                 value="&extensions.label;"/>
           <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4"/>
         </row>
         <row align="center">
           <label control="debug"
-                 value="Debugging:"/>
+                 value="&debug.label;"/>
           <checkbox preference="pref_debug" id="debug" tabindex="5"
-          label="Remove all bugs"/>
+          label="&debug.humor;"/>
         </row>
       </rows>
     </grid>
