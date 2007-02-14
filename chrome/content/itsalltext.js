@@ -75,8 +75,7 @@ var ItsAllText = function() {
      */
     that.localeString = function(name) {
         return this.locale.GetStringFromName(name);
-    }
-        
+    };
 
     /**
      * This is a handy debug message.  I'll remove it or disable it when

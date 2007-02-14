@@ -174,6 +174,7 @@ CacheObj.prototype.write = function() {
      
 // @todo [9] IDEA: Pass in the line number to the editor, arbitrary command?
 // @todo [9] IDEA: Allow the user to pick an alternative editor?
+// @todo [9] IDEA: A different editor per extension?
 /**
  * Edit a textarea as a file.
  * @param {String} extension The extension of the file to edit.
