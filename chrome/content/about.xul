@@ -1,33 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 
-<window id="itsalltext_about" title="About It's All Text"
-     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<!DOCTYPE window SYSTEM "chrome://itsalltext/locale/about.dtd" >
+<window    id="itsalltext_about"
+        title="&title;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <vbox style="max-width: 40em">
-    <description style="white-space: pre; margin: 1em;">
-It's All Text - Easy external editing of web forms.
-Copyright (C) 2006 Christian Höltje
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License or
-any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</description>
+    <description style="white-space: pre; margin: 1em;">&description;</description>
     <hbox align="right">
       <button oncommand="window.close();" tabindex="1">
-        <description>Close</description>
+        <description>&close;</description>
       </button>
     </hbox>
   </vbox>  
 </window>
-<!-- Local Variables: -->
-<!-- mode: xml -->
-<!-- End: -->
