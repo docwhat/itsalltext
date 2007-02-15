@@ -113,6 +113,7 @@ CacheObj.prototype.setExtension = function(ext) {
  * @returns {String} the unique identifier.
  */
 CacheObj.prototype.getNodeIdentifier = function(node) {
+    ItsAllText.debug('getNodeIdentifier',node);
     var id   = node.getAttribute('id');
     if (!id) {
         var name = node.getAttribute('name');
@@ -312,8 +313,9 @@ CacheObj.prototype.fadeStep = function(background_pallet, color_pallet, step, de
     var that = this;
     return function() {
         if (step < background_pallet.length) {
-            that.node.style.backgroundColor = background_pallet[step++].hex();
-            that.node.style.color = color_pallet[step++].hex();
+            that.node.style.backgroundColor = background_pallet[step].hex();
+            that.node.style.color = color_pallet[step].hex();
+            step++;
             setTimeout(that.fadeStep(background_pallet, color_pallet, step, delay),delay);
         } else {
             that.node.style.backgroundColor = that.initial_background;
@@ -399,7 +401,7 @@ CacheObj.prototype.addGumDrop = function() {
         var use_context  = event.ctrlKey || event.altKey;
         var use_cutpaste = event.shiftKey;
         if (use_context) {
-            var target = ItsAllText.rebuildOptionMenu(cache_object.uid);
+            var target = ItsAllText.rebuildMenu(cache_object.uid);
             target.showPopup(document.documentElement,
                              event.screenX, event.screenY,
                              "bottomleft", "topleft");

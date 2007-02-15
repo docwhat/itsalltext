@@ -341,16 +341,21 @@ var ItsAllText = function() {
     /**
      * Returns a cache object
      * Note: These UIDs are only unique for Its All Text.
-     * @param {Object} node A dom object node.
+     * @param {Object} node A dom object node or ID to one.
      * @returns {String} the UID or null.
      */
     that.getCacheObj = function(node) {
         var cobj = null;
-        if (node && node.hasAttribute(that.MYSTRING+"_UID")) {
-            cobj = that.tracker[node.getAttribute(that.MYSTRING+"_UID")];
-        }
-        if (!cobj) {
-            cobj = new ItsAllText.CacheObj(node);
+        var str = that.MYSTRING+"_UID";
+        if (typeof(node) == 'string') {
+            cobj = that.tracker[node];
+        } else {
+            if (node && node.hasAttribute(str)) {
+                cobj = that.tracker[node.getAttribute(str)];
+            }
+            if (!cobj) {
+                cobj = new ItsAllText.CacheObj(node);
+            }
         }
         return cobj;
     };
@@ -547,6 +552,7 @@ var ItsAllText = function() {
         if(event.target && event.target.id) {
             var id = event.target.id;
             var node = document.popupNode;
+            var cobj = that.getCacheObj(node);
             var tag = node.nodeName.toLowerCase();
             if(id == "contentAreaContextMenu") {
                 var menu = document.getElementById("itsalltext-contextmenu");
@@ -554,9 +560,9 @@ var ItsAllText = function() {
                                              tag != "textbox"));
             }
             if(id == "itsalltext-context-popup" && 
-               (tag == 'textarea' || tag == 'textbox') &&
-               node.id) {
-                that.rebuildOptionMenu(node.id, 'itsalltext-context-popup');
+               (tag == 'textarea' || tag == 'textbox')) {
+                that.rebuildMenu(cobj.uid,
+                                 'itsalltext-context-popup');
             }
         }
         return true;
@@ -605,7 +611,7 @@ var ItsAllText = function() {
 ItsAllText.prototype.menuNewExtEdit = function(event) {
     var that = this;
     var uid = this._current_uid;
-    var cobj = that.tracker[uid];
+    var cobj = that.getCacheObj(uid);
 
     var params = {out:null};       
     window.openDialog("chrome://itsalltext/chrome/newextension.xul", "",
@@ -625,9 +631,9 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
  */
 ItsAllText.prototype.menuExtEdit = function(event) {
     var that = this;
-    var uid = this._current_uid;
+    var uid = that._current_uid;
     var ext = event.target.getAttribute('label');
-    var cobj = that.tracker[uid];
+    var cobj = that.getCacheObj(uid);
     cobj.edit(ext);
 };
 
@@ -636,7 +642,7 @@ ItsAllText.prototype.menuExtEdit = function(event) {
  * @private
  * @param {String} uid The UID to show in the option menu.
  */
-ItsAllText.prototype.rebuildOptionMenu = function(uid, menu_id) {
+ItsAllText.prototype.rebuildMenu = function(uid, menu_id) {
     menu_id = typeof(menu_id) == 'string'?menu_id:'itsalltext-optionmenu';
     var i;
     var that = this;
