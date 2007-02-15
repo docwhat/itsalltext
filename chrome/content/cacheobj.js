@@ -17,7 +17,7 @@ function CacheObj(node) {
     that.size = 0;
     that.node = node;
     that.button = null;
-    that.initial_color = 'transparent';
+    that.initial_background = '';
     that._is_watching = false;
      
     that.node_id = that.getNodeIdentifier(node);
@@ -69,9 +69,11 @@ function CacheObj(node) {
      * @param {Event} event The event object.
      */
     that.mouseover = function(event) {
-        var style = that.button.style;
-        style.opacity = '0.7';
-        ItsAllText.refreshTextarea(that.node);
+        var style = that.button?that.button.style:null;
+        if (style) {
+            style.opacity = '0.7';
+            ItsAllText.refreshTextarea(that.node);
+        }
     };
 
     /**
@@ -80,8 +82,10 @@ function CacheObj(node) {
      * @param {Event} event The event object.
      */
     that.mouseout = function(event) {
-        var style = that.button.style;
-        style.opacity = '0.1';
+        var style = that.button?that.button.style:null;
+        if (style) {
+            style.opacity = '0.1';
+        }
     };
 }
 
@@ -171,6 +175,18 @@ CacheObj.prototype.write = function() {
              
     return this.file.path;
 };
+
+/**
+ * Fetches the computed CSS attribute for a specific node
+ * @param {DOM} node The DOM node to get the information for.
+ * @param {String} attr The CSS-style attribute to fetch (not DOM name).
+ * @returns attribute
+ */
+CacheObj.prototype.getStyle = function(node, attr) {
+    var view  = node ? node.ownerDocument.defaultView : null;
+    var style = view.getComputedStyle(node, '');
+    return  style.getPropertyCSSValue(attr).cssText;
+};
      
 // @todo [9] IDEA: Pass in the line number to the editor, arbitrary command?
 // @todo [9] IDEA: Allow the user to pick an alternative editor?
@@ -186,8 +202,8 @@ CacheObj.prototype.edit = function(extension, retried) {
     }
     if (typeof(retried) == 'undefined') { retried = false; }
     var filename = this.write();
-    this.initial_color = this.node.style.backgroundColor;
-    this.is_moz = this.node.style.backgroundColor;
+    this.initial_background = this.node.style.backgroundColor;
+    this.initial_color      = this.node.style.color;
     try {
         var program = ItsAllText.getEditor();
              
@@ -292,12 +308,16 @@ CacheObj.prototype.read = function() {
  * @param {int}    step   Size of a step.
  * @param {delay}  delay  Delay in microseconds.
  */
-CacheObj.prototype.fadeStep = function(pallet, step, delay) {
+CacheObj.prototype.fadeStep = function(background_pallet, color_pallet, step, delay) {
     var that = this;
     return function() {
-        if (step < pallet.length) {
-            that.node.style.backgroundColor = pallet[step++].hex();
-            setTimeout(that.fadeStep(pallet, step, delay),delay);
+        if (step < background_pallet.length) {
+            that.node.style.backgroundColor = background_pallet[step++].hex();
+            that.node.style.color = color_pallet[step++].hex();
+            setTimeout(that.fadeStep(background_pallet, color_pallet, step, delay),delay);
+        } else {
+            that.node.style.backgroundColor = that.initial_background;
+            that.node.style.color = that.initial_color;
         }
     };
 };
@@ -308,10 +328,16 @@ CacheObj.prototype.fadeStep = function(pallet, step, delay) {
  * @param {int} delay  How long to wait between delay (microseconds).
  */
 CacheObj.prototype.fade = function(steps, delay) {
-    var colEnd = new ItsAllText.Color(this.initial_color);
-    var colStart = new ItsAllText.Color('yellow');//colEnd.invert();
-    var pallet = colStart.blend(colEnd, steps);
-    setTimeout(this.fadeStep(pallet, 0, delay), delay);
+    var color             = this.getStyle(this.node, 'color');
+    var color_stop        = new ItsAllText.Color(color);
+    var color_start       = new ItsAllText.Color('black');
+    var color_pallet      = color_start.blend(color_stop, steps);
+
+    var background        = this.getStyle(this.node, 'background-color');
+    var background_stop   = new ItsAllText.Color(background);
+    var background_start  = new ItsAllText.Color('yellow');
+    var background_pallet = background_start.blend(background_stop, steps);
+    setTimeout(this.fadeStep(background_pallet, color_pallet, 0, delay), delay);
 };
 
 /**
@@ -322,7 +348,7 @@ CacheObj.prototype.update = function() {
     if (this.hasChanged()) {
         var value = this.read();
         if (value !== null) {
-            this.fade(15, 100);
+            this.fade(20, 100);
             this.node.value = value;
             return true;
         }
