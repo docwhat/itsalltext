@@ -149,7 +149,7 @@ var ItsAllText = function() {
         while (entries.hasMoreElements()) {
             var entry = entries.getNext();
             entry.QueryInterface(Components.interfaces.nsIFile);
-            if(force || entry.lastModifiedTime < last_week) {
+            if(force || !entry.exists() || entry.lastModifiedTime < last_week){
                 try{
                     entry.remove(false);
                 } catch(e) {
@@ -172,6 +172,8 @@ var ItsAllText = function() {
      * @type Hash
      */
     that.preferences = {
+        debug: true,
+
         /**
          * Fetches the current value of the preference.
          * @private
