@@ -6,9 +6,22 @@
 
   <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
-     <menuitem id="itsalltext-menuitem" label="&top.label;" 
-               oncommand="ItsAllText.onEditNode(document.popupNode)"
-               accesskey="&top.key;" />
+    <menu id="itsalltext-contextmenu" label="&top.label;" accesskey="&top.key;">
+      <menupopup id="itsalltext-context-popup">
+        <menuitem label="&edit.label;" 
+                  oncommand="ItsAllText.onEditNode(document.popupNode)"
+                  accesskey="&edit.key;" />
+        <menuitem label="&newext.label;"
+                  accesskey="&newext.key;"
+                  oncommand="ItsAllText.menuNewExtEdit(event);" />
+        <menuseparator/>
+        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
+        <menuseparator/>
+        <menuitem label="&pref.label;"
+                  accesskey="&pref.key;"
+                  oncommand="window.openDialog('chrome://itsalltext/chrome/preferences.xul', 'Preferences', 'chrome,titlebar,toolbar,centerscreen,modal');"/>
+      </menupopup>
+    </menu>
   </popup>
 
 

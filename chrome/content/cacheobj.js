@@ -59,7 +59,7 @@ function CacheObj(node) {
     /* Set the default extension and create the nsIFile object. */
     var extension = node.getAttribute('itsalltext-extension');
     if (typeof(extension) != 'string' || !extension.match(/^[.a-z0-9]+$/i)) {
-        extension = '.txt';
+        extension = ItsAllText.getExtensions()[0];
     }
     that.setExtension(extension);
 
@@ -388,7 +388,7 @@ CacheObj.prototype.addGumDrop = function() {
     gumdrop.style.position         = 'absolute';
     gumdrop.style.padding          = '0';
     gumdrop.style.border           = 'none';
-    gumdrop.style.zIndex           = 2147483646; // Max Int - 1
+    gumdrop.style.zIndex           = 1; // we want it just above normal items.
     
     gumdrop.style.width            = this.gumdrop_width+'px';
     gumdrop.style.height           = this.gumdrop_height+'px';

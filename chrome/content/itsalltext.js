@@ -303,8 +303,13 @@ var ItsAllText = function() {
      * @returns Array
      */
     that.getExtensions = function() {
-        var e = that.preferences.extensions.replace(/[\n\t ]+/g,'');
-        return e.split(',');
+        var string = that.preferences.extensions.replace(/[\n\t ]+/g,'');
+        var extensions = string.split(',');
+        if (extensions.length === 0) {
+            return ['.txt'];
+        } else {
+            return extensions;
+        }
     };
 
     /**
@@ -526,11 +531,8 @@ var ItsAllText = function() {
      */
     that.onEditNode = function(node) {
         var cobj = that.getCacheObj(node);
-        if(!cobj) {
-            that.debug('onEditNode','missing cobj for ',node);
-        } else {
-            that.debug('onEditNode',cobj);
-            cobj.edit('.txt');
+        if(cobj) {
+            cobj.edit();
         }
         return;
     };
@@ -540,12 +542,21 @@ var ItsAllText = function() {
      * @param {Object} event The event passed in by the event handler.
      */
     that.onContextMenu = function(event) {
-        var tag = document.popupNode.nodeName.toLowerCase();
-
-        that.debug('onContextMenu', tag);
-        document.getElementById("itsalltext-menuitem").
-            setAttribute('hidden', (tag != "textarea" &&
-                                    tag != "textbox"));
+        if(event.target && event.target.id) {
+            var id = event.target.id;
+            var node = document.popupNode;
+            var tag = node.nodeName.toLowerCase();
+            if(id == "contentAreaContextMenu") {
+                var menu = document.getElementById("itsalltext-contextmenu");
+                menu.setAttribute('hidden', (tag != "textarea" &&
+                                             tag != "textbox"));
+            }
+            if(id == "itsalltext-context-popup" && 
+               (tag == 'textarea' || tag == 'textbox') &&
+               node.id) {
+                that.rebuildOptionMenu(node.id, 'itsalltext-context-popup');
+            }
+        }
         return true;
     };
 
@@ -623,26 +634,44 @@ ItsAllText.prototype.menuExtEdit = function(event) {
  * @private
  * @param {String} uid The UID to show in the option menu.
  */
-ItsAllText.prototype.rebuildOptionMenu = function(uid) {
+ItsAllText.prototype.rebuildOptionMenu = function(uid, menu_id) {
+    menu_id = typeof(menu_id) == 'string'?menu_id:'itsalltext-optionmenu';
     var i;
     var that = this;
     var exts = that.getExtensions();
-    var menu = document.getElementById('itsalltext-optionmenu');
+    var menu = document.getElementById(menu_id);
     var items = menu.childNodes;
-    var len   = items.length - 2; // ignore the pref and separator
-    var sep   = items[len];
-    var start = 2;
     var node;
     that._current_uid = uid;
-    
-    for(i = len-1; i >= start; i--) {
+    var magic_stop_node = null;
+    var magic_start = null;
+    var magic_stop = null;
+
+    // Find the beginning and end of the magic replacement parts.
+    for(i=0; i<items.length; i++) {
+        node = items[i];
+        if (node.nodeName.toLowerCase() == 'menuseparator') {
+            if(magic_start === null) {
+                magic_start = i;
+            } else {
+                magic_stop = i;
+                magic_stop_node = node;
+                break;
+            }
+        }
+    }
+
+    // Remove old magic bits
+    for(i = magic_stop - 1; i > magic_start; i--) {
         menu.removeChild(items[i]);
     }
+   
+    // Insert the new magic bits
     for(i=0; i<exts.length; i++) {
         node = document.createElementNS(that.XULNS, 'menuitem');
         node.setAttribute('label', exts[i]);
         node.addEventListener('command', function(event){return that.menuExtEdit(event);}, false);
-        menu.insertBefore(node, sep);
+        menu.insertBefore(node, magic_stop_node);
 
     }
     return menu;

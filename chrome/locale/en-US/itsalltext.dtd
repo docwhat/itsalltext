@@ -1,9 +1,12 @@
 <!ENTITY top.label "It's All Text!">
 <!ENTITY top.key   "i">
 
-<!ENTITY newext.label "New edit extension...">
+<!ENTITY edit.label "Edit with default extension">
+<!ENTITY edit.key   "e">
+
+<!ENTITY newext.label "Edit with new extension...">
 <!ENTITY newext.key   "n">
 
-<!ENTITY pref.label "Preferences">
+<!ENTITY pref.label "Preferences...">
 <!ENTITY pref.key   "p">
 
