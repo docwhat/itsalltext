@@ -19,17 +19,18 @@
 
 # NOTE: do not create files or directories in here that have
 #       spaces or other special characters in their names!
-SOURCES=$(shell find . \
+SOURCES:=$(shell find . \
 	   -not -regex '^\(\|.*/\)\(tmpdir\|CVS\|\.hg\|\.DS_Store\|docs\).*\(\|/.*\)$$' \
        -not -name 'Makefile' \
        -not -name '*\.log' \
+       -not -name '*\.lint' \
        -not -name '*\.xpi' \
        -not -name '.*' \
        -not -name '*~' \
 	   -print)
-#VERSION=$(shell grep '<em:version>' install.rdf| perl -p -e 's!.*<em:version>\s*([^<]*)\s*</em:version>.*!$$1!;')
-VERSION=$(shell grep 'em:version=' install.rdf| perl -p -e 's!.*em:version\s*=\s*"([^"]*)".*!$$1!;')
-SOURCES_JS=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
+VERSION:=$(shell grep 'em:version=' install.rdf| perl -p -e 's!.*em:version\s*=\s*"([^"]*)".*!$$1!;')
+SOURCES_JS:=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
+SOURCES_JS_LINT:=$(patsubst %.js, %.js.lint, $(SOURCES_JS))
 
 XPI_FILE=../itsalltext-$(VERSION).xpi
 
@@ -40,7 +41,7 @@ else
 endif
 
 all: lint docs
-	$(Q)echo done
+	$(Q)echo Lints and Docs are done
 
 .PHONY: release
 release: lint version_check $(XPI_FILE)
@@ -71,16 +72,12 @@ docs/.stamp: $(SOURCES_JS)
 	$(Q)touch "$@"
 
 .PHONY: lint
-lint: lint.log
+lint: $(SOURCES_JS_LINT)
 
-lint.log: $(SOURCES_JS)
-	$(Q)echo Linting source ...
-	$(Q)jslint -p $^ > $@
-	$(Q)if [ 0 -ne `grep -vE 'jslint: No problems found in ' "$@" | wc -l` ]; \
-	then touch --date='1972-01-01' "$@"; \
-	     echo "  ... there were $$(grep -E '^lint at [^:]+:[0-9]+:[0-9]+' "$@" | wc -l) errors."; \
-	     false ;\
-	fi
+%.js.lint: %.js
+	$(Q)jslint -p $< > $@
+	$(Q)if [ `wc -l $@|cut -d' ' -f1` -ne 1 ]; then\
+	     touch --date='1972-01-01' "$@"; echo "lint: $@"; false; fi
 
 .PHONY: todo
 todo:
@@ -93,7 +90,7 @@ narf:
 
 .PHONY: clean
 clean:
-	$(Q)find -name '*.orig' -print0 | xargs -0 --no-run-if-empty rm
+	$(Q)find \( -name '*.orig' -o -name '*.lint' \) -print0 | xargs -0 --no-run-if-empty rm
 	$(Q)rm -rf $(XPI_FILE) *.log
 
 .PHONY: realclean
