@@ -40,8 +40,8 @@ else
 	Q = @
 endif
 
-all: lint docs
-	$(Q)echo Lints and Docs are done
+all: lint version_check narf
+	$(Q)echo "Source checks out"
 
 .PHONY: release
 release: lint version_check $(XPI_FILE)

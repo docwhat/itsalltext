@@ -80,20 +80,38 @@ var ItsAllText = function() {
     };
 
     /**
+     * Create an error message from given arguments.
+     * @param {Object} message One or more objects to be made into strings...
+     */
+    that.logString = function() {
+        var args = Array.prototype.slice.apply(arguments,[0]);
+        for (var i=0; i<args.length; i++) {
+            try {
+                args[i] = args[i].toString();
+            } catch(e) {
+                Components.utils.reportError(e);
+                args[i] = 'toStringFailed';
+            }
+        }
+        args.unshift(that.MYSTRING+':');
+        return args.join(' ');
+    };
+
+    /**
      * This is a handy debug message.  I'll remove it or disable it when
      * I release this.
      * @param {Object} message One or more objects can be passed in to display.
      */
     that.log = function() {
-        var args = Array.prototype.slice.apply(arguments,[0]);
+        var message = that.logString.apply(that, arguments);
         try {
             // idiom: Convert arguments to an array for easy handling.
             var consoleService = Components.
                 classes["@mozilla.org/consoleservice;1"].
                 getService(Components.interfaces.nsIConsoleService);
-            consoleService.logStringMessage("ItsAllText: " + args.join(' '));
+            consoleService.logStringMessage(message);
         } catch(e) {
-            Components.utils.reportError(e+"\nmessage: "+args.join(' '));
+            Components.utils.reportError(message);
         }
     };
 

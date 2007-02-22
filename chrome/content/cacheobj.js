@@ -113,7 +113,6 @@ CacheObj.prototype.setExtension = function(ext) {
  * @returns {String} the unique identifier.
  */
 CacheObj.prototype.getNodeIdentifier = function(node) {
-    ItsAllText.debug('getNodeIdentifier',node);
     var id   = node.getAttribute('id');
     if (!id) {
         var name = node.getAttribute('name');
@@ -368,7 +367,7 @@ CacheObj.prototype.addGumDrop = function() {
         cache_object.adjust();
         return; /*already done*/
     }
-    ItsAllText.debug('addGumDrop',cache_object);
+    ItsAllText.debug('addGumDrop()',cache_object.node_id,cache_object.uid);
     
     var node = cache_object.node;
     var doc = node.ownerDocument;
