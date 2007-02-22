@@ -85,12 +85,16 @@ var ItsAllText = function() {
      * @param {Object} message One or more objects can be passed in to display.
      */
     that.log = function() {
-        // idiom: Convert arguments to an array for easy handling.
         var args = Array.prototype.slice.apply(arguments,[0]);
-        var consoleService = Components.
-            classes["@mozilla.org/consoleservice;1"].
-            getService(Components.interfaces.nsIConsoleService);
-        consoleService.logStringMessage("ItsAllText: " + args.join(' '));
+        try {
+            // idiom: Convert arguments to an array for easy handling.
+            var consoleService = Components.
+                classes["@mozilla.org/consoleservice;1"].
+                getService(Components.interfaces.nsIConsoleService);
+            consoleService.logStringMessage("ItsAllText: " + args.join(' '));
+        } catch(e) {
+            Components.utils.reportError(e+"\nmessage: "+args.join(' '));
+        }
     };
 
     /**
