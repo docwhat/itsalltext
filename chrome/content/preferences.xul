@@ -37,7 +37,7 @@
         <row align="center">
           <label control="editor" value="&editor.label;"/>
           <vbox>
-            <textbox preference="pref_editor" id="editor" size="20" readonly="false"
+            <textbox preference="pref_editor" id="editor" size="20"
              style="-moz-appearance: none !important; background:
              inherit;" />
             <hbox align="right">
