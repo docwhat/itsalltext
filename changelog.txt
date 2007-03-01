@@ -10,6 +10,11 @@ Note to Mac OS X users: Most editors come with a component in
 strange, then create a shell script to do an "open -a /path/to/editor
 $*".
 
+****** 0.4.3 ******
+* fixed gumdrop positioning
+* Hide gumdrop/menu when textarea is readonly/disabled.
+* Show context menu all the time
+
 ****** 0.4.2 ******
 * Stupid bugs fixed.
 * The popup positions right in XP.

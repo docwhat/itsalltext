@@ -442,6 +442,7 @@ var ItsAllText = function() {
      * @param {Object} node A DOM element.
      * @return {Array} The X & Y page offsets
      */
+    // @todo: [9] Remove getPageOffset if it's not used
     that.getPageOffset = function(node) {
         var pos = [node.offsetLeft, node.offsetTop];
         var pnode = node.offsetParent;
@@ -573,21 +574,20 @@ var ItsAllText = function() {
      * @param {Object} event The event passed in by the event handler.
      */
     that.onContextMenu = function(event) {
-        if(event.target && event.target.id) {
-            var id = event.target.id;
+        if(event.target &&
+           event.target.id == "itsalltext-context-popup") {
             var node = document.popupNode;
             var cobj = that.getCacheObj(node);
             var tag = node.nodeName.toLowerCase();
-            if(id == "contentAreaContextMenu") {
-                var menu = document.getElementById("itsalltext-contextmenu");
-                menu.setAttribute('hidden', (tag != "textarea" &&
-                                             tag != "textbox"));
-            }
-            if(id == "itsalltext-context-popup" && 
-               (tag == 'textarea' || tag == 'textbox')) {
-                that.rebuildMenu(cobj.uid,
-                                 'itsalltext-context-popup');
-            }
+            var is_disabled = (!(tag == 'textarea' || 
+                                 tag == 'textbox') ||
+                               node.style.display == 'none' ||
+                               node.getAttribute('readonly') ||
+                               node.getAttribute('disabled')
+                               );
+            that.rebuildMenu(cobj.uid,
+                             'itsalltext-context-popup',
+                             is_disabled);
         }
         return true;
     };
@@ -666,13 +666,15 @@ ItsAllText.prototype.menuExtEdit = function(event) {
  * @private
  * @param {String} uid The UID to show in the option menu.
  */
-ItsAllText.prototype.rebuildMenu = function(uid, menu_id) {
+ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     menu_id = typeof(menu_id) == 'string'?menu_id:'itsalltext-optionmenu';
+    is_disabled = (typeof(is_disabled) == 'undefined'||!is_disabled)?false:(is_disabled&&true);
     var i;
     var that = this;
     var exts = that.getExtensions();
     var menu = document.getElementById(menu_id);
     var items = menu.childNodes;
+    var items_length = items.length - 1; /* We ignore the preferences item */
     var node;
     that._current_uid = uid;
     var magic_stop_node = null;
@@ -680,16 +682,17 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id) {
     var magic_stop = null;
 
     // Find the beginning and end of the magic replacement parts.
-    for(i=0; i<items.length; i++) {
+    for(i=0; i<items_length; i++) {
         node = items[i];
         if (node.nodeName.toLowerCase() == 'menuseparator') {
             if(magic_start === null) {
                 magic_start = i;
-            } else {
+            } else if (magic_stop === null) {
                 magic_stop = i;
                 magic_stop_node = node;
-                break;
             }
+        } else if (node.nodeName.toLowerCase() == 'menuitem') {
+            node.setAttribute('disabled', is_disabled?'true':'false');
         }
     }
 
@@ -703,6 +706,7 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id) {
         node = document.createElementNS(that.XULNS, 'menuitem');
         node.setAttribute('label', exts[i]);
         node.addEventListener('command', function(event){return that.menuExtEdit(event);}, false);
+        node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
 
     }

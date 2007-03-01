@@ -445,7 +445,10 @@ CacheObj.prototype.adjust = function() {
     var style    = gumdrop.style;
     if (!gumdrop || !el) { return; }
     var display  = '';
-    if (el.style.display == 'none') {
+    if (el.style.display == 'none' ||
+        el.getAttribute('readonly') ||
+        el.getAttribute('disabled')
+        ) {
         display = 'none';
     }
     if (style.display != display) {
