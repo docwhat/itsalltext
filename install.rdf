@@ -12,7 +12,7 @@
                    em:maxVersion="0.8" />
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="itsalltext@docwhat.gerf.org"
-                   em:version="0.4.3"
+                   em:version="0.4.4"
                    em:type="2"
                    em:name="It's All Text!"
                    em:description="Edit text using your favorite editor!"
