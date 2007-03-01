@@ -367,6 +367,9 @@ CacheObj.prototype.addGumDrop = function() {
         cache_object.adjust();
         return; /*already done*/
     }
+    if (ItsAllText.getDisableGumdrops()) {
+        return;
+    }
     ItsAllText.debug('addGumDrop()',cache_object.node_id,cache_object.uid);
     
     var node = cache_object.node;
@@ -442,6 +445,12 @@ CacheObj.prototype.addGumDrop = function() {
 CacheObj.prototype.adjust = function() {
     var gumdrop  = this.button;
     var el       = this.node;
+    if (ItsAllText.getDisableGumdrops()) {
+        if(gumdrop && gumdrop.style.display != 'none') {
+            gumdrop.style.display = 'none';
+        }
+        return;
+    }
     var style    = gumdrop.style;
     if (!gumdrop || !el) { return; }
     var display  = '';

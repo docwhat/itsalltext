@@ -14,6 +14,7 @@ $*".
 * fixed gumdrop positioning
 * Hide gumdrop/menu when textarea is readonly/disabled.
 * Show context menu all the time
+* Added preference to turn off gumdrops
 
 ****** 0.4.2 ******
 * Stupid bugs fixed.

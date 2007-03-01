@@ -1,5 +1,4 @@
 // @todo [6] [pref] Better strategy for getting the default editor: EDITOR env variable or view_source.editor.path
-// @todo [9] [pref] Option to turn off gumdrop and rely on context menu.
 
 /**
  * Open a filepicker to select the value of the editor.

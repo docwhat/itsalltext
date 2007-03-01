@@ -23,6 +23,8 @@
                 name="extensions.itsalltext.refresh" type="int"/>
     <preference id="pref_extensions"
                 name="extensions.itsalltext.extensions" type="string"/>
+    <preference id="pref_disable_gumdrops"
+                name="extensions.itsalltext.disable_gumdrops" type="bool"/>
     <preference id="pref_debug"
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
@@ -67,6 +69,12 @@
           <label control="extensions"
                  value="&extensions.label;"/>
           <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4"/>
+        </row>
+        <row align="center">
+          <label control="disable_gumdrops"
+                 value="&disable_gumdrops.label;"/>
+          <checkbox preference="pref_disable_gumdrops" id="disable_gumdrops" tabindex="5"
+          label="&disable_gumdrops.checkbox;"/>
         </row>
         <row align="center">
           <label control="debug"

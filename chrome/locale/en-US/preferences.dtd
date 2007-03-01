@@ -1,8 +1,10 @@
-<!ENTITY title            "It's All Text! Preferences">
-<!ENTITY editor.label     "Editor:">
-<!ENTITY picker.label     "Browse">
-<!ENTITY seconds.label    "Seconds between refreshing:">
-<!ENTITY charset.label    "Character Set (default: UTF-8):">
-<!ENTITY extensions.label "File Extensions:">
-<!ENTITY debug.label      "Debugging:">
-<!ENTITY debug.humor      "Remove all bugs">
+<!ENTITY title                       "It's All Text! Preferences">
+<!ENTITY editor.label                "Editor:">
+<!ENTITY picker.label                "Browse">
+<!ENTITY seconds.label               "Seconds between refreshing:">
+<!ENTITY charset.label               "Character Set (default: UTF-8):">
+<!ENTITY extensions.label            "File Extensions:">
+<!ENTITY debug.label                 "Debugging:">
+<!ENTITY debug.humor                 "Remove all bugs">
+<!ENTITY disable_gumdrops.label      "In-Page Edit Buttons:">
+<!ENTITY disable_gumdrops.checkbox   "Disable">

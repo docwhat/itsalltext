@@ -228,11 +228,12 @@ var ItsAllText = function() {
          * @type Hash
          */
         types: {
-            'charset':      'Char',
-            'editor':       'Char',
-            'refresh':      'Int',
-            'debug':        'Bool',
-            'extensions':   'Char'
+            'charset':            'Char',
+            'editor':             'Char',
+            'refresh':            'Int',
+            'debug':              'Bool',
+            'disable_gumdrops':   'Bool',
+            'extensions':         'Char'
         },
 
         /**
@@ -323,6 +324,14 @@ var ItsAllText = function() {
     that.getDebug = function() {
         return that.preferences.debug;
     };
+
+    /**
+     * A Preference Option: Are the edit gumdrops disabled?
+     * @returns {bool}
+     */
+    that.getDisableGumdrops = function() {
+        return that.preferences.disable_gumdrops;
+    }
 
     /**
      * A Preference Option: The list of extensions
