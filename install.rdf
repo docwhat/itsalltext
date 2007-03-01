@@ -2,12 +2,10 @@
 <RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <!-- FireFox -->
   <RDF:Description RDF:about="rdf:#$firefox"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="1.5"
                    em:maxVersion="3.0a3" />
-  <!-- Flock -->
   <RDF:Description RDF:about="rdf:#$flock"
                    em:id="{a463f10c-3994-11da-9945-000d60ca027b}"
                    em:minVersion="0.4"
