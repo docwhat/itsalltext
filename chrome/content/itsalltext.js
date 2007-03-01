@@ -438,23 +438,6 @@ var ItsAllText = function() {
     };
 
     /**
-     * Returns the real page offset for an element.
-     * @param {Object} node A DOM element.
-     * @return {Array} The X & Y page offsets
-     */
-    // @todo: [9] Remove getPageOffset if it's not used
-    that.getPageOffset = function(node) {
-        var pos = [node.offsetLeft, node.offsetTop];
-        var pnode = node.offsetParent;
-        while(pnode) {
-            pos[0] += pnode.offsetLeft || 0;
-            pos[1] += pnode.offsetTop || 0;
-            pnode = pnode.offsetParent;
-        }
-        return pos;
-    };
-
-    /**
      * This function is called regularly to watch changes to web documents.
      */
     that.monitor = {
