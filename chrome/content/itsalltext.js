@@ -331,7 +331,7 @@ var ItsAllText = function() {
      */
     that.getDisableGumdrops = function() {
         return that.preferences.disable_gumdrops;
-    }
+    };
 
     /**
      * A Preference Option: The list of extensions
