@@ -451,13 +451,16 @@ CacheObj.prototype.adjust = function() {
     if (style.display != display) {
         style.display = display;
     }
-    
+
     /* Reposition the gumdrops incase the dom changed. */
-    var pos  = ItsAllText.getPageOffset(el);
-    var left = (pos[0]+Math.max(1,el.offsetWidth-this.gumdrop_width))+'px';
-    var top  = (pos[1]+el.offsetHeight)+'px';
-    if(style.left != left) { style.left = left; }
-    if(style.top != top) { style.top = top; }
+    var left = el.offsetLeft+Math.max(1, el.offsetWidth-this.gumdrop_width);
+    var top  = el.offsetTop+el.offsetHeight;
+    if(left && top) {
+        left = [left,'px'].join('');
+        top  = [top,'px'].join('');
+        if(style.left != left) { style.left = left; }
+        if(style.top != top) { style.top = top; }
+    }
 };
 
 /**
