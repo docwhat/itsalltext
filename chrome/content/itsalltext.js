@@ -20,6 +20,7 @@
 // @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
 // @todo [3] Have a menu/context menu item for turning on monitoring/watch.
 // @todo [9] Menu item to pick the file to load into a textarea.
+// @todo [3] Show a proper dialog when unable to execute an editor with options for preferences or cancel.
 
 var ItsAllText = function() {
     /**
