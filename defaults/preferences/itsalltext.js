@@ -1,5 +1,5 @@
 pref("extensions.itsalltext.charset",  "UTF-8");
-pref("extensions.itsalltext.editor",   "/usr/bin/gedit");
+pref("extensions.itsalltext.editor",   "Please Choose An Editor");
 pref("extensions.itsalltext.refresh",  7);
 pref("extensions.itsalltext.debug",  false);
 pref("extensions.itsalltext.disable_gumdrops", false);

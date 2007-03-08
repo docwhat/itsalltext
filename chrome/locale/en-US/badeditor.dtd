@@ -1,0 +1,10 @@
+<!ENTITY title              "It's All Text! was unable to open your editor">
+<!ENTITY header             "Unable to open your editor">
+<!ENTITY pref.label         "Preferences">
+<!ENTITY helptext           "I was unable to run your editor.
+
+You can now either cancel your editor or you can use the preferences to choose a new editor.  Please make sure that you use the full path to the editor and that the editor is executable.
+
+Thank you.
+">
+<!ENTITY reason             "Reason:">

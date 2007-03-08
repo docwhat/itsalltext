@@ -193,19 +193,17 @@ CacheObj.prototype.getStyle = function(node, attr) {
 /**
  * Edit a textarea as a file.
  * @param {String} extension The extension of the file to edit.
- * @param {boolean} retried This is used internally.
  */
-CacheObj.prototype.edit = function(extension, retried) {
+CacheObj.prototype.edit = function(extension) {
     if (typeof(extension) == 'string') {
         this.setExtension(extension);
     }
-    if (typeof(retried) == 'undefined') { retried = false; }
     var filename = this.write();
     this.initial_background = this.node.style.backgroundColor;
     this.initial_color      = this.node.style.color;
-    try {
-        var program = ItsAllText.getEditor();
+    var program = ItsAllText.getEditor();
              
+    try {
         // create an nsIProcess
         var process = Components.
             classes["@mozilla.org/process/util;1"].
@@ -222,12 +220,17 @@ CacheObj.prototype.edit = function(extension, retried) {
         process.run(false, args, args.length, result);
         this._is_watching = true;
     } catch(e) {
-        if (!retried) {
-            window.openDialog('chrome://itsalltext/chrome/preferences.xul',
-                              ItsAllText.localeString('no_editor_pref'), 
-                              "chrome,titlebar,toolbar,centerscreen,modal",
-                              "badeditor");
-            this.edit(extension, true); // Try one more time.
+        var params = {out:null,
+                      exists: program.exists(),
+                      path: program.path,
+                      exception: e };
+        window.openDialog('chrome://itsalltext/chrome/badeditor.xul',
+                          null,
+                          "chrome,titlebar,toolbar,centerscreen,modal",
+                          params);
+        if(params.out.do_preferences) {
+            ItsAllText.openPreferences();
+            this.edit(extension);
         }
     }
 };

@@ -347,6 +347,16 @@ var ItsAllText = function() {
             return extensions;
         }
     };
+    
+    /**
+     * Open the preferences dialog box.
+     * @private
+     */
+    that.openPreferences = function() {
+        window.openDialog('chrome://itsalltext/chrome/preferences.xul',
+                          'itsalltext_preferences',
+                          "chrome,titlebar,toolbar,centerscreen,modal");
+    };
 
     /**
      * A Preference Option: Append an extension
