@@ -43,7 +43,6 @@ function CacheObj(node) {
                                  doc.location.port,
                                  doc.location.search,
                                  doc.location.pathname,
-                                 doc.location.hash,
                                  that.node_id ].join(':'));
     that.base_filename = [host, hash.slice(0,10)].join('.');
     /* The current extension.
