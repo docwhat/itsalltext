@@ -21,6 +21,7 @@
 // @todo [3] Have a menu/context menu item for turning on monitoring/watch.
 // @todo [9] Menu item to pick the file to load into a textarea.
 // @todo [3] Show a proper dialog when unable to execute an editor with options for preferences or cancel.
+// @todo [9] Hot-keys for editing or opening the context menu.
 
 var ItsAllText = function() {
     /**
