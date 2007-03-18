@@ -62,6 +62,8 @@ function CacheObj(node) {
     }
     that.setExtension(extension);
 
+    that.initFromExistingFile();
+
     /**
      * A callback for when the textarea/textbox or button has 
      * the mouse waved over it.
@@ -106,6 +108,37 @@ CacheObj.prototype.setExtension = function(ext) {
     this.extension = ext;
     this.file = file;
 };
+
+/**
+ * This function looks for an existing file and starts to monitor
+ * if the file exists already.  It also deletes all existing files for
+ * this cache object.
+ */
+CacheObj.prototype.initFromExistingFile = function() {
+    var base = this.base_filename;
+    var fobj = ItsAllText.getEditDir();
+    var entries = fobj.directoryEntries;
+    var ext = null;
+    while (entries.hasMoreElements()) {
+        var entry = entries.getNext();
+        entry.QueryInterface(Components.interfaces.nsIFile);
+        if (entry.leafName.indexOf(base) === 0) {
+            // startswith
+            if (ext === null) {
+                ext = entry.leafName.slice(base.length);
+            }
+            try{
+                entry.remove(false);
+            } catch(e) {
+                that.debug('unable to remove',entry,'because:',e);
+            }
+        }
+    }
+    if (ext !== null) {
+        this.setExtension(ext);
+        this._is_watching = true;
+    }
+}
 
 /**
  * Returns a unique identifier for the node, within the document.
