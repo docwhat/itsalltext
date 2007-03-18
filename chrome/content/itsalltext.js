@@ -459,6 +459,26 @@ var ItsAllText = function() {
     };
 
     /**
+     * Returns the offset from the containing block.
+     * @param {Object} node A DOM element.
+     * @param {Object} container If unset, then this will use the offsetParent of node. Pass in null to go all the way to the root.
+     * @return {Array} The X & Y page offsets
+     */
+    that.getContainingBlockOffset = function(node, container) {
+        if(typeof(container) == 'undefined') {
+            container = node.offsetParent;
+        }
+        var pos = [node.offsetLeft, node.offsetTop];
+        var pnode = node.offsetParent;
+        while(pnode && (container === null || pnode != container)) {
+            pos[0] += pnode.offsetLeft || 0;
+            pos[1] += pnode.offsetTop || 0;
+            pnode = pnode.offsetParent;
+        }
+        return pos;
+    };
+
+    /**
      * This function is called regularly to watch changes to web documents.
      */
     that.monitor = {

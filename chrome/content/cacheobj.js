@@ -138,7 +138,7 @@ CacheObj.prototype.initFromExistingFile = function() {
         this.setExtension(ext);
         this._is_watching = true;
     }
-}
+};
 
 /**
  * Returns a unique identifier for the node, within the document.
@@ -486,6 +486,7 @@ CacheObj.prototype.adjust = function() {
         }
         return;
     }
+
     var style    = gumdrop.style;
     if (!gumdrop || !el) { return; }
     var display  = '';
@@ -500,8 +501,16 @@ CacheObj.prototype.adjust = function() {
     }
 
     /* Reposition the gumdrops incase the dom changed. */
-    var left = el.offsetLeft+Math.max(1, el.offsetWidth-this.gumdrop_width);
-    var top  = el.offsetTop+el.offsetHeight;
+    var left = Math.max(1, el.offsetWidth-this.gumdrop_width);
+    var top  = el.offsetHeight;
+    if (el.offsetParent === gumdrop.offsetParent) {
+        left += el.offsetLeft;
+        top  += el.offsetTop;
+    } else {
+        var coord = ItsAllText.getContainingBlockOffset(el, gumdrop.offsetParent);
+        left += coord[0];
+        top  += coord[1];
+    }
     if(left && top) {
         left = [left,'px'].join('');
         top  = [top,'px'].join('');
