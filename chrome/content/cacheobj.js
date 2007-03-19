@@ -159,6 +159,7 @@ CacheObj.prototype.getNodeIdentifier = function(node) {
         doc.setAttribute(attr,serial);
         node.setAttribute('id',id);
     }
+    //ItsAllText.debug('narf',node.nodeName,id);
     return id;
 };
 
@@ -414,6 +415,8 @@ CacheObj.prototype.addGumDrop = function() {
     
     var gumdrop = doc.createElementNS(ItsAllText.XHTMLNS, "img");
     gumdrop.setAttribute('src', this.gumdrop_url);
+    var gid = cache_object.getNodeIdentifier(gumdrop);
+    
     if (ItsAllText.getDebug()) {
         gumdrop.setAttribute('title', cache_object.node_id);
     } else {
@@ -435,24 +438,23 @@ CacheObj.prototype.addGumDrop = function() {
     gumdrop.setAttribute(ItsAllText.MYSTRING+'_UID', cache_object.uid);
 
     var clickfun = function(event) {
-        var use_context  = event.ctrlKey || event.altKey;
-        var use_cutpaste = event.shiftKey;
-        if (use_context) {
-            var target = ItsAllText.rebuildMenu(cache_object.uid);
-            target.showPopup(document.documentElement,
-                             event.screenX, event.screenY,
-                             "bottomleft", "topleft");
-        } else if(use_cutpaste) {
-            ItsAllText.debug('mouse: use_cutpaste');
-        } else {
-            cache_object.edit();
-        }
+        cache_object.edit();
+        event.stopPropagation();
+        return false;
+    };
+    var contextfun = function(event) {
+        var popup = ItsAllText.rebuildMenu(cache_object.uid);
+        popup.showPopup(
+                        document.documentElement,
+                        event.screenX, event.screenY,
+                        'context' );
         event.stopPropagation();
         return false;
     };
     
     // Click event handler
     gumdrop.addEventListener("click", clickfun, false);
+    gumdrop.addEventListener("contextmenu", contextfun, false);
     
     // Insert it into the document
     var parent = node.parentNode;
