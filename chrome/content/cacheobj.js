@@ -159,7 +159,6 @@ CacheObj.prototype.getNodeIdentifier = function(node) {
         doc.setAttribute(attr,serial);
         node.setAttribute('id',id);
     }
-    //ItsAllText.debug('narf',node.nodeName,id);
     return id;
 };
 
