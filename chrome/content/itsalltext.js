@@ -555,6 +555,7 @@ var ItsAllText = function() {
          */
         unwatch: function(doc) {
             var documents = that.monitor.documents;
+            var i;
             for(i in documents) {
                 if (documents[i] === doc) {
                     that.debug('unwatching', doc);
