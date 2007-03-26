@@ -22,9 +22,7 @@
 SOURCES:=$(shell find . \
 	   -not -regex '^\(\|.*/\)\(tmpdir\|CVS\|\.hg\|\.DS_Store\|docs\).*\(\|/.*\)$$' \
        -not -name 'Makefile' \
-       -not -name '*\.log' \
-       -not -name '*\.lint' \
-       -not -name '*\.xpi' \
+       -not -name '*\.\(log\|orig\|lint\|xpi\)' \
        -not -name '.*' \
        -not -name '*~' \
 	   -print)
