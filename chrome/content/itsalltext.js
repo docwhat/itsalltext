@@ -354,9 +354,22 @@ var ItsAllText = function() {
      * @private
      */
     that.openPreferences = function() {
-        window.openDialog('chrome://itsalltext/chrome/preferences.xul',
-                          'itsalltext_preferences',
-                          "chrome,titlebar,toolbar,centerscreen,modal");
+        var optionsURL = 'chrome://itsalltext/chrome/preferences.xul';
+        /* This code is borrowed from
+           chrome://mozapps/content/extensions/extensions.js 
+           about line 980
+           It fixes the problem with Macs not getting a close button.
+         */
+        var features;
+        try {
+            var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                .getService(Components.interfaces.nsIPrefBranch);
+            instantApply = prefs.getBoolPref("browser.preferences.instantApply");
+            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
+        } catch (e) {
+            features = "chrome,titlebar,toolbar,centerscreen,modal";
+        }
+        window.openDialog(optionsURL, "", features);
     };
 
     /**
