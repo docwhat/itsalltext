@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE overlay SYSTEM "chrome://itsalltext/locale/itsalltext.dtd" >
-<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/x-javascript" src="itsalltext.js" />
+
+<overlay id="ItsAllTextOverlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="application/x-javascript" src="chrome://itsalltext/chrome/itsalltext.js" />
 
   <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
