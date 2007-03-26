@@ -71,6 +71,11 @@ docs/.stamp: $(SOURCES_JS)
 	$^
 	$(Q)touch "$@"
 
+.PHONY: lintlog
+lintlog:
+	$(Q)$(MAKE) lint || :
+	$(Q)find -name '*.lint' -print0 | xargs -0 cat
+
 .PHONY: lint
 lint: $(SOURCES_JS_LINT)
 

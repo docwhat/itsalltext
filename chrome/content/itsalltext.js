@@ -362,8 +362,7 @@ var ItsAllText = function() {
          */
         var features;
         try {
-            var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                .getService(Components.interfaces.nsIPrefBranch);
+            var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
             instantApply = prefs.getBoolPref("browser.preferences.instantApply");
             features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
         } catch (e) {
@@ -612,20 +611,30 @@ var ItsAllText = function() {
      * @param {Object} event The event passed in by the event handler.
      */
     that.onContextMenu = function(event) {
-        if(event.target &&
-           event.target.id == "itsalltext-context-popup") {
-            var node = document.popupNode;
-            var cobj = that.getCacheObj(node);
-            var tag = node.nodeName.toLowerCase();
-            var is_disabled = (!(tag == 'textarea' || 
-                                 tag == 'textbox') ||
-                               node.style.display == 'none' ||
-                               node.getAttribute('readonly') ||
-                               node.getAttribute('disabled')
-                               );
-            that.rebuildMenu(cobj.uid,
-                             'itsalltext-context-popup',
-                             is_disabled);
+        if(event.target) {
+            var tid = event.target.id;
+            if (tid == "itsalltext-context-popup" ||
+                tid == "contentAreaContextMenu") {
+                var node = document.popupNode;
+                var tag = node.nodeName.toLowerCase();
+                var is_disabled = (!(tag == 'textarea' || 
+                                     tag == 'textbox') ||
+                                   node.style.display == 'none' ||
+                                   node.getAttribute('readonly') ||
+                                   node.getAttribute('disabled')
+                                   );
+                if (tid == "itsalltext-context-popup") {
+                    var cobj = that.getCacheObj(node);
+                    that.rebuildMenu(cobj.uid,
+                                     'itsalltext-context-popup',
+                                     is_disabled);
+                } else {
+                    // tid == "contentAreaContextMenu"
+                    var menu = document.getElementById("itsalltext-contextmenu");
+                    menu.setAttribute('hidden', is_disabled);
+                }
+                    
+            }
         }
         return true;
     };

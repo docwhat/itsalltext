@@ -10,6 +10,16 @@ Note to Mac OS X users: Most editors come with a component in
 strange, then create a shell script to do an "open -a /path/to/editor
 $*".
 
+****** 0.6.1 ******
+* Fix for MacOSX preferences not having a close button.
+* missing 'var'
+
+****** 0.6.0 ******
+* really fixed gumdrop positioning
+* right clicking the gumdrop lets you choose the file extension
+* if the editor doesn't work, explain to the user what happened.
+* improved refreshing rules!
+
 ****** 0.4.3 ******
 * fixed gumdrop positioning
 * Hide gumdrop/menu when textarea is readonly/disabled.

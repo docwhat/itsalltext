@@ -26,7 +26,6 @@
     </menu>
   </popup>
 
-
   <!-- The merge point is main-window -->
   <window id="main-window">
     <popupset id="itsalltext-optionmenu-set">
