@@ -1,4 +1,5 @@
 // @todo [6] [pref] Better strategy for getting the default editor: EDITOR env variable or view_source.editor.path
+// @todo [8] [pref] Option to make the textarea uneditable when using editor.
 
 /**
  * Open a filepicker to select the value of the editor.
