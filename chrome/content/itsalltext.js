@@ -363,7 +363,7 @@ var ItsAllText = function() {
         var features;
         try {
             var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-            instantApply = prefs.getBoolPref("browser.preferences.instantApply");
+            var instantApply = prefs.getBoolPref("browser.preferences.instantApply");
             features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
         } catch (e) {
             features = "chrome,titlebar,toolbar,centerscreen,modal";
