@@ -352,23 +352,26 @@ var ItsAllText = function() {
     /**
      * Open the preferences dialog box.
      * @private
+     * Stolen from http://wiki.mozilla.org/XUL:Windows
+     * and utilityOverlay.js's openPreferences()
      */
-    that.openPreferences = function() {
-        var optionsURL = 'chrome://itsalltext/chrome/preferences.xul';
-        /* This code is borrowed from
-           chrome://mozapps/content/extensions/extensions.js 
-           about line 980
-           It fixes the problem with Macs not getting a close button.
-         */
-        var features;
-        try {
-            var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-            var instantApply = prefs.getBoolPref("browser.preferences.instantApply");
-            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-        } catch (e) {
-            features = "chrome,titlebar,toolbar,centerscreen,modal";
+    that.openPreferences = function () {
+        var paneID = that.MYSTRING + '_preferences';
+        var instantApply = getBoolPref("browser.preferences.instantApply", false);
+        var features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
+
+        var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+        var win = wm.getMostRecentWindow("Browser:Preferences");
+        if (win) {
+            win.focus();
+            if (paneID) {
+                var pane = win.document.getElementById(paneID);
+                win.document.documentElement.showPane(pane);
+            }
+        } else {
+            openDialog('chrome://itsalltext/chrome/preferences.xul',
+                       "", features, paneID);
         }
-        window.openDialog(optionsURL, "", features);
     };
 
     /**
