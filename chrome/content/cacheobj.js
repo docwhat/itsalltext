@@ -261,7 +261,7 @@ CacheObj.prototype.edit = function(extension) {
                           "chrome,titlebar,toolbar,centerscreen,modal",
                           params);
         if(params.out.do_preferences) {
-            ItsAllText.openPreferences();
+            ItsAllText.openPreferences(true);
             this.edit(extension);
         }
     }

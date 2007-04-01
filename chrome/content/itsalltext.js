@@ -351,13 +351,15 @@ var ItsAllText = function() {
     
     /**
      * Open the preferences dialog box.
+     * @param{boolean} wait The function won't return until the preference is set.
      * @private
      * Stolen from http://wiki.mozilla.org/XUL:Windows
      * and utilityOverlay.js's openPreferences()
      */
-    that.openPreferences = function () {
+    that.openPreferences = function (wait) {
+        wait = typeof(wait)=='boolean'?wait:false;
         var paneID = that.MYSTRING + '_preferences';
-        var instantApply = getBoolPref("browser.preferences.instantApply", false);
+        var instantApply = getBoolPref("browser.preferences.instantApply", false) && !wait;
         var features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
 
         var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
