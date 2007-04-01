@@ -12,7 +12,7 @@ function doOnload() {
     var params = window['arguments'][0];
     var r=document.getElementById('reason');
     if(params.exists) {
-        r.appendChild(document.createTextNode(params.exception));
+        var textnode = document.createTextNode(locale.getFormattedString('eexecute'));
     } else {
         var textnode = document.createTextNode(locale.getFormattedString('enoent', [params.path]));
 

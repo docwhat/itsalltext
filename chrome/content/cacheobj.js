@@ -250,13 +250,12 @@ CacheObj.prototype.edit = function(extension) {
         // to the process.
         var args = [filename];
         var result = {};
-        process.run(false, args, args.length, result);
+        var ec = process.run(true, args, args.length, result);
         this._is_watching = true;
     } catch(e) {
         var params = {out:null,
                       exists: program.exists(),
-                      path: program.path,
-                      exception: e };
+                      path: program.path};
         window.openDialog('chrome://itsalltext/chrome/badeditor.xul',
                           null,
                           "chrome,titlebar,toolbar,centerscreen,modal",
