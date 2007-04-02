@@ -21,7 +21,7 @@
         <menuseparator/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
-                  oncommand="window.openDialog('chrome://itsalltext/chrome/preferences.xul', 'Preferences', 'chrome,titlebar,toolbar,centerscreen,modal');"/>
+                  oncommand="ItsAllText.openPreferences();"/>
       </menupopup>
     </menu>
   </popup>
@@ -38,7 +38,7 @@
         <menuseparator/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
-                  oncommand="window.openDialog('chrome://itsalltext/chrome/preferences.xul', 'Preferences', 'chrome,titlebar,toolbar,centerscreen,modal');"/>
+                  oncommand="ItsAllText.openPreferences();"/>
       </popup>
     </popupset>
   </window>
