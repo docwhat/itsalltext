@@ -5,7 +5,8 @@
 <prefwindow id="itsalltext-prefs"
          title="&title;"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="pref_onload();">
+         buttons="accept,cancel"
+         onload="pref_onload();">
 
 <script type="application/x-javascript" src="preferences.js"/>
 
@@ -13,7 +14,10 @@
 <stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties"/>
 </stringbundleset>
  
-<prefpane id="itsalltext-pane" label="&title;" flex="1">
+<prefpane 
+    id="itsalltext-pane"
+    label="&title;"
+    flex="1">
   <preferences>
     <preference id="pref_charset"
                 name="extensions.itsalltext.charset" type="string"/>
