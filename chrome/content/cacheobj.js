@@ -100,8 +100,7 @@ CacheObj.prototype.setExtension = function(ext) {
     }
 
     /* Create the nsIFile object */
-    var file = Components.classes["@mozilla.org/file/local;1"].
-        createInstance(Components.interfaces.nsILocalFile);
+    var file = ItsAllText.factoryFile();
     file.initWithFile(ItsAllText.getEditDir());
     file.append([this.base_filename,ext].join(''));
 
@@ -237,6 +236,11 @@ CacheObj.prototype.edit = function(extension) {
     var program = ItsAllText.getEditor();
              
     try {
+        // checks
+        if (program === null)        { throw "Editor is not set."; }
+        if (!program.exists())       { throw "Editor does not exists."; }
+        if (!program.isExecutable()) { throw "Editor is not executable."; }
+
         // create an nsIProcess
         var process = Components.
             classes["@mozilla.org/process/util;1"].
@@ -254,13 +258,13 @@ CacheObj.prototype.edit = function(extension) {
         this._is_watching = true;
     } catch(e) {
         var params = {out:null,
-                      exists: program.exists(),
-                      path: program.path};
+                      exists: program ? program.exists() : false,
+                      path: program ? program.path : null };
         window.openDialog('chrome://itsalltext/chrome/badeditor.xul',
                           null,
                           "chrome,titlebar,toolbar,centerscreen,modal",
                           params);
-        if(params.out.do_preferences) {
+        if(params.out !== null && params.out.do_preferences) {
             ItsAllText.openPreferences(true);
             this.edit(extension);
         }

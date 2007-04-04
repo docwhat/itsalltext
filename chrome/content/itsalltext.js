@@ -143,6 +143,21 @@ var ItsAllText = function() {
     };
 
     /**
+     * A factory method to make an nsILocalFile object.
+     * @param {String} path A path to initialize the object with (optional).
+     * @returns {nsILocalFile}
+     */
+    that.factoryFile = function(path) {
+        var file = Components.
+            classes["@mozilla.org/file/local;1"].
+            createInstance(Components.interfaces.nsILocalFile);
+        if (typeof(path) == 'string' && path !== '') {
+            file.initWithPath(path);
+        }
+        return file;
+    }
+
+    /**
      * Returns the directory where we put files to edit.
      * @returns nsILocalFile The location where we should write editable files.
      */
@@ -310,13 +325,25 @@ var ItsAllText = function() {
     that.getEditor = function() {
         var editor = that.preferences.editor;
 
-        // create an nsILocalFile for the executable
-        var file = Components.
-            classes["@mozilla.org/file/local;1"].
-            createInstance(Components.interfaces.nsILocalFile);
+        if (editor === '') {
+            var checks = ['/System','/Applications','/Library', '/Network', '/Volumes'];
+            var is_mac = true;
+            var dir;
+            for(var i=0; i<checks.length; i++) {
+                dir = that.factoryFile(checks[i]);
+                is_mac = is_mac && dir.exists() && dir.isDirectory();
+            }
+            if (is_mac) {
+                editor = '/usr/bin/open'; 
+                that.preferences._set('editor', editor);
+            }
+        }
 
-        file.initWithPath(editor);
-        return file;
+        if (editor === '') {
+            return null;
+        } else {
+            return that.factoryFile(editor);
+        }
     };
 
     /**

@@ -10,12 +10,16 @@ function onOK() {
 function doOnload() {
     var locale = document.getElementById("strings");
     var params = window['arguments'][0];
-    var r=document.getElementById('reason');
-    if(params.exists) {
-        var textnode = document.createTextNode(locale.getFormattedString('eexecute'));
+    var reason = document.getElementById('reason');
+    var textnode = '**error**';
+    if(params.path === null) {
+        textnode = locale.getFormattedString('bad.noset',[]);
     } else {
-        var textnode = document.createTextNode(locale.getFormattedString('enoent', [params.path]));
-
-        r.appendChild(textnode);
+        if(params.exists) {
+            textnode = locale.getFormattedString('bad.noexec', []);
+        } else {
+            textnode = locale.getFormattedString('bad.noent', [params.path]);
+        }
     }
+    reason.appendChild(document.createTextNode(textnode));
 }
