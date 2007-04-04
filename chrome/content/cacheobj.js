@@ -118,12 +118,13 @@ CacheObj.prototype.initFromExistingFile = function() {
     var fobj = ItsAllText.getEditDir();
     var entries = fobj.directoryEntries;
     var ext = null;
+    var tmpfiles = /(\.bak|.tmp|~)$/;
     while (entries.hasMoreElements()) {
         var entry = entries.getNext();
         entry.QueryInterface(Components.interfaces.nsIFile);
         if (entry.leafName.indexOf(base) === 0) {
             // startswith
-            if (ext === null) {
+            if (ext === null && !entry.leafName.match(tmpfiles)) {
                 ext = entry.leafName.slice(base.length);
             }
             try{
@@ -254,7 +255,7 @@ CacheObj.prototype.edit = function(extension) {
         // to the process.
         var args = [filename];
         var result = {};
-        var ec = process.run(true, args, args.length, result);
+        var ec = process.run(false, args, args.length, result);
         this._is_watching = true;
     } catch(e) {
         var params = {out:null,
