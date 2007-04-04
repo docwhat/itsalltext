@@ -10,6 +10,10 @@ Note to Mac OS X users: Most editors come with a component in
 strange, then create a shell script to do an "open -a /path/to/editor
 $*".
 
+****** 0.6.2 *****
+* Default Mac OS X to '/usr/bin/open'
+* Fixed problems with detecting editor launch trouble.
+
 ****** 0.6.1 ******
 * Fix for MacOSX preferences not having a close button.
 * missing 'var'

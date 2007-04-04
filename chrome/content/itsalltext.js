@@ -155,7 +155,7 @@ var ItsAllText = function() {
             file.initWithPath(path);
         }
         return file;
-    }
+    };
 
     /**
      * Returns the directory where we put files to edit.
