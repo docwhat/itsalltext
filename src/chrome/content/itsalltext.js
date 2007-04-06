@@ -702,10 +702,13 @@ var ItsAllText = function() {
 
     that.checkVersion = function() {
         if( that.preferences._get('lastversion') != that.VERSION) {
-            that.preferences._set('lastversion', that.VERSION);
-            window.setTimeout(function() {
-                var browser = getBrowser();
-                browser.selectedTab = browser.addTab(that.README, null);
+            setTimeout(function(){
+                try{
+                    var browser = getBrowser();
+                    browser.selectedTab = browser.addTab(that.README, null);
+                    that.preferences._set('lastversion', that.VERSION);
+                } catch(e) {
+                };
             }, 100);
         }
     };
@@ -723,8 +726,9 @@ var ItsAllText = function() {
         // Start the monitor
         that.monitor.restart();
 
+        // Check if there was an update and show the page...
         that.checkVersion();
-
+        
         var appcontent = document.getElementById("appcontent"); // The Browser
         if (appcontent) {
             // Normal web-page.
