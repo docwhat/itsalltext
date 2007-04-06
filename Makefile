@@ -26,7 +26,7 @@ JSMIN      := cat
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 0.6.5
+VERSION    := 0.6.7
 
 # NOTE: do not create files or directories in here that have
 #       spaces or other special characters in their names!

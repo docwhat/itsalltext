@@ -234,15 +234,17 @@ CacheObj.prototype.edit = function(extension) {
     var filename = this.write();
     this.initial_background = this.node.style.backgroundColor;
     this.initial_color      = this.node.style.color;
-    var program = ItsAllText.getEditor();
+    var program = null; 
              
     try {
+        program = ItsAllText.getEditor();
         // checks
-        if (program === null)        { throw "Editor is not set."; }
-        if (!program.exists())       { throw "Editor does not exists."; }
+        if (program === null)        { throw {name:"Editor is not set."}; }
+        if (!program.exists())       { throw {name:"NS_ERROR_FILE_NOT_FOUND"}; }
         /* Mac check because of 
          * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
-        if (!(ItsAllText.isMac() || program.isExecutable())) { throw "Editor is not executable."; }
+        if (!(ItsAllText.isDarwin() || program.isExecutable())) { 
+            throw {name:"NS_ERROR_FILE_ACCESS_DENIED"}; }
 
         // create an nsIProcess
         var process = Components.
@@ -259,10 +261,11 @@ CacheObj.prototype.edit = function(extension) {
         var result = {};
         var ec = process.run(false, args, args.length, result);
         this._is_watching = true;
-    } catch(e) {
+    } catch(e) {        
         var params = {out:null,
                       exists: program ? program.exists() : false,
-                      path: program ? program.path : null };
+                      path: ItsAllText.preferences.editor,
+                      exception: e.name };
         window.openDialog('chrome://itsalltext/chrome/badeditor.xul',
                           null,
                           "chrome,titlebar,toolbar,centerscreen,modal",

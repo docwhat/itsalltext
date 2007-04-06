@@ -331,38 +331,46 @@ var ItsAllText = function() {
 
     };
 
-    that.isMac = function() {
-        var is_mac = that._is_mac;
-        if (typeof(is_mac) == 'undefined') {
-            var checks = ['/System',  '/Applications',
-                          '/Library', '/Network', '/Volumes'];
-            is_mac = true;
-            for(var i=0; i<checks.length; i++) {
-                dir = that.factoryFile(checks[i]);
-                is_mac = is_mac && dir.exists() && dir.isDirectory();
-            }
-            that._is_mac = is_mac;
+    /**
+     * Returns true if the system is running Mac OS X.
+     * @returns {boolean} Is this a Mac OS X system?
+     */
+    that.isDarwin = function() {
+        /* more help:
+         http://developer.mozilla.org/en/docs/Code_snippets:Miscellaneous#Operating_system_detection
+        */
+
+        var is_darwin = that._is_darwin;
+        if (typeof(is_darwin) == 'undefined') {
+            is_darwin = /^Darwin/i.test(Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS);
+            that._is_darwin = is_darwin;
         }
-        return is_mac;
+        return is_darwin;
     };
 
     /**
      * A Preference Option: What editor should we use?
+     *
+     * Note: On some platforms, this can return an 
+     * NS_ERROR_FILE_INVALID_PATH exception and possibly others.
+     *
+     * For a complete list of exceptions, see:
+     * http://lxr.mozilla.org/seamonkey/source/xpcom/base/nsError.h#262
      * @returns {nsILocalFile} A file object of the editor.
      */
     that.getEditor = function() {
         var editor = that.preferences.editor;
+        var retval = null;
 
-        if (editor === '' && that.isMac()) {
+        if (editor === '' && that.isDarwin()) {
             editor = '/usr/bin/open'; 
             that.preferences._set('editor', editor);
         }
 
-        if (editor === '') {
-            return null;
-        } else {
-            return that.factoryFile(editor);
+        if (editor !== '') {
+            retval = that.factoryFile(editor);
         }
+        return retval;
     };
 
     /**
