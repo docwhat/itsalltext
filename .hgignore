@@ -1,4 +1,5 @@
 syntax:regexp
-^docs/
-\.log$
-\.lint$
+^(docs|lint|build)/
+^\.[^/]+/
+^[^/]+\.xpi/
+
