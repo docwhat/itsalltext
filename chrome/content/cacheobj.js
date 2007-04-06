@@ -240,7 +240,9 @@ CacheObj.prototype.edit = function(extension) {
         // checks
         if (program === null)        { throw "Editor is not set."; }
         if (!program.exists())       { throw "Editor does not exists."; }
-        if (!program.isExecutable()) { throw "Editor is not executable."; }
+        /* Mac check because of 
+         * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
+        if (!(ItsAllText.isMac() || program.isExecutable())) { throw "Editor is not executable."; }
 
         // create an nsIProcess
         var process = Components.

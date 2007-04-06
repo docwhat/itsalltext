@@ -318,6 +318,21 @@ var ItsAllText = function() {
 
     };
 
+    that.isMac = function() {
+        var is_mac = that._is_mac;
+        if (typeof(is_mac) == 'undefined') {
+            var checks = ['/System',  '/Applications',
+                          '/Library', '/Network', '/Volumes'];
+            is_mac = true;
+            for(var i=0; i<checks.length; i++) {
+                dir = that.factoryFile(checks[i]);
+                is_mac = is_mac && dir.exists() && dir.isDirectory();
+            }
+            that._is_mac = is_mac;
+        }
+        return is_mac;
+    };
+
     /**
      * A Preference Option: What editor should we use?
      * @returns {nsILocalFile} A file object of the editor.
@@ -325,18 +340,9 @@ var ItsAllText = function() {
     that.getEditor = function() {
         var editor = that.preferences.editor;
 
-        if (editor === '') {
-            var checks = ['/System','/Applications','/Library', '/Network', '/Volumes'];
-            var is_mac = true;
-            var dir;
-            for(var i=0; i<checks.length; i++) {
-                dir = that.factoryFile(checks[i]);
-                is_mac = is_mac && dir.exists() && dir.isDirectory();
-            }
-            if (is_mac) {
-                editor = '/usr/bin/open'; 
-                that.preferences._set('editor', editor);
-            }
+        if (editor === '' && that.isMac()) {
+            editor = '/usr/bin/open'; 
+            that.preferences._set('editor', editor);
         }
 
         if (editor === '') {
