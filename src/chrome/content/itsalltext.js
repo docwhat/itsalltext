@@ -49,6 +49,18 @@ var ItsAllText = function() {
      */
     that.MYSTRING = 'itsalltext';
 
+    /**
+     * A constant, the version number.  Set by the Makefile.
+     * @type String
+     */
+    that.VERSION = '@@VERSION@@';
+
+    /**
+     * A constant, the url to the readme.
+     * @type String
+     */
+    that.README = 'chrome://itsalltext/content/readme.xhtml';
+
     /* The XHTML Namespace */
     that.XHTMLNS = "http://www.w3.org/1999/xhtml";
 
@@ -245,6 +257,7 @@ var ItsAllText = function() {
          * @type Hash
          */
         types: {
+            'lastversion':        'Char',
             'charset':            'Char',
             'editor':             'Char',
             'refresh':            'Int',
@@ -496,7 +509,8 @@ var ItsAllText = function() {
     that.refreshDocument = function(doc) {
         // @todo [1] Confirm that we find textareas inside iframes and frames.
         if(!doc.location) { return; } // it's being cached, but not shown.
-        var is_chrome = (doc.location.protocol == 'chrome:');
+        var is_chrome = (doc.location.protocol == 'chrome:' &&
+                         doc.location.href != that.README);
         var nodes = doc.getElementsByTagName('textarea');
         var i;
         for(i=0; i < nodes.length; i++) {
@@ -561,7 +575,8 @@ var ItsAllText = function() {
                 var is_usable = (is_html) && 
                     location.protocol != 'about:' &&
                     location.protocol != 'chrome:';
-                if (!is_usable) { 
+                var is_my_readme = location.href == that.README;
+                if (!(is_usable || is_my_readme)) { 
                     that.debuglog('watch(): ignoring -- ',
                                   location, contentType);
                     return;
@@ -677,6 +692,16 @@ var ItsAllText = function() {
         return true;
     };
 
+    that.checkVersion = function() {
+        if( that.preferences._get('lastversion') != that.VERSION) {
+            that.preferences._set('lastversion', that.VERSION);
+            window.setTimeout(function() {
+                var browser = getBrowser();
+                browser.selectedTab = browser.addTab(that.README, null);
+            }, 100);
+        }
+    };
+
     /**
      * Initialize the module.  Should be called once, when a window is loaded.
      * @private
@@ -689,6 +714,8 @@ var ItsAllText = function() {
 
         // Start the monitor
         that.monitor.restart();
+
+        that.checkVersion();
 
         var appcontent = document.getElementById("appcontent"); // The Browser
         if (appcontent) {
