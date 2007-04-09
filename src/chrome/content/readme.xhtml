@@ -1,30 +1,36 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.or
-g/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" >
   <head>
     <title>Welcome to It's All Text! version 999.@@VERSION@@</title>
     <style type="text/css">
       html { background: #abd; color: #000; padding: 0; margin: 0; }
-      body { background: #fff; color: #000; margin: 1ex 2em; padding: 1em; 
-             -moz-border-radius: 1em; 
+      body { background: #fff; color: #000; margin: 1ex auto; padding: 1em; 
+             -moz-border-radius: 1em; width: 30em;
              font: 1.2em sans-serif;}
-      h1 { background: #00d; color: #fff; -moz-border-radius: 1ex; padding: 0.5em 1em; margin: 0;}
+      h1, h2, h3, h4, h5, h6 { background: #00d; color: #fff; -moz-border-radius: 1ex; padding: 0.3em 0.8em 0.3em 2em; margin-left: -2em;}
+      h1 { padding: 0.5em 1em 0.5em 2em; margin: 0 -2em;}
+      h2, h3, h4, h5, h6 { display: block; width: 20em; clear: both; }
       #ver { margin: 0; text-align: right; }
-      #test { width: 100%; height: 10em; background: #cdf; }
+      #test { width: 50%; height: 10em; background: #cdf; }
+      #nteb { font-size: 0.5em; text-align: right; margin-right: 50%; padding-right: 30px; }
+      #signoff { font-size: 2em; font-style: oblique; font-family: monospace; }
+
+      #faq dl { margin-left: 1em; }
+      #faq dd { font-size: 0.8em; }
+
+      #changelog > ul { font-family: monospace; white-space: pre-wrap; }
     </style>
   </head>
   <body>
     <h1>Welcome to It's All Text!</h1>
     <p id="ver"> version 999.@@VERSION@@</p>
     
-    <p> This software is ALMOST version 1.0!</p>
-
-    <p>
-      This version is still beta.
+    <p> 
+      This software is ALMOST version 1.0! However, this version is still beta.
     </p>
 
     <p>
-      Upon installation, go to Tools->Addons and select It's All Text and
+      Upon installation, go to <tt>Tools-&gt;Addons</tt> and select It's All Text and
       set the Preferences.  Specifically, you'll have to set the editor's
       full path.  A future version will automagically pop up preferences
       when you try to edit without an editor set.
@@ -38,76 +44,38 @@ g/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     </p>
 
     <p>
-      A test TextArea for you to play with...
+      Here is a test edit box for you to play with...
     </p>
-    <form>
+    <form action="">
       <textarea id="test">Click the edit button and have fun editing!</textarea>
+      <div id="nteb">Note the edit button.&mdash;&gt; </div>
     </form>
 
+    <div style="clear:both;"/>
+    <p id="signoff"> Ciao! </p>
 
-    <pre>
-****** 0.6.2 *****
-* Default Mac OS X to '/usr/bin/open'
-* Fixed problems with detecting editor launch trouble.
+    <h3>FAQ</h3>
 
-****** 0.6.1 ******
-* Fix for MacOSX preferences not having a close button.
-* missing 'var'
+    <dl id="faq">
+      <dt>I want to do something more complicated than just running an editor with a filename.</dt>
+      <dd>
+        <p>In unix systems, such as Mac OS X or Linux, you can create a shell script with your commands in it.</p>
+        <p>In windows, you can create a <tt>.cmd</tt> file instead.</p>
+      </dd>
+      <dt>GMail: It only works some places.</dt>
+      <dd><p>GMail supports a rich text editor.  If the rich text editor is turned on, then It's All Text! cannot work because there is no <tt>textarea</tt> to edit.</p>
+      <p>Workaround: Turn off the rich text editor in GMail.</p>
+      </dd>
+    </dl>
 
-****** 0.6.0 ******
-* really fixed gumdrop positioning
-* right clicking the gumdrop lets you choose the file extension
-* if the editor doesn't work, explain to the user what happened.
-* improved refreshing rules!
+    <h3>ChangeLog</h3>
+    <div id="changelog">
+      <h4>Version 1.0 Release Candidate</h4>
+      <ul>
+        <li>Created changelog</li>
+        <li>The chosen set of version 1.0 functionality exists and works.</li>
+      </ul>
+    </div>
 
-****** 0.4.3 ******
-* fixed gumdrop positioning
-* Hide gumdrop/menu when textarea is readonly/disabled.
-* Show context menu all the time
-* Added preference to turn off gumdrops
-
-****** 0.4.2 ******
-* Stupid bugs fixed.
-* The popup positions right in XP.
-* The default extension can be set by the web-page designer via:
-  itsalltext-extension=".extension"
-* The chosen extension is remembered for the life of the page.
-
-****** 0.4.0 ******
-* Added API so that other extensions can have edit buttons!
-* Allow the extension of the file to be set.
-* Added the hostname to the file, so that names aren't ONLY a hash.
-* We now have extension settings.
-* Extensions can make use of It's All Text! as well (see API.js).
-* cleaned up preferences layout.
-* Found and fixed a memory leak in the preference observer.
-
-****** 0.3.4 ******
-* Fade in and out gumdrops.
-* The gumdrop no longer alters the flow of the page.
-* it should behave much better under load.
-* Removed a memory leak.
-* Improved preferences a little.
-
-****** 0.3.3 ******
-* Preferences popup if the editor doesn't work.
-* Deal with case where textarea.name is not unique
-
-****** 0.3.2 ******
-* Fixed browse button for windows
-* Added better icon based on the Foolish Dictionary's splash page
-* Pretty gumdrop!  It should also stay in place better.
-
-****** 0.3.1 ******
-* Working browse button for choosing your editor.
-
-****** 0.3 ******
-Released to addons.mozilla.org
-* Edit button is added to HTML next to text area.
-* Cleaned up timing intervals and memory leak in document checks.
-* Better hash handling.
-    </pre>
-
-    <p> Ciao! </p>
   </body>
 </html>
