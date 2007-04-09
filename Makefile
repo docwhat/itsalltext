@@ -90,11 +90,11 @@ $(filter-out %.rdf %.dtd %.xhtml %.js, $(OUTPUT)): build/%: src/%
 
 $(filter %.rdf %.dtd %.xhtml, $(OUTPUT)): build/%: src/%
 	$(Q)mkdir -p $(dir $@)
-	$(Q)cat $< | sed 's/@@VERSION@@/$(VERSION)/g' > $@
+	$(Q)cat $< | sed 's/999.@@VERSION@@/$(VERSION)/g' > $@
 
 $(filter %.js, $(OUTPUT)): build/%.js: src/%.js
 	$(Q)mkdir -p $(dir $@)
-	$(Q)cat $< | sed 's/@@VERSION@@/$(VERSION)/g' | $(JSMIN) > $@
+	$(Q)cat $< | sed 's/999.@@VERSION@@/$(VERSION)/g' | $(JSMIN) > $@
 
 
 ##

@@ -53,7 +53,7 @@ var ItsAllText = function() {
      * A constant, the version number.  Set by the Makefile.
      * @type String
      */
-    that.VERSION = '@@VERSION@@';
+    that.VERSION = '999.@@VERSION@@';
 
     /**
      * A constant, the url to the readme.
@@ -708,7 +708,8 @@ var ItsAllText = function() {
                     browser.selectedTab = browser.addTab(that.README, null);
                     that.preferences._set('lastversion', that.VERSION);
                 } catch(e) {
-                };
+                    // pass
+                }
             }, 100);
         }
     };
