@@ -30,10 +30,12 @@ function pref_editor_select() {
     }
   
     var rv = fp.show();
+    var file;
+    var editor;
     if (rv == nsIFilePicker.returnOK) {
-        var file = fp.file;
+        file = fp.file;
         pref_editor.value = file.path;
-        var editor = document.getElementById('editor');
+        editor = document.getElementById('editor');
         editor.style.color = 'inherit';
         editor.style.backgroundColor = 'inherit';
     }
@@ -51,17 +53,21 @@ function setHelp(text) {
 function pref_onload() {
     var locale = document.getElementById("strings");
     document.getElementById('browse').focus();
+    var editor;
+    var box;
+    var desc;
+    var textnode;
     if (window['arguments'] && window['arguments'][0] && window['arguments'][0] == 'badeditor') {
-        var editor = document.getElementById('editor');
+        editor = document.getElementById('editor');
         editor.style.color = 'black';
         editor.style.backgroundColor = '#fb4';
-        var box = document.getElementById('help');
+        box = document.getElementById('help');
         // Clean it out
         while (box.firstChild) {
             box.removeChild(box.firstChild);
         }
-        var desc = document.createElement('description');
-        var textnode = document.createTextNode(locale.getFormattedString('problem.editor', [editor.value]));
+        desc = document.createElement('description');
+        textnode = document.createTextNode(locale.getFormattedString('problem.editor', [editor.value]));
         desc.appendChild(textnode);
         desc.style.maxWidth = '18em';
         box.appendChild(desc);

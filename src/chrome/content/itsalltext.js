@@ -118,9 +118,10 @@ var ItsAllText = function() {
      */
     that.log = function() {
         var message = that.logString.apply(that, arguments);
+        var consoleService, e;
         try {
             // idiom: Convert arguments to an array for easy handling.
-            var consoleService = Components.
+            consoleService = Components.
                 classes["@mozilla.org/consoleservice;1"].
                 getService(Components.interfaces.nsIConsoleService);
             consoleService.logStringMessage(message);
@@ -197,8 +198,9 @@ var ItsAllText = function() {
         var last_week = Date.now() - (1000*60*60*24*7);
         var fobj = that.getEditDir();
         var entries = fobj.directoryEntries;
+        var entry;
         while (entries.hasMoreElements()) {
-            var entry = entries.getNext();
+            entry = entries.getNext();
             entry.QueryInterface(Components.interfaces.nsIFile);
             if(force || !entry.exists() || entry.lastModifiedTime < last_week){
                 try{
@@ -418,10 +420,11 @@ var ItsAllText = function() {
 
         var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
         var win = wm.getMostRecentWindow("Browser:Preferences");
+        var pane;
         if (win) {
             win.focus();
             if (paneID) {
-                var pane = win.document.getElementById(paneID);
+                pane = win.document.getElementById(paneID);
                 win.document.documentElement.showPane(pane);
             }
         } else {
@@ -481,8 +484,9 @@ var ItsAllText = function() {
      */
     that.cleanCacheObjs = function() {
         var count = 0;
-        for(var id in that.tracker) {
-            var cobj = that.tracker[id];
+        var cobj, id;
+        for(id in that.tracker) {
+            cobj = that.tracker[id];
             if (cobj.node.ownerDocument.location === null) {
                 that.debug('cleaning %s', id);
                 delete cobj.node;
@@ -573,17 +577,18 @@ var ItsAllText = function() {
          * @param {Object} doc The document to watch.
          */
         watch: function(doc, force) {
+            var contentType, location, is_html, is_usable, is_my_readme;
             if (!force) {
                 /* Check that this is a document we want to play with. */
-                var contentType = doc.contentType;
-                var location = doc.location;
-                var is_html = (contentType=='text/html' ||
+                contentType = doc.contentType;
+                location = doc.location;
+                is_html = (contentType=='text/html' ||
                                contentType=='text/xhtml');
                 //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
-                var is_usable = (is_html) && 
+                is_usable = (is_html) && 
                     location.protocol != 'about:' &&
                     location.protocol != 'chrome:';
-                var is_my_readme = location.href == that.README;
+                is_my_readme = location.href == that.README;
                 if (!(is_usable || is_my_readme)) { 
                     that.debuglog('watch(): ignoring -- ',
                                   location, contentType);
@@ -612,10 +617,10 @@ var ItsAllText = function() {
             /* Walk the documents looking for changes */
             var documents = monitor.documents;
             that.debuglog('monitor.watcher(',offset,'): ', documents.length);
-            var i;
+            var i, doc;
             var did_delete = false;
             for(i in documents) {
-                var doc = documents[i];
+                doc = documents[i];
                 if (doc.location) {
                     that.debuglog('refreshing', doc.location);
                     that.refreshDocument(doc);
@@ -672,26 +677,27 @@ var ItsAllText = function() {
      * @param {Object} event The event passed in by the event handler.
      */
     that.onContextMenu = function(event) {
+        var tid, node, tag, is_disabled, cobj, menu;
         if(event.target) {
-            var tid = event.target.id;
+            tid = event.target.id;
             if (tid == "itsalltext-context-popup" ||
                 tid == "contentAreaContextMenu") {
-                var node = document.popupNode;
-                var tag = node.nodeName.toLowerCase();
-                var is_disabled = (!(tag == 'textarea' || 
+                node = document.popupNode;
+                tag = node.nodeName.toLowerCase();
+                is_disabled = (!(tag == 'textarea' || 
                                      tag == 'textbox') ||
                                    node.style.display == 'none' ||
                                    node.getAttribute('readonly') ||
                                    node.getAttribute('disabled')
                                    );
                 if (tid == "itsalltext-context-popup") {
-                    var cobj = that.getCacheObj(node);
+                    cobj = that.getCacheObj(node);
                     that.rebuildMenu(cobj.uid,
                                      'itsalltext-context-popup',
                                      is_disabled);
                 } else {
                     // tid == "contentAreaContextMenu"
-                    var menu = document.getElementById("itsalltext-contextmenu");
+                    menu = document.getElementById("itsalltext-contextmenu");
                     menu.setAttribute('hidden', is_disabled);
                 }
                     
@@ -701,10 +707,11 @@ var ItsAllText = function() {
     };
 
     that.checkVersion = function() {
+        var browser;
         if( that.preferences._get('lastversion') != that.VERSION) {
             setTimeout(function(){
                 try{
-                    var browser = getBrowser();
+                    browser = getBrowser();
                     browser.selectedTab = browser.addTab(that.README, null);
                     that.preferences._set('lastversion', that.VERSION);
                 } catch(e) {
@@ -765,8 +772,9 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
     var params = {out:null};       
     window.openDialog("chrome://itsalltext/chrome/newextension.xul", "",
     "chrome, dialog, modal, resizable=yes", params).focus();
+    var ext;
     if (params.out) {
-        var ext = params.out.extension.replace(/[\n\t ]+/g,'');
+        ext = params.out.extension.replace(/[\n\t ]+/g,'');
         if(params.out.do_save) {
             that.appendExtensions(ext);
         }

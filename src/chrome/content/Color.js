@@ -76,10 +76,11 @@ var Color = function() {
 	 *             If not specified, the alpha value will be ignored.
 	 */
     this.hex = function(bg) {
+        var r, g, b;
 		if (bg) {
-			var r = alphaBlend(this.red, bg.red, this.alpha);
-			var g = alphaBlend(this.green, bg.green, this.alpha);
-			var b = alphaBlend(this.blue, bg.blue, this.alpha);
+			r = alphaBlend(this.red, bg.red, this.alpha);
+			g = alphaBlend(this.green, bg.green, this.alpha);
+			b = alphaBlend(this.blue, bg.blue, this.alpha);
 		} else {
 			r = this.red;
 			g = this.green;
@@ -103,10 +104,11 @@ var Color = function() {
 	 *             If not specified, the alpha value will be ignored.
 	 */
 	this.rgb = function(bg) {
+        var r, g, b;
 		if (bg) {
-			var r = alphaBlend(this.red, bg.red, this.alpha);
-			var g = alphaBlend(this.green, bg.green, this.alpha);
-			var b = alphaBlend(this.blue, bg.blue, this.alpha);
+			r = alphaBlend(this.red, bg.red, this.alpha);
+			g = alphaBlend(this.green, bg.green, this.alpha);
+			b = alphaBlend(this.blue, bg.blue, this.alpha);
 		} else {
 			r = this.red;
 			g = this.green;
@@ -162,13 +164,17 @@ var Color = function() {
 	 * Constructor function
 	 */
     this.toString = this.hex;
-
+    
+    var value;
+    var components, pattern;
+    var key, base, m;
+    var r, g, b, a;
     if (arguments.length >= 3) {
         /* r, g, b or r, g, b, a */
-        var r = arguments[0];
-        var g = arguments[1];
-        var b = arguments[2];
-        var a = arguments[3];
+        r = arguments[0];
+        g = arguments[1];
+        b = arguments[2];
+        a = arguments[3];
       
         this.red   = (!isNaN(r)) ? clamp(r, 0, 255) : 0;
         this.green = (!isNaN(g)) ? clamp(g, 0, 255) : 0;
@@ -176,18 +182,17 @@ var Color = function() {
         this.alpha = (!isNaN(a)) ? clamp(a, 0.0, 1.0) : 1.0;
     } else if (arguments.length == 1) {
         /* CSS Colour keyword or value */
-        var value = keyword[arguments[0]] ? keyword[arguments[0]] : arguments[0];
-        var components, pattern;
+        value = keyword[arguments[0]] ? keyword[arguments[0]] : arguments[0];
       
-        for (var key in func) {
+        for (key in func) {
             if (func[key].test(value)) {
                 pattern = key;
             }
         }
 
         components = value.match(func[pattern]);
-        var base = 10;
-        var m = 1; // Multiplier for percentage values
+        base = 10;
+        m = 1; // Multiplier for percentage values
       
         switch (pattern) {
         case "rgb%":

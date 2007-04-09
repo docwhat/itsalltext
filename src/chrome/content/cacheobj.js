@@ -119,8 +119,9 @@ CacheObj.prototype.initFromExistingFile = function() {
     var entries = fobj.directoryEntries;
     var ext = null;
     var tmpfiles = /(\.bak|.tmp|~)$/;
+    var entry;
     while (entries.hasMoreElements()) {
-        var entry = entries.getNext();
+        entry = entries.getNext();
         entry.QueryInterface(Components.interfaces.nsIFile);
         if (entry.leafName.indexOf(base) === 0) {
             // startswith
@@ -146,13 +147,14 @@ CacheObj.prototype.initFromExistingFile = function() {
  */
 CacheObj.prototype.getNodeIdentifier = function(node) {
     var id   = node.getAttribute('id');
+    var name, doc, attr, serial;
     if (!id) {
-        var name = node.getAttribute('name');
-        var doc = node.ownerDocument.getElementsByTagName('html')[0];
-        var attr = ItsAllText.MYSTRING+'_id_serial';
+        name = node.getAttribute('name');
+        doc = node.ownerDocument.getElementsByTagName('html')[0];
+        attr = ItsAllText.MYSTRING+'_id_serial';
         
         /* Get a serial that's unique to this document */
-        var serial = doc.getAttribute(attr);
+        serial = doc.getAttribute(attr);
         if (serial) { serial = parseInt(serial, 10)+1;
         } else { serial = 1; }
         id = [ItsAllText.MYSTRING,'generated_id',name,serial].join('_');
@@ -235,6 +237,8 @@ CacheObj.prototype.edit = function(extension) {
     this.initial_background = this.node.style.backgroundColor;
     this.initial_color      = this.node.style.color;
     var program = null; 
+    var process;
+    var args, result, ec, e, params;
              
     try {
         program = ItsAllText.getEditor();
@@ -247,7 +251,7 @@ CacheObj.prototype.edit = function(extension) {
             throw {name:"NS_ERROR_FILE_ACCESS_DENIED"}; }
 
         // create an nsIProcess
-        var process = Components.
+        process = Components.
             classes["@mozilla.org/process/util;1"].
             createInstance(Components.interfaces.nsIProcess);
         process.init(program);
@@ -257,12 +261,12 @@ CacheObj.prototype.edit = function(extension) {
         // called process terminates.
         // Second and third params are used to pass command-line arguments
         // to the process.
-        var args = [filename];
-        var result = {};
-        var ec = process.run(false, args, args.length, result);
+        args = [filename];
+        result = {};
+        ec = process.run(false, args, args.length, result);
         this._is_watching = true;
     } catch(e) {        
-        var params = {out:null,
+        params = {out:null,
                       exists: program ? program.exists() : false,
                       path: ItsAllText.preferences.editor,
                       exception: e.name };
@@ -299,20 +303,21 @@ CacheObj.prototype.read = function() {
     /* read file, reset ts & size */
     var DEFAULT_REPLACEMENT_CHARACTER = 65533;
     var buffer = [];
+    var fis, istream, str, e;
          
     try {
-        var fis = Components.
+        fis = Components.
             classes["@mozilla.org/network/file-input-stream;1"].
             createInstance(Components.interfaces.nsIFileInputStream);
         fis.init(this.file, 0x01, parseInt('00400',8), 0); 
         // MODE_RDONLY | PERM_IRUSR
              
-        var istream = Components.
+        istream = Components.
             classes["@mozilla.org/intl/converter-input-stream;1"].
             createInstance(Components.interfaces.nsIConverterInputStream);
         istream.init(fis, ItsAllText.getCharset(), 4096, DEFAULT_REPLACEMENT_CHARACTER);
              
-        var str = {};
+        str = {};
         while (istream.readString(4096, str) !== 0) {
             buffer.push(str.value);
         }
@@ -390,8 +395,9 @@ CacheObj.prototype.fade = function(steps, delay) {
  * @returns {boolean} Returns true ifthe file changed.
  */
 CacheObj.prototype.update = function() {
+    var value;
     if (this.hasChanged()) {
-        var value = this.read();
+        value = this.read();
         if (value !== null) {
             this.fade(20, 100);
             this.node.value = value;
@@ -513,11 +519,12 @@ CacheObj.prototype.adjust = function() {
     /* Reposition the gumdrops incase the dom changed. */
     var left = Math.max(1, el.offsetWidth-this.gumdrop_width);
     var top  = el.offsetHeight;
+    var coord;
     if (el.offsetParent === gumdrop.offsetParent) {
         left += el.offsetLeft;
         top  += el.offsetTop;
     } else {
-        var coord = ItsAllText.getContainingBlockOffset(el, gumdrop.offsetParent);
+        coord = ItsAllText.getContainingBlockOffset(el, gumdrop.offsetParent);
         left += coord[0];
         top  += coord[1];
     }
