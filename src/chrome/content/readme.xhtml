@@ -62,9 +62,20 @@
         <p>In unix systems, such as Mac OS X or Linux, you can create a shell script with your commands in it.</p>
         <p>In windows, you can create a <tt>.cmd</tt> file instead.</p>
       </dd>
+
       <dt>GMail: It only works some places.</dt>
       <dd><p>GMail supports a rich text editor.  If the rich text editor is turned on, then It's All Text! cannot work because there is no <tt>textarea</tt> to edit.</p>
       <p>Workaround: Turn off the rich text editor in GMail.</p>
+      </dd>
+
+      <dt>I use non-ASCII characters and they turn into blocks or question marks (?).</dt>
+      <dd>
+        <p>
+          The problem is that the encoding It's All Text! is using and your editor is using don't match.  You can figure out what encoding your editor wants and change the encodings preference in It's All Text! or you can change the encoding your editor uses.
+        </p>
+        <p>
+          A common problem I get is that someone is using Notepad or WordPad in Windows.  These both do not support sane encodings.  I recommend getting something like <a href="http://notepad-plus.sourceforge.net/">Notpad++</a> for editing in UTF-8 instead.
+        </p>
       </dd>
     </dl>
 
