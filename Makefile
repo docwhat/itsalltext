@@ -136,12 +136,18 @@ docs/.stamp: $(SOURCES_JS)
 	$^
 	$(Q)touch "$@"
 
+.PHONY: todo
+todo: .todo
+	$(Q)cat $<
+.todo: $(SOURCES) Makefile
+	$(Q)grep -hE '[@]todo' $^ | perl -p -e 's!^.*[@]todo\s*!!' | sort -n > "$@"
+
 
 ##
 ## Cleanup methods
 .PHONY: clean
 clean:
-	$(Q)rm -rf lint build docs
+	$(Q)rm -rf lint build docs .todo
 
 .PHONY: realclean
 realclean: clean
@@ -150,3 +156,4 @@ realclean: clean
 ## @todo [5] [make] Do a proper build in another directory.
 ## @todo [5] [make] Minimize JavaScript.
 ## @todo [5] [make] Put contents into a .jar.
+## @todo [7] Allow a web page to add an It's All Text! button.

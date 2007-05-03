@@ -2,4 +2,4 @@ syntax:regexp
 ^(docs|lint|build)/
 ^\.[^/]+/
 ^[^/]+\.xpi/
-
+^\.todo$
