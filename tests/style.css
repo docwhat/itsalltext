@@ -1,0 +1,13 @@
+html, body { background: #ffa; color: #000; 
+             font: 1em sans-serif; }
+h1 { background: #00f; color: #fff; 
+     margin: -1ex -1em 1ex; 
+     padding: 0.8ex 1em 0.2ex; }
+form { margin: 0; padding: 0; }
+textarea { background: #ddd; color: #000; 
+           height: 5ex; width: 10em; display: inline; }
+
+tt { color: #080; font-weight: bold; font-size: 1.2em; }
+
+ol li, ul li, p { line-height: 1.2em; margin: 0.4em; }
+

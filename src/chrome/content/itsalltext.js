@@ -583,7 +583,8 @@ var ItsAllText = function() {
                 contentType = doc.contentType;
                 location = doc.location;
                 is_html = (contentType=='text/html' ||
-                               contentType=='text/xhtml');
+                           contentType=='text/xhtml' ||
+                           contentType=='application/xhtml+xml');
                 //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
                 is_usable = (is_html) && 
                     location.protocol != 'about:' &&

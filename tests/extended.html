@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Extended Attributes</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Extended Attributes</h1>
+
+    <p>
+      Purpose: to verify that the extended attributes work.
+    </p>
+
+
+      <p>
+        Use this textarea for the tests below:
+        <textarea>testing area</textarea>
+      </p>
+    </form>
+    
+    <form action="" method="get">
+      <ol>
+        <li>
+          Click on the edit button on this textarea.  Your editor should open and the extension of the file should be <tt>.c</tt>.  Type in &ldquo;test 1&rdquo; and save and exit.  The textarea should be updated within a few seconds.
+          <br><textarea name="test1" itsalltext-extension=".c">/* Hello World */
+#include &lt;stdio.h&gt;
+
+main()
+{
+  for(;;)
+      { 
+          printf ("Hello World!\n");
+      }
+}</textarea>
+        </li>
+        <li>
+          Click on the edit button on this textarea.  Your editor should open and the extension of the file should be <tt>.txt</tt>.  Type in &ldquo;test 2&rdquo; and save and exit.  The textarea should be updated within a few seconds.
+          <br><textarea itsalltext-extension="/etc/hosts.txt" style="background: red; color: white;">HOSTILE</textarea>
+        </li>
+      </ol>
+    </form>
+
+  </body>
+</html>
+

@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+  <head>
+    <title></title>
+    <style type="text/css">
+      textarea { background: #ddf; color: red; }
+    </style>
+  </head>
+  
+  <body>
+    <h1>Test Page</h1>
+
+    <p>Test link:
+    <a href="/" onclick="window.open(this.href,'_blank'); return false">link1</a>
+    <a href="/" onclick="try{window.open(this.href,'_blank'); return false;}catch(e){return true;}">link2</a>
+    <br/>
+    <a href="?back">Back Link</a>
+    </p>
+
+    <div style="margin: -1em">
+    <div style="margin: 1em; padding: 1em; border: 1px dotted red;">
+    <form name="fish" action="">
+      <textarea name="ralf" style="background: #def" cols="40"
+                rows="8">
+        743              scrollType = 2;
+        744      
+        745            var imageWidth = 28;
+        746            var imageHeight = 28;
+        747            
+        748            // marker
+        749            var el = this._clientFrameDoc.createElementNS("http://www.w3.org/1999/xhtml", "img");
+        750            
+        751            var scrollImages  = new Array("chrome://global/content/bindings/autoscroll_all.png",
+        752                                          "chrome://global/content/bindings/autoscroll_v.png",
+        753                                          "chrome://global/content/bindings/autoscroll_h.png");
+        754            
+        755            el.src = scrollImages[scrollType];         
+        756            el.style.position = "fixed";
+        757            el.style.left = left - imageWidth / 2 + "px";
+        758            el.style.top = top - imageHeight / 2 + "px";
+        759            el.style.width = imageWidth + "px";
+        760            el.style.height = imageHeight + "px";
+        761            el.style.cursor = scrollCursor[scrollType];
+        762            el.style.zIndex = 2147483647; //Max Int
+        763            el.style.borderStyle = "none";
+        764            el.style.padding = "0";
+        765            el.style.margin = "0";
+        766 
+        767            this._clientFrameDoc.documentElement.appendChild(el);
+        768            
+        769            this._autoScrollMarkerImage = el;
+      </textarea>
+      <br/>
+      <textarea name="e-v" id="one">e-v one</textarea>
+      <textarea name="e-v" id="two">e-v two</textarea>
+      <textarea name="e-v" disabled="disabled">disabled</textarea>
+      <textarea name="e-v" readonly="readonly">readonly</textarea>
+      <textarea name="e-v">readonly</textarea>
+      <div style="margin: 2em; border: 1px dashed green;">
+        <textarea name="javascript" itsalltext-extension=".JS">
+          function javascript() { 
+          alert('one');
+          }
+        </textarea>
+        <textarea name="hostile" itsalltext-extension="/../fish"
+                  style="background: red; color: white;">
+          HOSTILE
+        </textarea>
+      </div>
+      <input type="submit"/>
+    </form>
+    </div>
+    </div>
+    <p>
+      <b
+          onclick="document.getElementById('two').style.display='none';"
+          >hide</b>
+      <br/>
+      <b onclick="document.getElementById('two').style.display = '';">show</b>
+    </p>
+    
+    <p>Test text: Please note that FIPS codes are not the same thing as ZIP Codes, however the two-letter abbreviations for U.S. states are the same as the Postal Service state abbreviations. Currently, actual "states" of the United States are (with the exception of number 11, District of Columbia), those entries with a FIPS code of 01 to 56. NBSP: &nbsp; 	
+&lt;--
+    </p>
+
+    <hr/>
+    <address><a href="mailto:holtje@holtje-desktop">Christian Holtje</a></address>
+<!-- Created: Wed Nov  8 12:25:35 EST 2006 -->
+<!-- hhmts start -->
+Last modified: Thu Mar  1 12:24:17 EST 2007
+<!-- hhmts end -->
+  </body>
+</html>
