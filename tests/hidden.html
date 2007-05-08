@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Hidden Textareas</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script type="text/javascript">
+     function toggle(that, event) {
+       var dis = document.getElementById('dis');
+       var vis = document.getElementById('vis');
+       if(dis.style.display == 'none') {
+         dis.style.display = '';
+       } else { 
+         dis.style.display = 'none';
+       }
+       if(vis.style.visibility == 'hidden') {
+         vis.style.visibility = '';
+       } else { 
+         vis.style.visibility = 'hidden';
+       }
+       return false;
+     }
+    </script>
+  </head>
+
+  <body>
+    <h1>Hidden Textareas</h1>
+
+    <p>
+      Purpose: to verify that the edit button does not show up for hidden textareas.
+    </p>
+
+
+    <form action="" method="get">
+      <ol>
+        <li>
+          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
+          <br>
+            <div class="boxed">
+              &nbsp;<textarea id="dis" style="display: none;">display: none</textarea>
+            </div>
+        </li>
+        <li>
+          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
+          <br>
+            <div class="boxed">
+              <textarea id="vis" style="visibility: hidden;">visibility: hidden</textarea>
+            </div>
+        </li>
+        <li>
+          Click on the button to toggle the hiddeness/visibility of
+          the textareas.  The edit button should appear within a few
+          seconds.  Click the toggle button again, and the edit
+          buttons should disappear in a few seconds.  Moving the
+          cursor over a textarea will make the edit button appear
+          quicker.
+          <br>
+            <button onclick="return toggle(this, event);">Toggle</button>
+        </li>
+      </ol>
+    </form>
+
+  </body>
+</html>
+
