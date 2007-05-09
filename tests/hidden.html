@@ -7,8 +7,9 @@
     <script type="text/javascript">
      function toggle(that, event) {
        var dis = document.getElementById('dis');
-       var dis2 = document.getElementById('dis2');
        var vis = document.getElementById('vis');
+
+       var dis2 = document.getElementById('dis2');
        var vis2 = document.getElementById('vis2');
 
        if(dis.style.display == 'none') {
@@ -16,20 +17,20 @@
        } else { 
          dis.style.display = 'none';
        }
-       if(dis2.style.display == 'none') {
-         dis2.style.display = '';
-       } else { 
-         dis2.style.display = 'none';
-       }
        if(vis.style.visibility == 'hidden') {
          vis.style.visibility = '';
        } else { 
          vis.style.visibility = 'hidden';
        }
-       if(vis2.style.visibility == 'hidden') {
-         vis2.style.visibility = '';
+       if(dis2.className == 'nodis') {
+           dis2.className = '';
        } else { 
-         vis2.style.visibility = 'hidden';
+           dis2.className = 'nodis';
+       }
+       if(vis2.className == 'novis') {
+           vis2.className = '';
+       } else { 
+           vis2.className = 'novis';
        }
        return false;
      }
