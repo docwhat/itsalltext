@@ -7,20 +7,37 @@
     <script type="text/javascript">
      function toggle(that, event) {
        var dis = document.getElementById('dis');
+       var dis2 = document.getElementById('dis2');
        var vis = document.getElementById('vis');
+       var vis2 = document.getElementById('vis2');
+
        if(dis.style.display == 'none') {
          dis.style.display = '';
        } else { 
          dis.style.display = 'none';
+       }
+       if(dis2.style.display == 'none') {
+         dis2.style.display = '';
+       } else { 
+         dis2.style.display = 'none';
        }
        if(vis.style.visibility == 'hidden') {
          vis.style.visibility = '';
        } else { 
          vis.style.visibility = 'hidden';
        }
+       if(vis2.style.visibility == 'hidden') {
+         vis2.style.visibility = '';
+       } else { 
+         vis2.style.visibility = 'hidden';
+       }
        return false;
      }
     </script>
+    <style type="text/css">
+      .nodis { display: none; }
+      .novis { visibility: hidden; }
+    </style>
   </head>
 
   <body>
@@ -44,7 +61,21 @@
           In the boxed area below, there should <em>not</em> be a button or a textarea visible.
           <br>
             <div class="boxed">
+              &nbsp;<textarea id="dis2" class="nodis">display: none</textarea>
+            </div>
+        </li>
+        <li>
+          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
+          <br>
+            <div class="boxed">
               <textarea id="vis" style="visibility: hidden;">visibility: hidden</textarea>
+            </div>
+        </li>
+        <li>
+          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
+          <br>
+            <div class="boxed">
+              <textarea id="vis2" class="novis">visibility: hidden</textarea>
             </div>
         </li>
         <li>
