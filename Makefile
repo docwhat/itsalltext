@@ -157,3 +157,4 @@ realclean: clean
 ## @todo [5] [make] Minimize JavaScript.
 ## @todo [5] [make] Put contents into a .jar.
 ## @todo [7] Allow a web page to add an It's All Text! button.
+## @todo [7] Allow a way to hide/disable/move button incase it obscures something.
