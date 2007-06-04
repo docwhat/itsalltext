@@ -496,6 +496,8 @@ CacheObj.prototype.addGumDrop = function() {
 CacheObj.prototype.adjust = function() {
     var gumdrop  = this.button;
     var el       = this.node;
+    var doc      = el.ownerDocument;
+
     if (ItsAllText.getDisableGumdrops()) {
         if(gumdrop && gumdrop.style.display != 'none') {
             gumdrop.style.display = 'none';
@@ -506,7 +508,9 @@ CacheObj.prototype.adjust = function() {
     var style    = gumdrop.style;
     if (!gumdrop || !el) { return; }
     var display  = '';
-    if (el.style.display == 'none' ||
+    var cstyle = doc.defaultView.getComputedStyle(el, '');
+    if (cstyle.display == 'none' ||
+        cstyle.visibility == 'hidden' ||
         el.getAttribute('readonly') ||
         el.getAttribute('disabled')
         ) {
