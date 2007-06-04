@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Styles</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <style type="text/css">
+      textarea { margin: 1ex 2em; }
+      [class*="textarea"], 
+      [id*="textarea"],
+      [class*="textarea"] > *,
+      [id*="textarea"] > * {
+      width: 50% ! important;
+      }  
+    </style>
+  </head>
+
+  <body>
+    <h1>Styles</h1>
+
+    <div class="back"><a href=".">back</a></div>
+
+    <p>
+      Purpose: verify that behavior is correct with various CSS and other styles.
+    </p>
+
+    <form action="" method="get">
+      <div class="textarea">
+        <p>
+          Use this textarea for the tests below:
+        </p>
+        <textarea>testing area</textarea>
+      </div>
+    </form>
+    
+    <ol>
+      <li>
+      Verify that the edit button is its normal size and shape. <span class="note">Known bug in version &lt;= 0.7.0</span>
+      </li>
+    </ol>
+
+    <div class="back"><a href=".">back</a></div>
+  </body>
+</html>
+

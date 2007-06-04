@@ -12,3 +12,9 @@ tt { color: #080; font-weight: bold; font-size: 1.2em; }
 ol li, ul li, p { line-height: 1.2em; margin: 0.4em; }
 
 .boxed { border: 1px solid #228; min-height: 4em; }
+.back { float: right;}
+.back a { background: white; color: blue; border: 1px solid blue;
+          text-decoration: none; padding: 0.5ex 1ex; }
+.back a:hover { background: #def; }
+
+.note { font-size: xx-small; }
