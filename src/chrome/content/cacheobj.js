@@ -72,7 +72,7 @@ function CacheObj(node) {
     that.mouseover = function(event) {
         var style = that.button?that.button.style:null;
         if (style) {
-            style.opacity = '0.7';
+            style.setProperty('opacity', '0.7', 'important');
             ItsAllText.refreshTextarea(that.node);
         }
     };
@@ -85,7 +85,7 @@ function CacheObj(node) {
     that.mouseout = function(event) {
         var style = that.button?that.button.style:null;
         if (style) {
-            style.opacity = '0.1';
+            style.setProperty('opacity', '0.1', 'important');
         }
     };
 }
@@ -439,15 +439,16 @@ CacheObj.prototype.addGumDrop = function() {
     cache_object.button = gumdrop; // Store it for easy finding in the future.
     
     // Image Attributes
-    gumdrop.style.cursor           = 'pointer';
-    gumdrop.style.display          = 'block';
-    gumdrop.style.position         = 'absolute';
-    gumdrop.style.padding          = '0';
-    gumdrop.style.border           = 'none';
-    gumdrop.style.zIndex           = 1; // we want it just above normal items.
+    gumdrop.style.setProperty('cursor',   'pointer', 'important');
+    gumdrop.style.setProperty('display',  'block', 'important');
+    gumdrop.style.setProperty('position',  'absolute', 'important');
+    gumdrop.style.setProperty('padding',   '0', 'important');
+    gumdrop.style.setProperty('margin',   '0', 'important');
+    gumdrop.style.setProperty('border',    'none', 'important');
+    gumdrop.style.setProperty('zIndex',    '1', 'important'); // we want it just above normal items.
     
-    gumdrop.style.width            = this.gumdrop_width+'px';
-    gumdrop.style.height           = this.gumdrop_height+'px';
+    gumdrop.style.setProperty('width',  this.gumdrop_width+'px',  'important');
+    gumdrop.style.setProperty('height', this.gumdrop_height+'px', 'important');
 
     gumdrop.setAttribute(ItsAllText.MYSTRING+'_UID', cache_object.uid);
 
@@ -500,7 +501,7 @@ CacheObj.prototype.adjust = function() {
 
     if (ItsAllText.getDisableGumdrops()) {
         if(gumdrop && gumdrop.style.display != 'none') {
-            gumdrop.style.display = 'none';
+            gumdrop.style.setProperty('display', 'none', 'important');
         }
         return;
     }
@@ -517,7 +518,7 @@ CacheObj.prototype.adjust = function() {
         display = 'none';
     }
     if (style.display != display) {
-        style.display = display;
+        style.setProperty('display', display, 'important');
     }
 
     /* Reposition the gumdrops incase the dom changed. */
@@ -535,8 +536,8 @@ CacheObj.prototype.adjust = function() {
     if(left && top) {
         left = [left,'px'].join('');
         top  = [top,'px'].join('');
-        if(style.left != left) { style.left = left; }
-        if(style.top != top) { style.top = top; }
+        if(style.left != left) { style.setProperty('left', left, 'important');}
+        if(style.top != top)   { style.setProperty('top',  top, 'important');}
     }
 };
 
