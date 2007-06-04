@@ -20,33 +20,33 @@ var Color = function() {
 
     // CSS 2.1 Colour Keywords
 	var keyword = {
-        "maroon"   : "#800000",
-        "red"      : "#ff0000",
-        "orange"   : "#ffA500",
-        "yellow"   : "#ffff00",
-        "olive"    : "#808000",
-        "purple"   : "#800080",
-        "fuchsia"  : "#ff00ff",
-        "white"    : "#ffffff",
-        "lime"     : "#00ff00",
-        "green"    : "#008000",
-        "navy"     : "#000080",
-        "blue"     : "#0000ff",
-        "aqua"     : "#00ffff",
-        "teal"     : "#008080",
-        "black"    : "#000000",
-        "silver"   : "#c0c0c0",
-        "gray"     : "#808080"
+        maroon   : "#800000",
+        red      : "#ff0000",
+        orange   : "#ffA500",
+        yellow   : "#ffff00",
+        olive    : "#808000",
+        purple   : "#800080",
+        fuchsia  : "#ff00ff",
+        white    : "#ffffff",
+        lime     : "#00ff00",
+        green    : "#008000",
+        navy     : "#000080",
+        blue     : "#0000ff",
+        aqua     : "#00ffff",
+        teal     : "#008080",
+        black    : "#000000",
+        silver   : "#c0c0c0",
+        gray     : "#808080"
     };
 
     // CSS Functional Notations and Hex Patterns
 	var func = {
-        "rgb"   : /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\);?$/,
+        rgb   : /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\);?$/,
         "rgb%"  : /^rgb\(\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*\);?$/,
-        "rgba"  : /^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*((?:\d+(?:\.\d+)?)|(?:\.\d+))\s*\);?$/,
+        rgba  : /^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*((?:\d+(?:\.\d+)?)|(?:\.\d+))\s*\);?$/,
         "rgba%" : /^rgba\(\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*((?:\d+(?:\.\d+)?)|(?:\.\d+))\s*\);?$/,
-        "hex3"  : /^#([0-9A-Fa-f])([0-9A-Fa-f])([0-9A-Fa-f]);?$/,
-        "hex6"  : /^#([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2});?$/
+        hex3  : /^#([0-9A-Fa-f])([0-9A-Fa-f])([0-9A-Fa-f]);?$/,
+        hex6  : /^#([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2});?$/
     };
 
     /**
@@ -147,9 +147,9 @@ var Color = function() {
         var r, g, b, i;
       
         var step = {
-            "red"   : (alphaBlend(color.red, this.red, color.alpha) - this.red) / steps,
-            "green" : (alphaBlend(color.green, this.green, color.alpha) - this.green) / steps,
-            "blue"  : (alphaBlend(color.blue,  this.blue,  color.alpha) - this.blue) / steps
+            red   : (alphaBlend(color.red, this.red, color.alpha) - this.red) / steps,
+            green : (alphaBlend(color.green, this.green, color.alpha) - this.green) / steps,
+            blue  : (alphaBlend(color.blue,  this.blue,  color.alpha) - this.blue) / steps
         };
         for (i = 0; i < steps + 1; i++) {
             r = Math.round(this.red   + (step.red * i));

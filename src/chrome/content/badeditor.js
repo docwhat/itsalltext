@@ -1,3 +1,4 @@
+/*jslint nomen: true, evil: false, browser: true */
 /**
  * Pass back the values that that the user selected.
  */

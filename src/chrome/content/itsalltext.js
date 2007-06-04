@@ -259,13 +259,13 @@ var ItsAllText = function() {
          * @type Hash
          */
         types: {
-            'lastversion':        'Char',
-            'charset':            'Char',
-            'editor':             'Char',
-            'refresh':            'Int',
-            'debug':              'Bool',
-            'disable_gumdrops':   'Bool',
-            'extensions':         'Char'
+            lastversion:        'Char',
+            charset:            'Char',
+            editor:             'Char',
+            refresh:            'Int',
+            debug:              'Bool',
+            disable_gumdrops:   'Bool',
+            extensions:         'Char'
         },
 
         /**
