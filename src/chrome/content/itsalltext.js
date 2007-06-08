@@ -59,7 +59,7 @@ var ItsAllText = function() {
      * A constant, the url to the readme.
      * @type String
      */
-    that.README = 'chrome://itsalltext/content/readme.xhtml';
+    that.README = 'chrome://itsalltext/locale/readme.xhtml';
 
     /* The XHTML Namespace */
     that.XHTMLNS = "http://www.w3.org/1999/xhtml";
