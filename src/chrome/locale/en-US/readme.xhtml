@@ -17,12 +17,10 @@
 
       #faq dl { margin-left: 1em; }
       #faq dd { font-size: 0.8em; }
-
-      #changelog > ul { font-family: monospace; white-space: pre-wrap; }
     </style>
   </head>
   <body>
-    <h1>Welcome to It's All Text!</h1>
+    <h1>Welcome to <span class="iat">It's All Text!</span></h1>
     <p id="ver"> version 999.@@VERSION@@</p>
     
     <p> 
@@ -30,9 +28,9 @@
     </p>
 
     <p>
-      Upon installation, go to <tt>Tools-&gt;Addons</tt> and select It's All Text and
+      Upon installation, go to <tt>Tools-&gt;Addons</tt> and select <span class="iat">It's All Text!</span> and
       set the Preferences.  Specifically, you'll have to set the editor's
-      full path.  A future version will automagically pop up preferences
+      full path.  A future version will auto-magically pop up preferences
       when you try to edit without an editor set.
     </p>
       
@@ -47,7 +45,9 @@
       Here is a test edit box for you to play with...
     </p>
     <form action="">
-      <textarea id="test">Click the edit button and have fun editing!</textarea>
+      <p style="margin: 0; padding: 0;">
+        <textarea id="test" cols="10" rows="4">Click the edit button and have fun editing!</textarea>
+      </p>
       <div id="nteb">Note the edit button.&mdash;&gt; </div>
     </form>
 
@@ -59,35 +59,29 @@
     <dl id="faq">
       <dt>I want to do something more complicated than just running an editor with a filename.</dt>
       <dd>
-        <p>In unix systems, such as Mac OS X or Linux, you can create a shell script with your commands in it.</p>
+        <p>In UNIX systems, such as Mac OS X or Linux, you can create a shell script with your commands in it.</p>
         <p>In windows, you can create a <tt>.cmd</tt> file instead.</p>
       </dd>
 
-      <dt>GMail: It only works some places.</dt>
-      <dd><p>GMail supports a rich text editor.  If the rich text editor is turned on, then It's All Text! cannot work because there is no <tt>textarea</tt> to edit.</p>
-      <p>Workaround: Turn off the rich text editor in GMail.</p>
+      <dt>I can't find the edit button for (gmail, blogger, etc.)</dt>
+      <dd>
+        <p>Gmail, blogger, and other sites has the option to use "rich text editors".  The editors act similar to a word processor.  Due to the way these work, it isn't possible for <span class="iat">It's All Text!</span> find the <tt>textarea</tt>, it is hidden or, in some cases, absent.
+        </p>
+      <p>
+        Workaround: Turn off the rich text editor, if possible.
+      </p>
       </dd>
 
       <dt>I use non-ASCII characters and they turn into blocks or question marks (?).</dt>
       <dd>
         <p>
-          The problem is that the encoding It's All Text! is using and your editor is using don't match.  You can figure out what encoding your editor wants and change the encodings preference in It's All Text! or you can change the encoding your editor uses.
+          The problem is that the encoding <span class="iat">It's All Text!</span> is using and your editor is using don't match.  You can figure out what encoding your editor wants and change the encodings preference in <span class="iat">It's All Text!</span> or you can change the encoding your editor uses.
         </p>
         <p>
           A common problem I get is that someone is using Notepad or WordPad in Windows.  These both do not support sane encodings.  I recommend getting something like <a href="http://notepad-plus.sourceforge.net/">Notepad++</a> for editing in UTF-8 instead.
         </p>
       </dd>
     </dl>
-
-    <h3>ChangeLog</h3>
-    <div id="changelog">
-      <h4>Version 1.0 Release Candidate</h4>
-      <ul>
-        <li>Created changelog</li>
-        <li>The chosen set of version 1.0 functionality exists and works.</li>
-        <li>Fixed problems with visibility and hiddens (and cascading vs. computed)</li>
-      </ul>
-    </div>
 
   </body>
 </html>
