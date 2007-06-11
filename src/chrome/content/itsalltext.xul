@@ -19,6 +19,8 @@
         <menuseparator/>
         <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
         <menuseparator/>
+        <menuitem label="&readme.label;"
+                  oncommand="ItsAllText.openReadme();"/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
                   oncommand="ItsAllText.openPreferences();"/>
@@ -36,12 +38,30 @@
         <menuseparator/>
         <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
         <menuseparator/>
+        <menuitem label="&readme.label;"
+                  oncommand="ItsAllText.openReadme();"/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
                   oncommand="ItsAllText.openPreferences();"/>
       </popup>
     </popupset>
   </window>
+
+  <!-- The merge point is the Tools menu -->
+  <menupopup id="menu_ToolsPopup">
+    <menu id="menu_itsalltext" class="menuitem-iconic"
+          image="chrome://itsalltext/chrome/icon16.png"
+          label="&top.label;"
+          insertbefore="sanitizeSeparator">
+      <menupopup>
+        <menuitem label="&readme.label;"
+                  oncommand="ItsAllText.openReadme();"/>
+        <menuitem label="&pref.label;"
+                  accesskey="&pref.key;"
+                  oncommand="ItsAllText.openPreferences();"/>
+      </menupopup>
+    </menu>
+  </menupopup>
 
 </overlay>
 <!-- Local Variables: -->
