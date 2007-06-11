@@ -19,6 +19,8 @@
         <menuseparator/>
         <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
         <menuseparator/>
+        <menuitem label="&pref.readme;"
+                  oncommand="ItsAllText.openReadme();"/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
                   oncommand="ItsAllText.openPreferences();"/>
@@ -36,6 +38,8 @@
         <menuseparator/>
         <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
         <menuseparator/>
+        <menuitem label="&pref.readme;"
+                  oncommand="ItsAllText.openReadme();"/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
                   oncommand="ItsAllText.openPreferences();"/>

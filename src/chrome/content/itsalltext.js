@@ -259,7 +259,6 @@ var ItsAllText = function() {
          * @type Hash
          */
         types: {
-            lastversion:        'Char',
             charset:            'Char',
             editor:             'Char',
             refresh:            'Int',
@@ -707,22 +706,9 @@ var ItsAllText = function() {
         return true;
     };
 
-    that.checkVersion = function() {
-        if( that.preferences._get('lastversion') != that.VERSION) {
-            setTimeout(function(){
-                var browser;
-                try{
-                    if( that.preferences._get('lastversion') != that.VERSION) {
-                        browser = getBrowser();
-                        browser.selectedTab = browser.addTab(that.README,
-                                                             null);
-                        that.preferences._set('lastversion', that.VERSION);
-                    }
-                } catch(e) {
-                    that.preferences._set('lastversion', '');
-                }
-            }, 100);
-        }
+    that.openReadme = function() {
+        browser = getBrowser();
+        browser.selectedTab = browser.addTab(that.README, null);
     };
 
     /**
@@ -738,11 +724,6 @@ var ItsAllText = function() {
         // Start the monitor
         that.monitor.restart();
 
-        // Check if there was an update and show the page...
-        window.setTimeout(function() {
-            that.checkVersion();
-        }, 10);
-        
         var appcontent = document.getElementById("appcontent"); // The Browser
         if (appcontent) {
             // Normal web-page.

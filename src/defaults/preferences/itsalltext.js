@@ -1,4 +1,3 @@
-pref("extensions.itsalltext.lastversion",  "");
 pref("extensions.itsalltext.charset",  "UTF-8");
 pref("extensions.itsalltext.editor",   "");
 pref("extensions.itsalltext.refresh",  3);
