@@ -20,6 +20,8 @@
 
       .iat { font-style: oblique; color: #024; }
       .warn { background: #fdd; }
+      
+      pre { background: #def; color: black; margin: 1em; padding: 0 1em; }
 
       #faq dl { margin-left: 1em; }
       #faq dd { font-size: 0.8em; }
@@ -78,18 +80,43 @@
     <h3>A note to Mac OS X users</h3>
     
     <p>
-      Out of the box, <span class="iat">It's All Text!</span> uses the <code>open</code> program; it will use the correct program depending on file extension.
+      Out of the box, <span class="iat">It's All Text!</span> uses the <code>open</code> program. <code>open</code> behaves like double clicking on a file.  It uses the type of the file to choose the correct application to run;  for <tt>.txt</tt> files, that application is the built-in text editor.
     </p>
     <p>
-      If you wish to use a specific editor instead of the <code>open</code> program then you need to find the correct path to use.  You cannot use the <tt>.app</tt> directory because Firefox does not currently understand them.  Read the documentation for your editor; most editors come with a program in <code>/usr/bin/</code>.  
+      If this behavior is fine for you, then leave the editor option alone and enjoy!
     </p>
     <p>
-      If you are trying to do something more complicated or if you cannot find the correct program, you can create a shell script and use that instead.  For example:<br/> <code>open -a /path/to/editor $*</code>
+      However, if you want to use a different editor or to force the same editor regardless of the file type, then you will need to do something a little more complicated.
     </p>
     <p>
-      Other alternatives are available at <a href="http://docwhat.gerf.org/2007/03/its_all_text_v06/#comment-2054">my website</a>.
+      Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=307463">cannot run .app applications directly</a>.  To run a program in Mac OS X you need to do one of two things:  If your editor comes with a non-<code>.app</code> version, then use that.  Otherwise you have to write a shell script.
     </p>
+    <p>
+      Check your editor's documentation; if it comes with a standalone program, usually located in the <code>/usr/bin/</code> directory, then you can enter that into the <span class="iat">It's All Text!</span> preferences and you're done.
+    </p>
+    <p>
+      Otherwise, you need to create a shell script.  Here are the basic steps to create a shell script:
+    </p>
+    <ol>
+      <li> Open your favorite editor. </li>
+      <li> Create a file like the example below. </li>
+      <li> Save it to your home directory: <code>~/iat.sh</code> </li>
+      <li> Open a terminal window. </li>
+      <li> Type this command to make the shell script executable: <code>chmod +x ~/iat.sh</code> </li>
+      <li> In <span class="iat">It's All Text!</span> preferences, use the shell script as your editor. </li>
+    </ol>
 
+    <p>
+      The example shell script.  Replace <code>/path/to/editor.app</code> with the actual path to your .app file.  It'll probably be something like <code>/Applications/MyEditor.app</code>.
+    </p>
+    <pre lang="sh">#!/bin/sh
+# This is an example shell script for It's All Text!
+
+open -a /path/to/editor.app $*</pre>
+
+    <p>
+      Other alternative shell scripts are available at <a href="http://docwhat.gerf.org/2007/03/its_all_text_v06/#comment-2054">here</a>.
+    </p>
 
 
 
