@@ -547,11 +547,14 @@ var ItsAllText = function() {
         var pnode = node.offsetParent;
         while(pnode && (container === null || pnode != container)) {
             pos[0] += pnode.offsetLeft || 0;
-            pos[1] += pnode.offsetTop || 0;
+            pos[1] += pnode.offsetTop  || 0;
+            pos[0] -= pnode.scrollLeft || 0;
+            pos[1] -= pnode.scrollTop  || 0;
             pnode = pnode.offsetParent;
         }
         return pos;
     };
+
 
     /**
      * This function is called regularly to watch changes to web documents.
