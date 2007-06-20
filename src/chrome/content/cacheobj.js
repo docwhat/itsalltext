@@ -555,8 +555,8 @@ CacheObj.prototype.adjust = function() {
     if (!gumdrop || !el) { return; }
     var display  = '';
     var cstyle = doc.defaultView.getComputedStyle(el, '');
-    if (cstyle.display == 'none' ||
-        cstyle.visibility == 'hidden' ||
+    if ((cstyle && (cstyle.display == 'none' ||
+                    cstyle.visibility == 'hidden')) ||
         el.getAttribute('readonly') ||
         el.getAttribute('disabled')
         ) {
