@@ -1,3 +1,24 @@
+/*
+ *  It's All Text - Easy external editing of web forms.
+ *  Copyright (C) 2006-2007 Christian Höltje
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License or
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+/*jslint nomen: true, evil: false, browser: true */
+
 /**
  * A Cache object is used to manage the node and the file behind it.
  * @constructor
@@ -18,7 +39,7 @@ function CacheObj(node) {
     that.node = node;
     that.button = null;
     that.initial_background = '';
-    that._is_watching = false;
+    that.private_is_watching = false;
      
     that.node_id = that.getNodeIdentifier(node);
     var doc = node.ownerDocument;
@@ -91,6 +112,22 @@ function CacheObj(node) {
 }
 
 /**
+ * Destroys the object, unallocating as much as possible to prevent leaks.
+ */
+CacheObj.prototype.destroy = function() {
+    ItsAllText.debug('destroying %o',this);
+    var node = this.node;
+    var doc  = this.node.ownerDocument;
+    var html = doc.getElementsByTagName('html')[0];
+
+    node.removeAttribute(ItsAllText.MYSTRING+'_UID');
+    html.removeAttribute(ItsAllText.MYSTRING+'_id_serial');
+
+    delete this.node;
+    delete this.button;
+};
+
+/**
  * Set the extension for the file to ext.
  * @param {String} ext The extension.  Must include the dot.  Example: .txt
  */
@@ -137,7 +174,7 @@ CacheObj.prototype.initFromExistingFile = function() {
     }
     if (ext !== null) {
         this.setExtension(ext);
-        this._is_watching = true;
+        this.private_is_watching = true;
     }
 };
 
@@ -264,7 +301,7 @@ CacheObj.prototype.edit = function(extension) {
         args = [filename];
         result = {};
         ec = process.run(false, args, args.length, result);
-        this._is_watching = true;
+        this.private_is_watching = true;
     } catch(e) {        
         params = {out:null,
                       exists: program ? program.exists() : false,
@@ -340,7 +377,7 @@ CacheObj.prototype.read = function() {
  */
  CacheObj.prototype.hasChanged = function() {
      /* Check exists.  Check ts and size. */
-     if(!this._is_watching ||
+     if(!this.private_is_watching ||
         !this.file.exists() ||
         !this.file.isReadable() ||
         (this.file.lastModifiedTime == this.timestamp && 

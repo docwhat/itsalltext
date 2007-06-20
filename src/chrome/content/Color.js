@@ -221,7 +221,7 @@ var Color = function() {
         this.green = clamp(Math.round(parseInt(components[2],base) * m), 0, 255);
         this.blue  = clamp(Math.round(parseInt(components[3],base) * m), 0, 255);
       
-        if (isNaN(components[4])) {
+        if (typeof(components[4]) === 'undefined' || isNaN(components[4])) {
             this.alpha = 1;
         } else {
             this.alpha = clamp(parseFloat("0" + components[4]), 0.0, 1.0);

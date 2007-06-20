@@ -1,6 +1,6 @@
 /*
  *  It's All Text - Easy external editing of web forms.
- *  Copyright 2006 Christian Höltje
+ *  Copyright (C) 2006-2007 Christian Höltje
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+/*jslint nomen: true, evil: false, browser: true */
 
 // @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
 // @todo [3] Have a menu/context menu item for turning on monitoring/watch.
@@ -66,14 +68,6 @@ var ItsAllText = function() {
     /* The XUL Namespace */
     that.XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
-
-    var string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"].
-        getService(Components.interfaces.nsIStringBundleService);
-    /**
-     * A localization bundle.  Use it like so:
-     * ItsAllText.locale.getStringFromName('blah');
-     */
-    that.locale = string_bundle.createBundle("chrome://itsalltext/locale/itsalltext.properties");
     /**
      * Formats a locale string, replacing $N with the arguments in arr.
      * @param {String} name Locale property name
@@ -81,7 +75,7 @@ var ItsAllText = function() {
      * @returns String
      */
     that.localeFormat = function(name, arr) {
-        return this.locale.formatStringFromName(name, arr, arr.length);
+        return this.getLocale().formatStringFromName(name, arr, arr.length);
     };
     /**
      * Returns the locale string matching name.
@@ -89,7 +83,7 @@ var ItsAllText = function() {
      * @returns String
      */
     that.localeString = function(name) {
-        return this.locale.GetStringFromName(name);
+        return this.getLocale().GetStringFromName(name);
     };
 
     /**
@@ -117,12 +111,12 @@ var ItsAllText = function() {
      */
     that.log = function() {
         var message = that.logString.apply(that, arguments);
-        var consoleService, e;
+        var e;
+        const consoleService = Components.
+            classes["@mozilla.org/consoleservice;1"].
+            getService(Components.interfaces.nsIConsoleService);
         try {
             // idiom: Convert arguments to an array for easy handling.
-            consoleService = Components.
-                classes["@mozilla.org/consoleservice;1"].
-                getService(Components.interfaces.nsIConsoleService);
             consoleService.logStringMessage(message);
         } catch(e) {
             Components.utils.reportError(message);
@@ -160,7 +154,7 @@ var ItsAllText = function() {
      * @returns {nsILocalFile}
      */
     that.factoryFile = function(path) {
-        var file = Components.
+        const file = Components.
             classes["@mozilla.org/file/local;1"].
             createInstance(Components.interfaces.nsILocalFile);
         if (typeof(path) == 'string' && path !== '') {
@@ -175,7 +169,7 @@ var ItsAllText = function() {
      */
     that.getEditDir = function() {
         /* Where is the directory that we use. */
-        var fobj = Components.classes["@mozilla.org/file/directory_service;1"].
+        const fobj = Components.classes["@mozilla.org/file/directory_service;1"].
             getService(Components.interfaces.nsIProperties).
             get("ProfD", Components.interfaces.nsIFile);
         fobj.append(that.MYSTRING);
@@ -189,35 +183,16 @@ var ItsAllText = function() {
         return fobj;
     };
 
-    /**
-     * Cleans out the edit directory, deleting all old files.
-     */
-    that.cleanEditDir = function(force) {
-        force = (force && typeof(force) != 'undefined');
-        var last_week = Date.now() - (1000*60*60*24*7);
-        var fobj = that.getEditDir();
-        var entries = fobj.directoryEntries;
-        var entry;
-        while (entries.hasMoreElements()) {
-            entry = entries.getNext();
-            entry.QueryInterface(Components.interfaces.nsIFile);
-            if(force || !entry.exists() || entry.lastModifiedTime < last_week){
-                try{
-                    entry.remove(false);
-                } catch(e) {
-                    that.debug('unable to remove',entry,'because:',e);
-                }
-            }
-        }
-    };
-
     /* Clean the edit directory whenever we create a new window. */
     that.cleanEditDir();
 
-    /* Load the various bits needed to make this work. */
-    var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
-    loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
-    loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
+    var loadthings = function() {
+        /* Load the various bits needed to make this work. */
+        const loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+        loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
+        loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
+    };
+    loadthings();
 
     /**
      * Dictionary for storing the preferences in.
@@ -232,9 +207,9 @@ var ItsAllText = function() {
          * @param {String} aData The name of the pref to fetch.
          * @returns {Object} The value of the preference.
          */
-        _get: function(aData) {
+        private_get: function(aData) {
             var po = that.preference_observer;
-            return po._branch['get'+(po.types[aData])+'Pref'](aData);
+            return po.private_branch['get'+(po.types[aData])+'Pref'](aData);
         },
 
         /**
@@ -242,9 +217,9 @@ var ItsAllText = function() {
          * @param {String} aData The name of the pref to change.
          * @param {Object} value The value to set.
          */
-        _set: function(aData, value) {
+        private_set: function(aData, value) {
             var po = that.preference_observer;
-            return po._branch['set'+(po.types[aData])+'Pref'](aData, value);
+            return po.private_branch['set'+(po.types[aData])+'Pref'](aData, value);
         }
     };
 
@@ -270,15 +245,15 @@ var ItsAllText = function() {
          * Register the observer.
          */
         register: function() {
-            var prefService = Components.
+            const prefService = Components.
                 classes["@mozilla.org/preferences-service;1"].
                 getService(Components.interfaces.nsIPrefService);
-            this._branch = prefService.getBranch("extensions."+that.MYSTRING+".");
-            this._branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
-            this._branch.addObserver("", this, false);
+            this.private_branch = prefService.getBranch("extensions."+that.MYSTRING+".");
+            this.private_branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+            this.private_branch.addObserver("", this, false);
             /* setup the preferences */
             for(var type in this.types) {
-                that.preferences[type] = that.preferences._get(type);
+                that.preferences[type] = that.preferences.private_get(type);
             }
         },
 
@@ -287,8 +262,8 @@ var ItsAllText = function() {
          * useful in the future.
          */
         unregister: function() {
-            if (!this._branch) {return;}
-            this._branch.removeObserver("", this);
+            if (!this.private_branch) {return;}
+            this.private_branch.removeObserver("", this);
         },
 
         /**
@@ -300,7 +275,7 @@ var ItsAllText = function() {
         observe: function(aSubject, aTopic, aData) {
             if (aTopic != "nsPref:changed") {return;}
             if (that.preferences) {
-                that.preferences[aData] = that.preferences._get(aData);
+                that.preferences[aData] = that.preferences.private_get(aData);
                 if (aData == 'refresh') {
                     that.monitor.restart();
                 }
@@ -340,10 +315,10 @@ var ItsAllText = function() {
          http://developer.mozilla.org/en/docs/Code_snippets:Miscellaneous#Operating_system_detection
         */
 
-        var is_darwin = that._is_darwin;
+        var is_darwin = that.private_is_darwin;
         if (typeof(is_darwin) == 'undefined') {
             is_darwin = /^Darwin/i.test(Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS);
-            that._is_darwin = is_darwin;
+            that.private_is_darwin = is_darwin;
         }
         return is_darwin;
     };
@@ -364,7 +339,7 @@ var ItsAllText = function() {
 
         if (editor === '' && that.isDarwin()) {
             editor = '/usr/bin/open'; 
-            that.preferences._set('editor', editor);
+            that.preferences.private_set('editor', editor);
         }
 
         if (editor !== '') {
@@ -416,7 +391,7 @@ var ItsAllText = function() {
         var instantApply = getBoolPref("browser.preferences.instantApply", false) && !wait;
         var features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
 
-        var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+        const wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
         var win = wm.getMostRecentWindow("Browser:Preferences");
         var pane;
         if (win) {
@@ -450,7 +425,7 @@ var ItsAllText = function() {
         } else {
             value = [value,',',ext].join('');
         }
-        that.preferences._set('extensions', value);
+        that.preferences.private_set('extensions', value);
     };
 
     // @todo [3] Profiling and optimization.
@@ -481,14 +456,16 @@ var ItsAllText = function() {
      * Cleans out all old cache objects.
      */
     that.cleanCacheObjs = function() {
+        doc = typeof(doc) === 'undefined'?null:doc;
         var count = 0;
-        var cobj, id;
+        var cobj, id, cdoc;
         for(id in that.tracker) {
             cobj = that.tracker[id];
-            if (cobj.node.ownerDocument.location === null) {
-                that.debug('cleaning %s', id);
-                delete cobj.node;
-                delete cobj.button;
+            cdoc = cobj.node.ownerDocument;
+            if (!cdoc.defaultView || !cdoc.location) {
+                cobj.destroy();
+                cdoc = null;
+                delete cobj;
                 delete that.tracker[id];
             } else {
                 count += 1;
@@ -617,13 +594,13 @@ var ItsAllText = function() {
 
             /* Walk the documents looking for changes */
             var documents = monitor.documents;
-            that.debuglog('monitor.watcher(',offset,'): ', documents.length);
+            //that.debuglog('monitor.watcher(',offset,'): ', documents.length);
             var i, doc;
             var did_delete = false;
             for(i in documents) {
                 doc = documents[i];
                 if (doc.location) {
-                    that.debuglog('refreshing', doc.location);
+                    //that.debuglog('refreshing', doc.location);
                     that.refreshDocument(doc);
                 }
             }
@@ -712,41 +689,36 @@ var ItsAllText = function() {
         browser.selectedTab = browser.addTab(that.README, null);
     };
 
-    /**
-     * Initialize the module.  Should be called once, when a window is loaded.
-     * @private
-     */
-    var windowload = function(event) {
-        that.debug("startup(): It's All Text! is watching this window...");
-
-        // Start watching the preferences.
-        that.preference_observer.register();
-
-        // Start the monitor
-        that.monitor.restart();
-
-        var appcontent = document.getElementById("appcontent"); // The Browser
-        if (appcontent) {
-            // Normal web-page.
-            appcontent.addEventListener("DOMContentLoaded", that.onDOMContentLoad,
-                                        true);
-        } else {
-            that.onDOMContentLoad(event); 
-        }
-        // Attach the context menu, if we can.
-        var contentAreaContextMenu = document.getElementById("contentAreaContextMenu");
-        if (contentAreaContextMenu) {
-            contentAreaContextMenu.addEventListener("popupshowing",
-                                                    that.onContextMenu, false);
-        }
-    };
   
     // Do the startup when things are loaded.
-    window.addEventListener("load", windowload, true);
+    window.addEventListener("load", function(event){that.pageload(event);}, true);
     // Do the startup when things are unloaded.
-    window.addEventListener("unload", function(event){that.monitor.unwatch(event.originalTarget||document); that.preference_observer.unregister();}, true);
+    window.addEventListener("unload", function(event){that.pageunload(event);}, true);
 
 };
+
+/**
+ * Cleans out the edit directory, deleting all old files.
+ */
+ItsAllText.prototype.cleanEditDir = function(force) {
+    force = typeof(force) === 'boolean'?force:false;
+    var last_week = Date.now() - (1000*60*60*24*7);
+    var fobj = this.getEditDir();
+    var entries = fobj.directoryEntries;
+    var entry;
+    while (entries.hasMoreElements()) {
+        entry = entries.getNext();
+        entry.QueryInterface(Components.interfaces.nsIFile);
+        if(force || !entry.exists() || entry.lastModifiedTime < last_week){
+            try{
+                entry.remove(false);
+            } catch(e) {
+                this.debug('unable to remove',entry,'because:',e);
+            }
+        }
+    }
+};
+
 
 /**
  * The command that is called when picking a new extension.
@@ -754,7 +726,7 @@ var ItsAllText = function() {
  */
 ItsAllText.prototype.menuNewExtEdit = function(event) {
     var that = this;
-    var uid = this._current_uid;
+    var uid = this.private_current_uid;
     var cobj = that.getCacheObj(uid);
 
     var params = {out:null};       
@@ -776,7 +748,7 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
  */
 ItsAllText.prototype.menuExtEdit = function(event) {
     var that = this;
-    var uid = that._current_uid;
+    var uid = that.private_current_uid;
     var ext = event.target.getAttribute('label');
     var cobj = that.getCacheObj(uid);
     cobj.edit(ext);
@@ -797,7 +769,7 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     var items = menu.childNodes;
     var items_length = items.length - 1; /* We ignore the preferences item */
     var node;
-    that._current_uid = uid;
+    that.private_current_uid = uid;
     var magic_stop_node = null;
     var magic_start = null;
     var magic_stop = null;
@@ -833,6 +805,62 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     }
     return menu;
 };
+
+/**
+ * Returns the locale object for translation.
+ */
+ItsAllText.prototype.getLocale = function() {
+    const string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"].
+        getService(Components.interfaces.nsIStringBundleService);
+    /**
+     * A localization bundle.  Use it like so:
+     * ItsAllText.locale.getStringFromName('blah');
+     */
+    return string_bundle.createBundle("chrome://itsalltext/locale/itsalltext.properties");
+};
+
+/**
+ * Initialize the module.  Should be called once, when a window is loaded.
+ * @private
+ */
+ItsAllText.prototype.pageload = function(event) {
+    var doc = event.originalTarget || document;
+    this.debug("pageload(): A page has been loaded");
+    
+    // Start watching the preferences.
+    this.preference_observer.register();
+    
+    // Start the monitor
+    this.monitor.restart();
+    
+    var appcontent = document.getElementById("appcontent"); // The Browser
+    if (appcontent) {
+        // Normal web-page.
+        appcontent.addEventListener("DOMContentLoaded", this.onDOMContentLoad,
+                                    true);
+    } else {
+        this.onDOMContentLoad(event); 
+    }
+    // Attach the context menu, if we can.
+    var contentAreaContextMenu = doc.getElementById("contentAreaContextMenu");
+    if (contentAreaContextMenu) {
+        contentAreaContextMenu.addEventListener("popupshowing",
+                                                this.onContextMenu, false);
+    }
+};
+
+/**
+ * Uninitialize the module.  Should be called once, when a window is unloaded.
+ * @private
+ */
+ItsAllText.prototype.pageunload = function(event) {
+    var doc = event.originalTarget||document;
+    this.debug("pageunload(): A page has been unloaded");
+    this.monitor.unwatch(doc);
+    this.preference_observer.unregister();
+    this.cleanCacheObjs();
+};
+
 
 ItsAllText = new ItsAllText();
 

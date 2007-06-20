@@ -1,6 +1,6 @@
 #
 #  It's All Text - Easy external editing of web forms.
-#  Copyright (C) 2006 Christian Höltje
+#  Copyright (C) 2006-2007 Christian Höltje
 #  
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -105,13 +105,15 @@ lint: $(SOURCES_JS_LINT)
 
 $(SOURCES_JS_LINT): lint/%.js.lint: %.js
 	$(Q)mkdir -p $(dir $@)
-	$(Q)$(JSLINT) -p $< > $@
+	$(Q)perl -p -e 's/^(\s*)const(\s+)/$$1var$$2/' $< > $@.pre
+	$(Q)$(JSLINT) -p $@.pre > $@
 	$(Q)if [ `wc -l $@|cut -d' ' -f1` -ne 1 ]; then\
 	     touch --date='1972-01-01' "$@"; echo "lint: $@"; false; fi
 
 .PHONY: showlint
 showlint: 
-	$(Q)$(QMAKE) lint || find ./lint -type f -print0 | xargs -0 cat | egrep -v '^jslint: No problems found in' || :
+	$(Q)$(QMAKE) -k lint || :
+	$(Q)find ./lint -type f -name '*.lint' -print0 | xargs -0 cat | egrep -v '^jslint: No problems found in'
 
 ##
 ## Narf is a magick keyword that should stop builds from working
