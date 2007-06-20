@@ -458,11 +458,19 @@ CacheObj.prototype.addGumDrop = function() {
         return false;
     };
     var contextfun = function(event) {
+        /* This took forever to fix; roughly 80+ man hours were spent
+         * over 5 months trying to make this stupid thing work.
+         * The documentation is completely wrong and useless.
+         *
+         * Excuse me while I scream.
+         *
+         * See Mozilla bugs: 287357, 362403, 279703
+         */
         var popup = ItsAllText.rebuildMenu(cache_object.uid);
-        popup.showPopup(
-                        document.documentElement,
+        document.popupNode = popup;
+        popup.showPopup(popup,
                         event.screenX, event.screenY,
-                        'context' );
+                        'context', null, null);
         event.stopPropagation();
         return false;
     };
