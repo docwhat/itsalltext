@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Menu Tests</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Menu Tests</h1>
+
+    <div class="back"><a href=".">back</a></div>
+
+    <p>
+      Purpose: To verify that the menus work correctly.
+    </p>
+
+    <form action="" method="get">
+      <p>
+        Use this textarea for the tests below:
+        <textarea>testing area</textarea>
+      </p>
+    </form>
+    
+    <ol>
+      <li>
+        Right-click on the <b>edit button</b>. Verify that the context menu appears near the cursor.  It should contain (Modulo text changes.  Please notify me of inaccuracies):
+        <ul>
+          <li><tt>Edit with new extension...</tt></li>
+          <li>( a list of extensions )</li>
+          <li><tt>View README...</tt></li>
+          <li><tt>Preferences</tt></li>
+        </ul>
+      </li>
+      <li>
+        Right-click on the <tt>textarea</tt>.  Click on <tt>It's All Text!</tt>.  It should contain (Modulo text changes.  Please notify me of inaccuracies):
+        <ul>
+          <li><tt>Edit with default extension...</tt></li>
+          <li><tt>Edit with new extension...</tt></li>
+          <li>( a list of extensions )</li>
+          <li><tt>View README...</tt></li>
+          <li><tt>Preferences</tt></li>
+        </ul>
+      </li>
+      <li>
+        Right-click on the <b>edit button</b> again. Verify that the context menu appears near the cursor as it did the first time.
+      </li>
+      <li>
+        Go to the menu <tt>Tools -&gt; It's All Text!</tt>.  Verify that it contains:
+        <ul>
+          <li><tt>View README...</tt></li>
+          <li><tt>Preferences</tt></li>
+        </ul>
+      </li>
+    </ol>
+
+    <div class="back"><a href=".">back</a></div>
+  </body>
+</html>
+
