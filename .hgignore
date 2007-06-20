@@ -1,5 +1,5 @@
 syntax:regexp
-^(docs|lint|build)/
+^(docs|lint|stage1|final)/
 ^\.[^/]+/
 ^[^/]+\.xpi/
 ^\.todo$

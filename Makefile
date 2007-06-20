@@ -23,29 +23,31 @@
 JSLINT     := jslint
 #JSMIN      := jsmin
 JSMIN      := cat
+ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
 VERSION    := 0.7.3
 
+
 # NOTE: do not create files or directories in here that have
 #       spaces or other special characters in their names!
-SOURCES:=$(shell find src/ -type f\
+SOURCES_CHROME:=$(shell find src/chrome -type f\
 	   -not -regex '^\(\|.*/\)\(build\|lint\|tmpdir\|.svn\|CVS\|.DS_Store\).*\(\|/.*\)$$' \
-       -not -name 'Makefile' \
-       -not -name '*-report.txt' \
-       -not -name '*.xpi' \
-       -not -name '*.orig' \
-       -not -name '*.log' \
-       -not -name '*.lint' \
-       -not -name '*.xcf' \
+       -not -regex '.*\.(xpi|orig|lint|log|xcf)' \
        -not -name '.*' \
        -not -name '*~' \
        -not -name '\#*' \
 	   -print)
+SOURCES_NONCHROME:=src/chrome.manifest src/gpl.txt src/install.rdf src/defaults/preferences/itsalltext.js
+SOURCES:=$(SOURCES_CHROME) $(SOURCES_NONCHROME)
 SOURCES_JS:=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
 SOURCES_JS_LINT:=$(patsubst %.js, lint/%.js.lint, $(SOURCES_JS))
-OUTPUT:=$(patsubst src/%, build/%, $(SOURCES))
+JARS:=chrome/content.jar chrome/en-US.jar
+
+STAGE1_OUT:=$(patsubst src/%, stage1/%, $(SOURCES))
+FINAL_OUT:=$(patsubst src/%, final/%, $(SOURCES_NONCHROME)) \
+	       $(patsubst %, final/%, $(JARS))
 
 XPI_FILE:=$(PROJNICK)-$(VERSION).xpi
 
@@ -75,28 +77,58 @@ version_check:
 ## build an xpi
 %.xpi: build
 	$(Q)echo Creating $@ ...
-	$(Q)(cd build && find -type f | zip ../$@ -@)
+	$(Q)(cd build && find -type f | $(ZIP) ../$@ -@)
 
-##
-## Build proccess. Puts the files we want in the extension into build/
-.PHONY: build
-build: narf lint .build-stamp
 
-.build-stamp: Makefile $(OUTPUT)
+%.d:
+	$(Q)mkdir -p $@
+
+#############
+## Stage 1 ##
+#############
+.PHONY: stage1
+stage1: .stage1-stamp
+
+.stage1-stamp: Makefile narf lint stage1 $(STAGE1_OUT)
 	$(Q)touch $@
 
-$(filter-out %.rdf %.dtd %.xhtml %.js, $(OUTPUT)): build/%: src/%
-	$(Q)mkdir -p $(dir $@)
-	$(Q)cp $< $@
-
-$(filter %.rdf %.dtd %.xhtml, $(OUTPUT)): build/%: src/%
+stage1/%: src/%
 	$(Q)mkdir -p $(dir $@)
 	$(Q)cat $< | sed 's/999.@@VERSION@@/$(VERSION)/g' > $@
 
-$(filter %.js, $(OUTPUT)): build/%.js: src/%.js
+stage1/%.js: src/%.js
 	$(Q)mkdir -p $(dir $@)
 	$(Q)cat $< | sed 's/999.@@VERSION@@/$(VERSION)/g' | $(JSMIN) > $@
 
+
+#################
+## Final Stage ##
+#################
+.PHONY: final
+final: .final-stamp
+
+.final-stamp: Makefile final $(FINAL_OUT)
+	$(Q)touch $@
+
+final/%: stage1/%
+	$(Q)mkdir -p $(dir $@)
+	$(Q)cp $< $@
+
+final/chrome.manifest: stage1/chrome.manifest Makefile
+	$(Q)perl -p -e 's!^(\s*content\s+itsalltext\s+)(chrome/)(\S+\s*)$$!$$1jar:$$2content.jar\!/$$3!;'  \
+	-e 's!^(\s*locale\s+itsalltext\s+)(\S+)(\s+)(chrome/)(\S+\s*)$$!$$1$$2$$3jar:$$4$$2.jar\!/$$5!;' $< \
+	> $@
+
+final/chrome/content.jar: stage1
+	$(Q)mkdir -p $(dir $@)
+	$(Q)cd stage1/chrome && $(ZIP) -r ../../$@ content
+
+final/chrome/en-US.jar: stage1
+	$(Q)mkdir -p $(dir $@)
+	$(Q)cd stage1/chrome && $(ZIP) -r ../../$@ locale/en-US
+
+.PHONY: build
+build: final
 
 ##
 ## Lint checks for possible problems.
@@ -150,7 +182,7 @@ todo: .todo
 ## Cleanup methods
 .PHONY: clean
 clean:
-	$(Q)rm -rf lint build docs .todo
+	$(Q)rm -rf lint build docs .todo stage1 final
 
 .PHONY: realclean
 realclean: clean
