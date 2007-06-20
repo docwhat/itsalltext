@@ -20,7 +20,6 @@
 // @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
 // @todo [3] Have a menu/context menu item for turning on monitoring/watch.
 // @todo [9] Menu item to pick the file to load into a textarea.
-// @todo [3] Show a proper dialog when unable to execute an editor with options for preferences or cancel.
 // @todo [9] Hot-keys for editing or opening the context menu.
 
 var ItsAllText = function() {
@@ -518,7 +517,6 @@ var ItsAllText = function() {
      * @param {Object} doc The document to refresh.
      */
     that.refreshDocument = function(doc) {
-        // @todo [1] Confirm that we find textareas inside iframes and frames.
         if(!doc.location) { return; } // it's being cached, but not shown.
         var is_chrome = (doc.location.protocol == 'chrome:' &&
                          doc.location.href != that.README);
