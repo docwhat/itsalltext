@@ -27,7 +27,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 0.7.3
+VERSION    := 0.7.4
 
 
 # NOTE: do not create files or directories in here that have
@@ -57,6 +57,7 @@ ifeq ($(VERBOSE),1)
 else
 	Q := @
 	QMAKE = $(MAKE) -s
+	ZIP := $(ZIP) -q
 endif
 
 all: lint
@@ -65,9 +66,8 @@ all: lint
 ## Release a new xpi
 .PHONY: release
 release: version_check $(XPI_FILE)
-	$(Q)echo "Don't forget to (see the README.txt):"
-	$(Q)echo " * bump the version number"
-	$(Q)echo " * commit the tag"
+	$(Q)echo "Don't forget to bump the version number if $(VERSION) isn't right!"
+	$(Q)echo "hg tag release-$(VERSION)"
 
 ## Show the version
 .PHONY: version_check
@@ -77,11 +77,8 @@ version_check:
 ## build an xpi
 %.xpi: build
 	$(Q)echo Creating $@ ...
-	$(Q)(cd build && find -type f | $(ZIP) ../$@ -@)
+	$(Q)(cd final && find -type f | $(ZIP) ../$@ -@)
 
-
-%.d:
-	$(Q)mkdir -p $@
 
 #############
 ## Stage 1 ##
@@ -89,7 +86,7 @@ version_check:
 .PHONY: stage1
 stage1: .stage1-stamp
 
-.stage1-stamp: Makefile narf lint stage1 $(STAGE1_OUT)
+.stage1-stamp: Makefile narf lint $(STAGE1_OUT)
 	$(Q)touch $@
 
 stage1/%: src/%
@@ -107,7 +104,7 @@ stage1/%.js: src/%.js
 .PHONY: final
 final: .final-stamp
 
-.final-stamp: Makefile final $(FINAL_OUT)
+.final-stamp: Makefile $(FINAL_OUT)
 	$(Q)touch $@
 
 final/%: stage1/%
@@ -115,6 +112,7 @@ final/%: stage1/%
 	$(Q)cp $< $@
 
 final/chrome.manifest: stage1/chrome.manifest Makefile
+	$(Q)mkdir -p $(dir $@)
 	$(Q)perl -p -e 's!^(\s*content\s+itsalltext\s+)(chrome/)(\S+\s*)$$!$$1jar:$$2content.jar\!/$$3!;'  \
 	-e 's!^(\s*locale\s+itsalltext\s+)(\S+)(\s+)(chrome/)(\S+\s*)$$!$$1$$2$$3jar:$$4$$2.jar\!/$$5!;' $< \
 	> $@
