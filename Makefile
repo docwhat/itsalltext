@@ -35,6 +35,7 @@ SOURCES:=$(shell find src/ -type f\
        -not -name 'Makefile' \
        -not -name '*-report.txt' \
        -not -name '*.xpi' \
+       -not -name '*.orig' \
        -not -name '*.log' \
        -not -name '*.lint' \
        -not -name '*.xcf' \
