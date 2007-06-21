@@ -448,7 +448,8 @@ CacheObj.prototype.update = function() {
  * @param {Object} event The event that triggered this.
  */
 CacheObj.prototype.onClick = function(event) {
-    cache_object.edit();
+    var cobj = ItsAllText.getCacheObj(event.target);
+    cobj.edit();
     event.stopPropagation();
     return false;
 };
@@ -466,8 +467,9 @@ CacheObj.prototype.onContext = function(event) {
      *
      * See Mozilla bugs: 287357, 362403, 279703
      */
-    var popup = ItsAllText.rebuildMenu(cache_object.uid);
-    document.popupNode = popup;
+    var cobj = ItsAllText.getCacheObj(event.target);
+    var popup = ItsAllText.rebuildMenu(cobj.uid);
+    event.target.ownerDocument.popupNode = popup;
     popup.showPopup(popup,
                     event.screenX, event.screenY,
                     'context', null, null);

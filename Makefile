@@ -60,8 +60,11 @@ else
 	ZIP := $(ZIP) -q
 endif
 
-all: lint
-	$(Q)echo done
+.PHONY: default
+default: lint narf final
+
+.PHONY: all
+all: lint narf docs final
 
 ## Release a new xpi
 .PHONY: release
@@ -159,10 +162,11 @@ narf: .narf-stamp
 ## Documentation
 .PHONY: docs
 docs: docs/.stamp
+
 docs/.stamp: $(SOURCES_JS)
 	$(Q)echo Creating docs ...
 	$(Q)jsdoc --directory docs \
-	--project-name "$(PROJNAME) - A Firefox Extension" \
+	--project-name "$(subst ", ', PROJNAME) - A Firefox Extension" \
 	--logo $(ICONFILE) \
 	--package-naming \
 	--private \
@@ -180,11 +184,11 @@ todo: .todo
 ## Cleanup methods
 .PHONY: clean
 clean:
-	$(Q)rm -rf lint build docs .todo stage1 final
+	$(Q)rm -rf build .todo stage1 final .*-stamp
 
 .PHONY: realclean
 realclean: clean
-	$(Q)rm -f $(XPI_FILE)
+	$(Q)rm -rf $(XPI_FILE) docs lint
 
 ## @todo [5] [make] Do a proper build in another directory.
 ## @todo [5] [make] Minimize JavaScript.
