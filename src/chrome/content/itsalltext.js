@@ -623,7 +623,7 @@ var ItsAllText = function() {
             }
             that.cleanCacheObjs();
             for(i=documents.length - 1; i >= 0; i--) {
-                if(typeof(documents[i]) == 'undefined') {
+                if(typeof(documents[i]) === 'undefined') {
                     documents.splice(i,1);
                 }
             }
@@ -871,9 +871,9 @@ ItsAllText.prototype.pageload = function(event) {
  */
 ItsAllText.prototype.pageunload = function(event) {
     var doc = event.originalTarget;
-    if (!doc || doc.nodeName != "#document") { 
-        return;
-    }
+    /* We don't check for the doc type because we want to 
+     * be sure everything is unloaded.
+     */
     this.debug("pageunload(): A page has been unloaded",doc);
     this.monitor.unwatch(doc);
     this.preference_observer.unregister();
