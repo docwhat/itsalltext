@@ -469,7 +469,7 @@ CacheObj.prototype.onContext = function(event) {
      */
     var cobj = ItsAllText.getCacheObj(event.target);
     var popup = ItsAllText.rebuildMenu(cobj.uid);
-    event.target.ownerDocument.popupNode = popup;
+    document.popupNode = popup;
     popup.showPopup(popup,
                     event.screenX, event.screenY,
                     'context', null, null);

@@ -835,8 +835,11 @@ ItsAllText.prototype.getLocale = function() {
  * @private
  */
 ItsAllText.prototype.pageload = function(event) {
-    var doc = event.originalTarget || document;
-    this.debug("pageload(): A page has been loaded");
+    var doc = event.originalTarget;
+    if (!doc || doc.nodeName != "#document") { 
+        return;
+    }
+    this.debug("pageload(): A page has been loaded:",doc);
     
     // Start watching the preferences.
     this.preference_observer.register();
@@ -870,8 +873,11 @@ ItsAllText.prototype.pageload = function(event) {
  * @private
  */
 ItsAllText.prototype.pageunload = function(event) {
-    var doc = event.originalTarget||document;
-    this.debug("pageunload(): A page has been unloaded");
+    var doc = event.originalTarget;
+    if (!doc || doc.nodeName != "#document") { 
+        return;
+    }
+    this.debug("pageunload(): A page has been unloaded",doc);
     this.monitor.unwatch(doc);
     this.preference_observer.unregister();
     this.cleanCacheObjs();
