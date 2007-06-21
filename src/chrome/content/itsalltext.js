@@ -636,9 +636,6 @@ var ItsAllText = function() {
      */
     that.onDOMContentLoad = function(event) {
         var doc = event.originalTarget;
-        if (!doc || doc.nodeName != "#document") { 
-            return;
-        }
         that.monitor.watch(doc);
         return;
     };
