@@ -5,7 +5,7 @@ h1 { background: #00f; color: #fff;
      padding: 0.8ex 1em 0.2ex; }
 form { margin: 0; padding: 0; }
 textarea { background: #ddd; color: #000; 
-           height: 5ex; width: 10em; display: inline; }
+           height: 3em; width: 30em; display: inline; }
 
 tt { color: #080; font-weight: bold; font-size: 1.1em; }
 
