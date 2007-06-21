@@ -94,8 +94,8 @@ function CacheObj(node) {
         var style = that.button?that.button.style:null;
         if (style) {
             style.setProperty('opacity', '0.7', 'important');
-            ItsAllText.refreshTextarea(that.node);
         }
+        ItsAllText.refreshTextarea(that.node);
     };
 
     /**
@@ -115,7 +115,7 @@ function CacheObj(node) {
  * Destroys the object, unallocating as much as possible to prevent leaks.
  */
 CacheObj.prototype.destroy = function() {
-    ItsAllText.debug('destroying %o',this);
+    ItsAllText.debug('destroying', this.node_id, this);
     var node = this.node;
     var doc  = this.node.ownerDocument;
     var html = doc.getElementsByTagName('html')[0];
@@ -125,6 +125,8 @@ CacheObj.prototype.destroy = function() {
 
     delete this.node;
     delete this.button;
+    delete this.file;
+    this.file = this.node = this.button = null;
 };
 
 /**
@@ -377,15 +379,12 @@ CacheObj.prototype.read = function() {
  */
  CacheObj.prototype.hasChanged = function() {
      /* Check exists.  Check ts and size. */
-     if(!this.private_is_watching ||
-        !this.file.exists() ||
-        !this.file.isReadable() ||
-        (this.file.lastModifiedTime == this.timestamp && 
-         this.file.fileSize         == this.size)) {
-         return false;
-     } else {
-         return true;
-     }
+     return this.private_is_watching &&
+         this.file &&
+         this.file.exists() &&
+         this.file.isReadable() &&
+         (this.file.lastModifiedTime != this.timestamp ||
+          this.file.fileSize         != this.size);
  };
 
 /**
@@ -445,6 +444,39 @@ CacheObj.prototype.update = function() {
 };
 
 /**
+ * The function to execute when a gumdrop is clicked.
+ * @param {Object} event The event that triggered this.
+ */
+CacheObj.prototype.onClick = function(event) {
+    cache_object.edit();
+    event.stopPropagation();
+    return false;
+};
+
+/**
+ * The function to execute when a gumdrop is right clicked (context)
+ * @param {Object} event The event that triggered this.
+ */
+CacheObj.prototype.onContext = function(event) {
+    /* This took forever to fix; roughly 80+ man hours were spent
+     * over 5 months trying to make this stupid thing work.
+     * The documentation is completely wrong and useless.
+     *
+     * Excuse me while I scream.
+     *
+     * See Mozilla bugs: 287357, 362403, 279703
+     */
+    var popup = ItsAllText.rebuildMenu(cache_object.uid);
+    document.popupNode = popup;
+    popup.showPopup(popup,
+                    event.screenX, event.screenY,
+                    'context', null, null);
+    event.stopPropagation();
+    return false;
+};
+  
+
+/**
  * Add the gumdrop to a textarea.
  * @param {Object} cache_object The Cache Object that contains the node.
  */
@@ -454,14 +486,17 @@ CacheObj.prototype.addGumDrop = function() {
         cache_object.adjust();
         return; /*already done*/
     }
+
+    // Add the textarea mouseovers even if the button is disabled
+    var node = cache_object.node;
+    node.addEventListener(   "mouseover",   cache_object.mouseover, false);
+    node.addEventListener(   "mouseout",    cache_object.mouseout,  false);
     if (ItsAllText.getDisableGumdrops()) {
         return;
     }
     ItsAllText.debug('addGumDrop()',cache_object.node_id,cache_object.uid);
     
-    var node = cache_object.node;
     var doc = node.ownerDocument;
-    var offsetNode = node;
     if (!node.parentNode) { return; }
     
     var gumdrop = doc.createElementNS(ItsAllText.XHTMLNS, "img");
@@ -489,32 +524,9 @@ CacheObj.prototype.addGumDrop = function() {
 
     gumdrop.setAttribute(ItsAllText.MYSTRING+'_UID', cache_object.uid);
 
-    var clickfun = function(event) {
-        cache_object.edit();
-        event.stopPropagation();
-        return false;
-    };
-    var contextfun = function(event) {
-        /* This took forever to fix; roughly 80+ man hours were spent
-         * over 5 months trying to make this stupid thing work.
-         * The documentation is completely wrong and useless.
-         *
-         * Excuse me while I scream.
-         *
-         * See Mozilla bugs: 287357, 362403, 279703
-         */
-        var popup = ItsAllText.rebuildMenu(cache_object.uid);
-        document.popupNode = popup;
-        popup.showPopup(popup,
-                        event.screenX, event.screenY,
-                        'context', null, null);
-        event.stopPropagation();
-        return false;
-    };
-    
-    // Click event handler
-    gumdrop.addEventListener("click", clickfun, false);
-    gumdrop.addEventListener("contextmenu", contextfun, false);
+    // Click event handlers
+    gumdrop.addEventListener("click",       cache_object.onClick,   false);
+    gumdrop.addEventListener("contextmenu", cache_object.onContext, false);
     
     // Insert it into the document
     var parent = node.parentNode;
@@ -527,10 +539,8 @@ CacheObj.prototype.addGumDrop = function() {
     }
     
     // Add mouseovers/outs
-    node.addEventListener("mouseover",    cache_object.mouseover, false);
-    node.addEventListener("mouseout",     cache_object.mouseout, false);
-    gumdrop.addEventListener("mouseover", cache_object.mouseover, false);
-    gumdrop.addEventListener("mouseout",  cache_object.mouseout, false);
+    gumdrop.addEventListener("mouseover",   cache_object.mouseover, false);
+    gumdrop.addEventListener("mouseout",    cache_object.mouseout,  false);
     
     cache_object.mouseout(null);
     cache_object.adjust();
@@ -554,7 +564,7 @@ CacheObj.prototype.adjust = function() {
     var style    = gumdrop.style;
     if (!gumdrop || !el) { return; }
     var display  = '';
-    var cstyle = doc.defaultView.getComputedStyle(el, '');
+    var cstyle = doc.defaultView && doc.defaultView.getComputedStyle(el, '');
     if ((cstyle && (cstyle.display == 'none' ||
                     cstyle.visibility == 'hidden')) ||
         el.getAttribute('readonly') ||

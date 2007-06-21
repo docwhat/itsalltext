@@ -94,7 +94,7 @@ var ItsAllText = function() {
         var args = Array.prototype.slice.apply(arguments,[0]);
         for (var i=0; i<args.length; i++) {
             try {
-                args[i] = args[i].toString();
+                args[i] = "" + args[i];
             } catch(e) {
                 Components.utils.reportError(e);
                 args[i] = 'toStringFailed';
@@ -494,7 +494,9 @@ var ItsAllText = function() {
      * @param {Object} doc The document to refresh.
      */
     that.refreshDocument = function(doc) {
-        if(!doc.location) { return; } // it's being cached, but not shown.
+        if(!doc.location) {
+            return; // it's being cached, but not shown.
+        }
         var is_chrome = (doc.location.protocol == 'chrome:' &&
                          doc.location.href != that.README);
         var nodes = doc.getElementsByTagName('textarea');
@@ -564,9 +566,10 @@ var ItsAllText = function() {
                            contentType=='application/xhtml+xml');
                 //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
                 is_usable = (is_html) && 
+                    location &&
                     location.protocol != 'about:' &&
                     location.protocol != 'chrome:';
-                is_my_readme = location.href == that.README;
+                is_my_readme = location && location.href == that.README;
                 if (!(is_usable || is_my_readme)) { 
                     that.debuglog('watch(): ignoring -- ',
                                   location, contentType);
@@ -632,8 +635,10 @@ var ItsAllText = function() {
      * @param {Object} event An event passed in.
      */
     that.onDOMContentLoad = function(event) {
-        if (event.originalTarget.nodeName != "#document") { return; }
-        var doc = event.originalTarget || document;
+        var doc = event.originalTarget;
+        if (!doc || doc.nodeName != "#document") { 
+            return;
+        }
         that.monitor.watch(doc);
         return;
     };
@@ -655,19 +660,23 @@ var ItsAllText = function() {
      * @param {Object} event The event passed in by the event handler.
      */
     that.onContextMenu = function(event) {
-        var tid, node, tag, is_disabled, cobj, menu;
+        var tid, node, tag, is_disabled, cobj, menu, cstyle, doc;
         if(event.target) {
             tid = event.target.id;
             if (tid == "itsalltext-context-popup" ||
                 tid == "contentAreaContextMenu") {
                 node = document.popupNode;
                 tag = node.nodeName.toLowerCase();
+                doc = node.ownerDocument;
+                cstyle = doc.defaultView.getComputedStyle(node, '');
                 is_disabled = (!(tag == 'textarea' || 
-                                     tag == 'textbox') ||
-                                   node.style.display == 'none' ||
-                                   node.getAttribute('readonly') ||
-                                   node.getAttribute('disabled')
-                                   );
+                                 tag == 'textbox') ||
+                               node.style.display == 'none' ||
+                               (cstyle && (cstyle.display == 'none' ||
+                                           cstyle.visibility == 'hidden')) ||
+                               node.getAttribute('readonly') ||
+                               node.getAttribute('disabled')
+                               );
                 if (tid == "itsalltext-context-popup") {
                     cobj = that.getCacheObj(node);
                     that.rebuildMenu(cobj.uid,
@@ -749,8 +758,10 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
 ItsAllText.prototype.menuExtEdit = function(event) {
     var that = this;
     var uid = that.private_current_uid;
+    ItsAllText.debug('menuExtEdit:',uid);
     var ext = event.target.getAttribute('label');
     var cobj = that.getCacheObj(uid);
+    that.monitor.watch(cobj.node.ownerDocument);
     cobj.edit(ext);
 };
 
@@ -838,6 +849,11 @@ ItsAllText.prototype.pageload = function(event) {
         // Normal web-page.
         appcontent.addEventListener("DOMContentLoaded", this.onDOMContentLoad,
                                     true);
+        /* This is a fallback.  It seems that sometimes I get here
+         * AFTER the DOMContentLoaded event has fired. :-( Better late
+         * than never, I guess.
+         */
+        setTimeout(function() {ItsAllText.onDOMContentLoad({originalTarget: event.originalTarget});}, 5000);
     } else {
         this.onDOMContentLoad(event); 
     }
