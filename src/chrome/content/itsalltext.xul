@@ -17,7 +17,7 @@
                   accesskey="&newext.key;"
                   oncommand="ItsAllText.menuNewExtEdit(event);" />
         <menuseparator/>
-        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
+        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event, '.txt');"/>
         <menuseparator/>
         <menuitem label="&readme.label;"
                   oncommand="ItsAllText.openReadme();"/>
@@ -36,7 +36,7 @@
                   accesskey="&newext.key;"
                   oncommand="ItsAllText.menuNewExtEdit(event);" />
         <menuseparator/>
-        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event);"/>
+        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event,'.txt');"/>
         <menuseparator/>
         <menuitem label="&readme.label;"
                   oncommand="ItsAllText.openReadme();"/>

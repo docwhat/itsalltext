@@ -112,12 +112,11 @@ var ItsAllText = function() {
     that.log = function() {
         var message = that.logString.apply(that, arguments);
         var e;
-        const consoleService = Components.
-            classes["@mozilla.org/consoleservice;1"].
-            getService(Components.interfaces.nsIConsoleService);
+        const consoleService = Components.classes["@mozilla.org/consoleservice;1"];
+        var obj = consoleService.getService(Components.interfaces.nsIConsoleService);
         try {
             // idiom: Convert arguments to an array for easy handling.
-            consoleService.logStringMessage(message);
+            obj.logStringMessage(message);
         } catch(e) {
             Components.utils.reportError(message);
         }
@@ -140,7 +139,7 @@ var ItsAllText = function() {
      * @param {Object} message One or more objects can be passed in to display.
      */
     that.debug = function() {
-        if (that.preferences.debug) {
+        if (that.preferences && that.preferences.debug) {
             try { Firebug.Console.logFormatted(arguments); } 
             catch(e) {
                 that.log.apply(that,arguments);
@@ -154,7 +153,7 @@ var ItsAllText = function() {
      * @returns {nsILocalFile}
      */
     that.factoryFile = function(path) {
-        const file = Components.
+        var file = Components.
             classes["@mozilla.org/file/local;1"].
             createInstance(Components.interfaces.nsILocalFile);
         if (typeof(path) == 'string' && path !== '') {
@@ -169,7 +168,7 @@ var ItsAllText = function() {
      */
     that.getEditDir = function() {
         /* Where is the directory that we use. */
-        const fobj = Components.classes["@mozilla.org/file/directory_service;1"].
+        var fobj = Components.classes["@mozilla.org/file/directory_service;1"].
             getService(Components.interfaces.nsIProperties).
             get("ProfD", Components.interfaces.nsIFile);
         fobj.append(that.MYSTRING);
@@ -188,7 +187,7 @@ var ItsAllText = function() {
 
     var loadthings = function() {
         /* Load the various bits needed to make this work. */
-        const loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+        var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
         loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
         loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
     };
@@ -245,7 +244,7 @@ var ItsAllText = function() {
          * Register the observer.
          */
         register: function() {
-            const prefService = Components.
+            var prefService = Components.
                 classes["@mozilla.org/preferences-service;1"].
                 getService(Components.interfaces.nsIPrefService);
             this.private_branch = prefService.getBranch("extensions."+that.MYSTRING+".");
@@ -391,7 +390,8 @@ var ItsAllText = function() {
         var instantApply = getBoolPref("browser.preferences.instantApply", false) && !wait;
         var features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
 
-        const wm = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+        const xpcom_wm = Components.classes["@mozilla.org/appshell/window-mediator;1"];
+        var wm = xpcom_wm.getService(Components.interfaces.nsIWindowMediator);
         var win = wm.getMostRecentWindow("Browser:Preferences");
         var pane;
         if (win) {
@@ -719,7 +719,7 @@ ItsAllText.prototype.cleanEditDir = function(force) {
             try{
                 entry.remove(false);
             } catch(e) {
-                this.debug('unable to remove',entry,'because:',e);
+                this.log('unable to remove',entry,'because:',e);
             }
         }
     }
@@ -751,15 +751,19 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
 /**
  * The command that is called when selecting an existing extension.
  * @param {Event} event
+ * @param {string} ext
+ * @param {boolean} clobber
  */
-ItsAllText.prototype.menuExtEdit = function(event) {
+ItsAllText.prototype.menuExtEdit = function(event, ext, clobber) {
     var that = this;
     var uid = that.private_current_uid;
-    ItsAllText.debug('menuExtEdit:',uid);
-    var ext = event.target.getAttribute('label');
+    if (ext !== null) {
+        ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
+    }
+    ItsAllText.debug('menuExtEdit:',uid, ext, clobber);
     var cobj = that.getCacheObj(uid);
     that.monitor.watch(cobj.node.ownerDocument);
-    cobj.edit(ext);
+    cobj.edit(ext, clobber);
 };
 
 /**
@@ -781,6 +785,7 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     var magic_stop_node = null;
     var magic_start = null;
     var magic_stop = null;
+    var cobj = that.getCacheObj(uid);
 
     // Find the beginning and end of the magic replacement parts.
     for(i=0; i<items_length; i++) {
@@ -801,15 +806,25 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     for(i = magic_stop - 1; i > magic_start; i--) {
         menu.removeChild(items[i]);
     }
+
+    if (cobj.edit_count <= 0 && cobj.file && cobj.file.exists()) {
+        node = document.createElementNS(that.XULNS, 'menuitem');
+        node.setAttribute('label', that.localeFormat('edit_existing', [cobj.extension]));
+        node.addEventListener('command', function(event){return that.menuExtEdit(event, null, false);}, false);
+        node.setAttribute('disabled', is_disabled?'true':'false');
+        menu.insertBefore(node, magic_stop_node);
+    }        
    
     // Insert the new magic bits
     for(i=0; i<exts.length; i++) {
         node = document.createElementNS(that.XULNS, 'menuitem');
-        node.setAttribute('label', exts[i]);
-        node.addEventListener('command', function(event){return that.menuExtEdit(event);}, false);
+        node.setAttribute('label', that.localeFormat('edit_ext', [exts[i]]));
+        (function() {
+            var ext=exts[i];
+            node.addEventListener('command', function(event){return that.menuExtEdit(event, ext);}, false);
+        })();
         node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
-
     }
     return menu;
 };
@@ -818,13 +833,13 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
  * Returns the locale object for translation.
  */
 ItsAllText.prototype.getLocale = function() {
-    const string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"].
-        getService(Components.interfaces.nsIStringBundleService);
+    const string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"];
+    var obj = string_bundle.getService(Components.interfaces.nsIStringBundleService);
     /**
      * A localization bundle.  Use it like so:
      * ItsAllText.locale.getStringFromName('blah');
      */
-    return string_bundle.createBundle("chrome://itsalltext/locale/itsalltext.properties");
+    return obj.createBundle("chrome://itsalltext/locale/itsalltext.properties");
 };
 
 /**

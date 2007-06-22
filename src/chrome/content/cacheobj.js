@@ -76,6 +76,11 @@ function CacheObj(node) {
      */
     that.file = null;
 
+    /* The number of edits done on this object.
+     * @type number
+     */
+    that.edit_count = 0;
+
     /* Set the default extension and create the nsIFile object. */
     var extension = node.getAttribute('itsalltext-extension');
     if (typeof(extension) != 'string' || !extension.match(/^[.a-z0-9]+$/i)) {
@@ -134,7 +139,7 @@ CacheObj.prototype.destroy = function() {
  * @param {String} ext The extension.  Must include the dot.  Example: .txt
  */
 CacheObj.prototype.setExtension = function(ext) {
-    if (ext == this.extension) {
+    if (ext == this.extension && this.file) {
         return; /* It's already set.  No problem. */
     }
 
@@ -145,6 +150,10 @@ CacheObj.prototype.setExtension = function(ext) {
 
     this.extension = ext;
     this.file = file;
+    if (file.exists()) {
+        this.timestamp = file.lastModifiedTime;
+        this.size      = file.fileSize;
+    }
 };
 
 /**
@@ -166,6 +175,7 @@ CacheObj.prototype.initFromExistingFile = function() {
             // startswith
             if (ext === null && !entry.leafName.match(tmpfiles)) {
                 ext = entry.leafName.slice(base.length);
+                continue;
             }
             try{
                 entry.remove(false);
@@ -217,35 +227,43 @@ CacheObj.prototype.toString = function() {
 
 /**
  * Write out the contents of the node.
+ * 
+ * @param {boolean} clobber Should an existing file be clobbered?
  */
-CacheObj.prototype.write = function() {
-    var foStream = Components.
-        classes["@mozilla.org/network/file-output-stream;1"].
-        createInstance(Components.interfaces.nsIFileOutputStream);
-             
-    /* write, create, truncate */
-    foStream.init(this.file, 0x02 | 0x08 | 0x20, 
-                  parseInt('0600',8), 0); 
-             
-    /* We convert to charset */
-    var conv = Components.
-        classes["@mozilla.org/intl/scriptableunicodeconverter"].
-        createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-    conv.charset = ItsAllText.getCharset();
-             
-    var text = conv.ConvertFromUnicode(this.node.value);
-    foStream.write(text, text.length);
-    foStream.close();
-             
-    /* Reset Timestamp and filesize, to prevent a spurious refresh */
-    this.timestamp = this.file.lastModifiedTime;
-    this.size      = this.file.fileSize;
+CacheObj.prototype.write = function(clobber) {
+    clobber = typeof(clobber) === 'boolean'?clobber:true;
+    var foStream, conv, text;
 
+    if (clobber) {
+        foStream = Components.
+            classes["@mozilla.org/network/file-output-stream;1"].
+            createInstance(Components.interfaces.nsIFileOutputStream);
+        
+        /* write, create, truncate */
+        foStream.init(this.file, 0x02 | 0x08 | 0x20, 
+                      parseInt('0600',8), 0); 
+        
+        /* We convert to charset */
+        conv = Components.
+            classes["@mozilla.org/intl/scriptableunicodeconverter"].
+            createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+        conv.charset = ItsAllText.getCharset();
+        
+        text = conv.ConvertFromUnicode(this.node.value);
+        foStream.write(text, text.length);
+        foStream.close();
+
+        /* Reset Timestamp and filesize, to prevent a spurious refresh */
+        this.timestamp = this.file.lastModifiedTime;
+        this.size      = this.file.fileSize;
+    } else {
+        this.timestamp = this.size = null; // force refresh of textarea
+    }
+    
     /* Register the file to be deleted on app exit. */
     Components.classes["@mozilla.org/uriloader/external-helper-app-service;1"].
         getService(Components.interfaces.nsPIExternalAppLauncher).
         deleteTemporaryFileOnExit(this.file);
-             
     return this.file.path;
 };
 
@@ -267,15 +285,19 @@ CacheObj.prototype.getStyle = function(node, attr) {
 /**
  * Edit a textarea as a file.
  * @param {String} extension The extension of the file to edit.
+ * @param {boolean} clobber Should an existing file be clobbered?
  */
-CacheObj.prototype.edit = function(extension) {
-    if (typeof(extension) == 'string') {
-        this.setExtension(extension);
-    }
-    var filename = this.write();
+CacheObj.prototype.edit = function(extension, clobber) {
+    ItsAllText.debug('edit(',extension,', ',clobber,')');
+    extension = typeof(extension) === 'string'?extension:this.extension;
+    this.setExtension(extension);
+
+    var filename = this.write(clobber);
     this.initial_background = this.node.style.backgroundColor;
     this.initial_color      = this.node.style.color;
     var program = null; 
+    const procutil = Components.classes["@mozilla.org/process/util;1"];
+
     var process;
     var args, result, ec, e, params;
              
@@ -290,9 +312,7 @@ CacheObj.prototype.edit = function(extension) {
             throw {name:"NS_ERROR_FILE_ACCESS_DENIED"}; }
 
         // create an nsIProcess
-        process = Components.
-            classes["@mozilla.org/process/util;1"].
-            createInstance(Components.interfaces.nsIProcess);
+        process = procutil.createInstance(Components.interfaces.nsIProcess);
         process.init(program);
              
         // Run the process.
@@ -304,6 +324,7 @@ CacheObj.prototype.edit = function(extension) {
         result = {};
         ec = process.run(false, args, args.length, result);
         this.private_is_watching = true;
+        this.edit_count++;
     } catch(e) {        
         params = {out:null,
                       exists: program ? program.exists() : false,
@@ -345,14 +366,12 @@ CacheObj.prototype.read = function() {
     var fis, istream, str, e;
          
     try {
-        fis = Components.
-            classes["@mozilla.org/network/file-input-stream;1"].
+        fis = Components.classes["@mozilla.org/network/file-input-stream;1"].
             createInstance(Components.interfaces.nsIFileInputStream);
         fis.init(this.file, 0x01, parseInt('00400',8), 0); 
         // MODE_RDONLY | PERM_IRUSR
              
-        istream = Components.
-            classes["@mozilla.org/intl/converter-input-stream;1"].
+        istream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].
             createInstance(Components.interfaces.nsIConverterInputStream);
         istream.init(fis, ItsAllText.getCharset(), 4096, DEFAULT_REPLACEMENT_CHARACTER);
              

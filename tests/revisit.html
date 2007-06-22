@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Revisit Test</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Revisit Test</h1>
+
+    <div class="back"><a href=".">back</a></div>
+
+    <p>
+      Purpose: to verify IAT! will reuse the same file instead of deleting it.
+    </p>
+
+    <form action="" method="get">
+      <p>
+        Use this textarea for the tests below:
+        <textarea id="identity">testing area</textarea>
+      </p>
+    </form>
+    
+    <ol>
+      <li>
+        Click on the edit button.  Add the phrase "visit 1" to the text. Save and quit your editor.
+      </li>
+      <li>
+        Click on <a href="?">this link</a> to come back to this page.
+      </li>
+      <li>
+        Verify that the phrase "visit 1" is not in the textarea above.
+      </li>
+      <li>
+        Right-Click on the edit button. Choose the option &ldquo;Edit using previous '.txt' file&rdquo;
+        <br/>
+        The phrase "visit 1" should be in your editor.
+      </li>
+    </ol>
+
+    <div class="back"><a href=".">back</a></div>
+  </body>
+</html>
+
