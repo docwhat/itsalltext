@@ -193,3 +193,4 @@ realclean: clean
 ## @todo [5] [make] Put contents into a .jar.
 ## @todo [7] Allow a web page to add an It's All Text! button.
 ## @todo [9] Thunderbird support.
+## @todo [8] Seamonkey support. GUID: {92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
