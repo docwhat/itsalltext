@@ -194,3 +194,6 @@ realclean: clean
 ## @todo [7] Allow a web page to add an It's All Text! button.
 ## @todo [9] Thunderbird support.
 ## @todo [8] Seamonkey support. GUID: {92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}
+## @todo [9] Option to disable yellow fade.
+## @todo [9] Prevent double yellow fades.
+## @todo [9] Option to choose yellow fade color.
