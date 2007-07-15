@@ -531,7 +531,6 @@ var ItsAllText = function() {
         return pos;
     };
 
-
     /**
      * This function is called regularly to watch changes to web documents.
      */
@@ -701,6 +700,49 @@ var ItsAllText = function() {
     window.addEventListener("unload", function(event){that.pageunload(event);}, true);
 
 };
+
+/**
+ * Convert an event into a key fingerprint, aka keyprint.
+ * @param {Event} event 
+ * @returns {String} keyprint
+ */
+ItsAllText.prototype.eventToKeyprint = function (event) {
+    return [ event.ctrlKey,
+             event.altKey,
+             event.metaKey,
+             event.shiftKey,
+             event.keyCode,
+             event.charCode ].join(':');
+};
+
+/**
+ * Convert a keyprint to a string suitable for human display.
+ * @param {String} keyprint
+ * @return {String} 
+ */
+ItsAllText.prototype.keyprintToString = function (keyprint) {
+    var split = keyprint.split(':');
+    var string = [];
+    if (split[0] === 'true') {
+        string.push('Ctrl');
+    }
+    if (split[1] === 'true') {
+        string.push('Alt');
+    }
+    if (split[2] === 'true') {
+        string.push('Meta');
+    }
+    if (split[3] === 'true') {
+        string.push('Shift');
+    }
+    if (split[4] === '0') {
+        string.push(String.fromCharCode(split[5]));
+    } else {
+        string.push('keyCode=',split[4]);
+    }
+    return string.join(' ');
+};
+
 
 /**
  * Cleans out the edit directory, deleting all old files.
