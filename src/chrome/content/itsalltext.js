@@ -487,6 +487,7 @@ var ItsAllText = function() {
 
     // @todo [5] Refresh textarea on editor quit.
     // @todo [9] IDEA: support for input elements as well?
+    // @todo [7] Preference: Which corner for the edit button.
 
     /**
      * Refresh Document.
