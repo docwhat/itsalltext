@@ -188,6 +188,7 @@ todo: .todo
 .PHONY: clean
 clean:
 	$(Q)rm -rf build .todo stage1 final .*-stamp
+	$(Q)find -name '*.orig' -print0 | xargs -0 -r rm
 
 .PHONY: realclean
 realclean: clean
