@@ -529,15 +529,14 @@ CacheObj.prototype.addGumDrop = function() {
     }
     cache_object.button = gumdrop; // Store it for easy finding in the future.
 
-    // Image Attributes & Position
-    // @todo [1] Options for which corner it is next to.
-    gumdrop.style.setProperty('cursor',   'pointer', 'important');
-    gumdrop.style.setProperty('display',  'block', 'important');
-    gumdrop.style.setProperty('position',  'absolute', 'important');
-    gumdrop.style.setProperty('padding',   '0', 'important');
-    gumdrop.style.setProperty('margin',   '0', 'important');
-    gumdrop.style.setProperty('border',    'none', 'important');
-    gumdrop.style.setProperty('zIndex',    '1', 'important'); // we want it just above normal items.
+    // Image Attributes
+    gumdrop.style.setProperty('cursor',   'pointer',  'important');
+    gumdrop.style.setProperty('display',  'block',    'important');
+    gumdrop.style.setProperty('position', 'absolute', 'important');
+    gumdrop.style.setProperty('padding',  '0',        'important');
+    gumdrop.style.setProperty('margin',   '0',        'important');
+    gumdrop.style.setProperty('border',   'none',     'important');
+    gumdrop.style.setProperty('zIndex',   '1',        'important'); // we want it just above normal items.
 
     gumdrop.style.setProperty('width',  this.gumdrop_width+'px',  'important');
     gumdrop.style.setProperty('height', this.gumdrop_height+'px', 'important');
@@ -596,10 +595,22 @@ CacheObj.prototype.adjust = function() {
         style.setProperty('display', display, 'important');
     }
 
-    /* Reposition the gumdrops incase the dom changed. */
-    var left = Math.max(1, el.offsetWidth-this.gumdrop_width);
-    var top  = el.offsetHeight;
-    var coord;
+    /**
+     * Position the gumdrop.
+     * Updates in case the DOM changes.
+     */
+    var left, top, coord;
+    var pos = ItsAllText.preferences.gumdrop_position;
+    if (pos === 'upper-right' || pos === 'lower-right') {
+        left = Math.max(1, el.offsetWidth-this.gumdrop_width);
+    } else {
+        left = 0;
+    }
+    if (pos === 'lower-left' || pos === 'lower-right') {
+        top  = el.offsetHeight;
+    } else {
+        top  = 0 - this.gumdrop_height;
+    }
     if (el.offsetParent === gumdrop.offsetParent) {
         left += el.offsetLeft;
         top  += el.offsetTop;

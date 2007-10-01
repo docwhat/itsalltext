@@ -228,7 +228,7 @@ var ItsAllText = function() {
             editor:             'Char',
             refresh:            'Int',
             debug:              'Bool',
-            disable_gumdrops:   'Bool',
+            gumdrop_position:   'Char',
             extensions:         'Char'
         },
 
@@ -354,7 +354,7 @@ var ItsAllText = function() {
      * @returns {bool}
      */
     that.getDisableGumdrops = function() {
-        return that.preferences.disable_gumdrops;
+        return that.preferences.gumdrop_position === 'none';
     };
 
     /**

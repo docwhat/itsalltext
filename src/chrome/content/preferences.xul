@@ -27,8 +27,8 @@
                 name="extensions.itsalltext.refresh" type="int"/>
     <preference id="pref_extensions"
                 name="extensions.itsalltext.extensions" type="string"/>
-    <preference id="pref_disable_gumdrops"
-                name="extensions.itsalltext.disable_gumdrops" type="bool"/>
+    <preference id="pref_gumdrop_position"
+                name="extensions.itsalltext.gumdrop_position" type="string"/>
     <preference id="pref_debug"
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
@@ -75,10 +75,20 @@
           <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4"/>
         </row>
         <row align="center">
-          <label control="disable_gumdrops"
-                 value="&disable_gumdrops.label;"/>
-          <checkbox preference="pref_disable_gumdrops" id="disable_gumdrops" tabindex="5"
-          label="&disable_gumdrops.checkbox;"/>
+          <label control="gumdrop_pos" value="&gumdrop_position.label;"/>
+          <radiogroup id="gumpdrop_pos" preference="pref_gumdrop_position">
+            <vbox>
+              <hbox>
+                <radio value="upper-left"  label="&gumdrop_position.upper_left;"/>
+                <radio value="upper-right" label="&gumdrop_position.upper_right;"/>
+              </hbox>
+              <hbox>
+                <radio value="lower-left"  label="&gumdrop_position.lower_left;"/>
+                <radio value="lower-right" label="&gumdrop_position.lower_right;"/>
+              </hbox>
+            </vbox>
+            <radio value="none"        label="&gumdrop_position.disable;"/>
+          </radiogroup>
         </row>
         <row align="center">
           <label control="debug"
