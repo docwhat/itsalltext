@@ -19,7 +19,7 @@
 /*jslint nomen: true, evil: false, browser: true */
 
 // @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
-// @todo [3] Have a menu/context menu item for turning on monitoring/watch.
+// @todo [wish] Have a menu/context menu item for turning on monitoring/watch.
 // @todo [9] Menu item to pick the file to load into a textarea.
 // @todo [9] Hot-keys for editing or opening the context menu.
 
@@ -432,7 +432,7 @@ var ItsAllText = function() {
         that.preferences.private_set('extensions', value);
     };
 
-    // @todo [3] Profiling and optimization.
+    // @todo [wish] Profiling and optimization.
 
     /**
      * Returns a cache object
@@ -490,9 +490,8 @@ var ItsAllText = function() {
         if (!is_chrome) { cobj.addGumDrop(); }
     };
 
-    // @todo [5] Refresh textarea on editor quit.
+    // @todo [wish] Refresh textarea on editor quit.
     // @todo [9] IDEA: support for input elements as well?
-    // @todo [7] Preference: Which corner for the edit button.
 
     /**
      * Refresh Document.
