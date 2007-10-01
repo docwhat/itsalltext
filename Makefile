@@ -1,5 +1,5 @@
 #
-#  
+#
 #  It's All Text - Easy external editing of web forms.
 #  Copyright (C) 2006-2007 Christian Höltje
 #
@@ -19,6 +19,7 @@
 # If you don't have jslint or jsmin, you can replace these with cat...
 # but I strongly suggest you get jslint and jsmin working.
 JSLINT     := jslint
+YC         := yuicompressor
 #JSMIN      := jsmin
 JSMIN      := cat
 ZIP        := zip
@@ -59,10 +60,10 @@ else
 endif
 
 .PHONY: default
-default: lint narf final
+default: lintcheck narf final
 
 .PHONY: all
-all: lint narf docs final
+all: lintcheck narf docs final
 
 ## Release a new xpi
 .PHONY: release
@@ -87,7 +88,7 @@ version_check:
 .PHONY: stage1
 stage1: .stage1-stamp
 
-.stage1-stamp: Makefile narf lint $(STAGE1_OUT)
+.stage1-stamp: Makefile narf lintcheck $(STAGE1_OUT)
 	$(Q)touch $@
 
 stage1/%: src/%
@@ -134,16 +135,20 @@ build: final
 .PHONY: lint
 lint: $(SOURCES_JS_LINT)
 
-$(SOURCES_JS_LINT): lint/%.js.lint: %.js
+$(SOURCES_JS_LINT): lint/%.js.lint: %.js Makefile
+	$(info linting $(notdir $<) ...)
 	$(Q)mkdir -p $(dir $@)
 	$(Q)perl -p -e 's/^(\s*)const(\s+)/$$1var$$2/' $< > $@.pre
-	$(Q)$(JSLINT) -p $@.pre > $@
-	$(Q)if [ `wc -l $@|cut -d' ' -f1` -ne 1 ]; then\
-	     touch --date='1972-01-01' "$@"; echo "lint: $@"; false; fi
+	$(Q)echo "*** Linting $<" > $@
+	$(Q)$(JSLINT) -p $@.pre >> $@
+	$(Q)$(YC) --type js --charset UTF-8 --warn -o /dev/null $@.pre >> $@ 2>&1
+
+.PHONY: lintcheck
+lintcheck: $(SOURCES_JS_LINT)
+	$(Q)egrep -q '^lint at |^\[WARNING\]' $(SOURCES_JS_LINT) ; test $$? != 0
 
 .PHONY: showlint
-showlint: 
-	$(Q)$(QMAKE) -k lint || :
+showlint: lint
 	$(Q)find ./lint -type f -name '*.lint' -print0 | xargs -0 cat | egrep -v '^jslint: No problems found in'
 
 ##

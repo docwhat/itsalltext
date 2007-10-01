@@ -53,7 +53,7 @@
         ItsAllText.monitor.watch(document, true);
 
         /* Turn on all the hidden CSS */
-        var nodes = [];
+        var nodes = [], i;
         var nodesIter = document.evaluate("//node()[@itsalltext-control]",
                                           document, null,
                                           XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
@@ -69,9 +69,11 @@
             return false;
         };
         for(i in nodes) {
-            node = nodes[i];
-            node.addEventListener('command', command, true);
-            node.style.display = '-moz-box';
+            if (nodes.hasOwnProperty(i)) {
+                node = nodes[i];
+                node.addEventListener('command', command, true);
+                node.style.display = '-moz-box';
+            }
         }
 
     };

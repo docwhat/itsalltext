@@ -298,7 +298,7 @@ CacheObj.prototype.edit = function(extension, clobber) {
     const procutil = Components.classes["@mozilla.org/process/util;1"];
 
     var process;
-    var args, result, ec, e, params;
+    var args, result, ec, params;
 
     try {
         program = ItsAllText.getEditor();
@@ -362,7 +362,7 @@ CacheObj.prototype.read = function() {
     /* read file, reset ts & size */
     var DEFAULT_REPLACEMENT_CHARACTER = 65533;
     var buffer = [];
-    var fis, istream, str, e;
+    var fis, istream, str;
 
     try {
         fis = Components.classes["@mozilla.org/network/file-input-stream;1"].
@@ -521,7 +521,6 @@ CacheObj.prototype.addGumDrop = function() {
 
     var gumdrop = doc.createElementNS(ItsAllText.XHTMLNS, "img");
     gumdrop.setAttribute('src', this.gumdrop_url);
-    var gid = cache_object.getNodeIdentifier(gumdrop);
 
     if (ItsAllText.getDebug()) {
         gumdrop.setAttribute('title', cache_object.node_id);
@@ -648,9 +647,11 @@ CacheObj.prototype.hashString = function(some_string) {
     };
 
     // convert the binary hash data to a hex string.
-    var retval = [];
+    var retval = [], i;
     for(i in hash) {
-        retval[i] = toHexString(hash.charCodeAt(i));
+        if (hash.hasOwnProperty(i)) {
+            retval[i] = toHexString(hash.charCodeAt(i));
+        }
     }
 
     return(retval.join(""));

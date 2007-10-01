@@ -38,12 +38,6 @@ var ItsAllText = function() {
     that.tracker = {};
 
     /**
-     * Keeps track of all the refreshes we are running.
-     * @type Array
-     */
-    var cron = [null]; // Eat the 0th position
-
-    /**
      * A constant, a string used for things like the preferences.
      * @type String
      */
@@ -110,7 +104,6 @@ var ItsAllText = function() {
      */
     that.log = function() {
         var message = that.logString.apply(that, arguments);
-        var e;
         const consoleService = Components.classes["@mozilla.org/consoleservice;1"];
         var obj = consoleService.getService(Components.interfaces.nsIConsoleService);
         try {
@@ -251,7 +244,9 @@ var ItsAllText = function() {
             this.private_branch.addObserver("", this, false);
             /* setup the preferences */
             for(var type in this.types) {
-                that.preferences[type] = that.preferences.private_get(type);
+                if (this.types.hasOwnProperty(type)) {
+                    that.preferences[type] = that.preferences.private_get(type);
+                }
             }
         },
 
@@ -455,19 +450,19 @@ var ItsAllText = function() {
      * Cleans out all old cache objects.
      */
     that.cleanCacheObjs = function() {
-        doc = typeof(doc) === 'undefined'?null:doc;
         var count = 0;
         var cobj, id, cdoc;
         for(id in that.tracker) {
-            cobj = that.tracker[id];
-            cdoc = cobj.node.ownerDocument;
-            if (!cdoc.defaultView || !cdoc.location) {
-                cobj.destroy();
-                cdoc = null;
-                delete cobj;
-                delete that.tracker[id];
-            } else {
-                count += 1;
+            if (that.tracker.hasOwnProperty(id)) {
+                cobj = that.tracker[id];
+                cdoc = cobj.node.ownerDocument;
+                if (!cdoc.defaultView || !cdoc.location) {
+                    cobj.destroy();
+                    cdoc = null;
+                    delete that.tracker[id];
+                } else {
+                    count += 1;
+                }
             }
         }
         that.debuglog('tracker count:', count);
@@ -598,12 +593,13 @@ var ItsAllText = function() {
             var documents = monitor.documents;
             //that.debuglog('monitor.watcher(',offset,'): ', documents.length);
             var i, doc;
-            var did_delete = false;
             for(i in documents) {
-                doc = documents[i];
-                if (doc.location) {
-                    //that.debuglog('refreshing', doc.location);
-                    that.refreshDocument(doc);
+                if (documents.hasOwnProperty(i)) {
+                    doc = documents[i];
+                    if (doc.location) {
+                        //that.debuglog('refreshing', doc.location);
+                        that.refreshDocument(doc);
+                    }
                 }
             }
         },
