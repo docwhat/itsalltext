@@ -29,6 +29,8 @@
                 name="extensions.itsalltext.extensions" type="string"/>
     <preference id="pref_gumdrop_position"
                 name="extensions.itsalltext.gumdrop_position" type="string"/>
+    <preference id="pref_fade_time"
+                name="extensions.itsalltext.fade_time" type="string"/>
     <preference id="pref_debug"
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
@@ -79,21 +81,29 @@
           <radiogroup id="gumpdrop_pos" preference="pref_gumdrop_position">
             <vbox>
               <hbox>
-                <radio value="upper-left"  label="&gumdrop_position.upper_left;"/>
-                <radio value="upper-right" label="&gumdrop_position.upper_right;"/>
+                <radio value="upper-left"  label="&gumdrop_position.upper_left;" tabindex="5"/>
+                <radio value="upper-right" label="&gumdrop_position.upper_right;" tabindex="6"/>
               </hbox>
               <hbox>
-                <radio value="lower-left"  label="&gumdrop_position.lower_left;"/>
-                <radio value="lower-right" label="&gumdrop_position.lower_right;"/>
+                <radio value="lower-left"  label="&gumdrop_position.lower_left;" tabindex="7"/>
+                <radio value="lower-right" label="&gumdrop_position.lower_right;" tabindex="8"/>
               </hbox>
             </vbox>
-            <radio value="none"        label="&gumdrop_position.disable;"/>
+            <radio value="none"        label="&gumdrop_position.disable;" tabindex="9"/>
           </radiogroup>
+        </row>
+        <row align="center">
+          <label control="fade_time" value="&fade_time.label;" tabindex="10"/>
+          <hbox>
+            <textbox preference="pref_fade_time" id="fade_time" size="3"
+            maxlength="3" tabindex="11"/>
+            <spacer/>
+          </hbox>
         </row>
         <row align="center">
           <label control="debug"
                  value="&debug.label;"/>
-          <checkbox preference="pref_debug" id="debug" tabindex="5"
+          <checkbox preference="pref_debug" id="debug" tabindex="12"
           label="&debug.humor;"/>
         </row>
       </rows>

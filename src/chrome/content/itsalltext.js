@@ -200,7 +200,11 @@ var ItsAllText = function() {
          */
         private_get: function(aData) {
             var po = that.preference_observer;
-            return po.private_branch['get'+(po.types[aData])+'Pref'](aData);
+            var real_type = po.types[aData];
+            var type = real_type === 'Float' ? 'Char' : real_type;
+            var retval = '';
+            retval = po.private_branch['get' + type + 'Pref'](aData);
+            return real_type === 'Float' ? parseFloat(retval) : retval;
         },
 
         /**
@@ -210,7 +214,12 @@ var ItsAllText = function() {
          */
         private_set: function(aData, value) {
             var po = that.preference_observer;
-            return po.private_branch['set'+(po.types[aData])+'Pref'](aData, value);
+            var real_type = po.types[aData];
+            var type = real_type === 'Float' ? 'Char' : real_type;
+            if (real_type === 'Float') {
+                value = '' + parseFloat(value);
+            }
+            po.private_branch['set'+type+'Pref'](aData);
         }
     };
 
@@ -229,6 +238,7 @@ var ItsAllText = function() {
             refresh:            'Int',
             debug:              'Bool',
             gumdrop_position:   'Char',
+            fade_time:          'Float',
             extensions:         'Char'
         },
 

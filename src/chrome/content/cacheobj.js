@@ -39,6 +39,8 @@ function CacheObj(node) {
     that.button = null;
     that.initial_background = '';
     that.private_is_watching = false;
+    that.button_fade_timer = null;
+    that.is_focused = false;
 
     that.node_id = that.getNodeIdentifier(node);
     var doc = node.ownerDocument;
@@ -95,9 +97,16 @@ function CacheObj(node) {
      * @param {Event} event The event object.
      */
     that.mouseover = function(event) {
+        if (event.type === 'focus') {
+            that.is_focused = true;
+        }
+        if (that.button_fade_timer) {
+            clearTimeout(that.button_fade_timer);
+        }
         var style = that.button?that.button.style:null;
         if (style) {
-            style.setProperty('opacity', '0.7', 'important');
+            style.setProperty('opacity', '0.7',   'important');
+            style.setProperty('display', 'block', 'important');
         }
         ItsAllText.refreshTextarea(that.node);
     };
@@ -108,9 +117,33 @@ function CacheObj(node) {
      * @param {Event} event The event object.
      */
     that.mouseout = function(event) {
-        var style = that.button?that.button.style:null;
+        if (that.button_fade_timer) {
+            clearTimeout(that.button_fade_timer);
+        }
+        if (that.is_focused && event.type !== 'blur') {
+            /* we're focused, don't fade until we're blurred. */
+            return;
+        }
+        that.is_focused = false;
+
+        var style = that.button?that.button.style:null, f;
+        var cur  = 0.7;
+        var dest = 0;
+        var fps  = 12;
+        var num_frames = (ItsAllText.preferences.fade_time * fps);
+        var increment = (cur - dest) / num_frames;
+        var wait = (1 / fps) / 1000;
         if (style) {
-            style.setProperty('opacity', '0.1', 'important');
+            f = function () {
+                cur -= increment;
+                if (cur > dest) {
+                    style.setProperty('opacity', cur, 'important');
+                    that.button_fade_timer = setTimeout(f, wait);
+                } else {
+                    style.setProperty('display', 'none', 'important');
+                }
+            };
+            f();
         }
     };
 }
@@ -511,6 +544,8 @@ CacheObj.prototype.addGumDrop = function() {
     var node = cache_object.node;
     node.addEventListener(   "mouseover",   cache_object.mouseover, false);
     node.addEventListener(   "mouseout",    cache_object.mouseout,  false);
+    node.addEventListener(   "focus",       cache_object.mouseover, false);
+    node.addEventListener(   "blur",        cache_object.mouseout,  false);
     if (ItsAllText.getDisableGumdrops()) {
         return;
     }
@@ -531,7 +566,7 @@ CacheObj.prototype.addGumDrop = function() {
 
     // Image Attributes
     gumdrop.style.setProperty('cursor',   'pointer',  'important');
-    gumdrop.style.setProperty('display',  'block',    'important');
+    gumdrop.style.setProperty('display',  'none',     'important');
     gumdrop.style.setProperty('position', 'absolute', 'important');
     gumdrop.style.setProperty('padding',  '0',        'important');
     gumdrop.style.setProperty('margin',   '0',        'important');
@@ -591,7 +626,7 @@ CacheObj.prototype.adjust = function() {
         ) {
         display = 'none';
     }
-    if (style.display != display) {
+    if (display === 'none' && style.display != display) {
         style.setProperty('display', display, 'important');
     }
 
