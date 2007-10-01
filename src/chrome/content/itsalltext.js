@@ -1,17 +1,17 @@
 /*
- *  It's All Text! - Easy external editing of web forms. 
- *  
+ *  It's All Text! - Easy external editing of web forms.
+ *
  *  Copyright (C) 2006-2007 Christian Höltje
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -139,7 +139,7 @@ var ItsAllText = function() {
      */
     that.debug = function() {
         if (that.preferences && that.preferences.debug) {
-            try { Firebug.Console.logFormatted(arguments); } 
+            try { Firebug.Console.logFormatted(arguments); }
             catch(e) {
                 that.log.apply(that,arguments);
             }
@@ -278,7 +278,7 @@ var ItsAllText = function() {
                     that.monitor.restart();
                 }
             }
-        }        
+        }
     };
 
     /**
@@ -324,7 +324,7 @@ var ItsAllText = function() {
     /**
      * A Preference Option: What editor should we use?
      *
-     * Note: On some platforms, this can return an 
+     * Note: On some platforms, this can return an
      * NS_ERROR_FILE_INVALID_PATH exception and possibly others.
      *
      * For a complete list of exceptions, see:
@@ -336,7 +336,7 @@ var ItsAllText = function() {
         var retval = null;
 
         if (editor === '' && that.isDarwin()) {
-            editor = '/usr/bin/open'; 
+            editor = '/usr/bin/open';
             that.preferences.private_set('editor', editor);
         }
 
@@ -375,7 +375,7 @@ var ItsAllText = function() {
             return extensions;
         }
     };
-    
+
     /**
      * Open the preferences dialog box.
      * @param{boolean} wait The function won't return until the preference is set.
@@ -417,7 +417,7 @@ var ItsAllText = function() {
                 return; // Don't add a duplicate.
             }
         }
-        
+
         var value = that.preferences.extensions;
         if(value.replace(/[\t\n ]+/g) === '') {
             value = ext;
@@ -428,7 +428,7 @@ var ItsAllText = function() {
     };
 
     // @todo [3] Profiling and optimization.
-    
+
     /**
      * Returns a cache object
      * Note: These UIDs are only unique for Its All Text.
@@ -564,12 +564,12 @@ var ItsAllText = function() {
                            contentType=='text/xhtml' ||
                            contentType=='application/xhtml+xml');
                 //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
-                is_usable = (is_html) && 
+                is_usable = (is_html) &&
                     location &&
                     location.protocol != 'about:' &&
                     location.protocol != 'chrome:';
                 is_my_readme = location && location.href == that.README;
-                if (!(is_usable || is_my_readme)) { 
+                if (!(is_usable || is_my_readme)) {
                     that.debuglog('watch(): ignoring -- ',
                                   location, contentType);
                     return;
@@ -586,7 +586,7 @@ var ItsAllText = function() {
         watcher: function(offset) {
             var monitor = that.monitor;
             var rate = that.getRefresh();
-            
+
             var now = Date.now();
             if (now - monitor.last_now < Math.round(rate * 0.9)) {
                 that.debuglog('monitor.watcher(',offset,') -- skipping catchup refresh');
@@ -665,7 +665,7 @@ var ItsAllText = function() {
                 tag = node.nodeName.toLowerCase();
                 doc = node.ownerDocument;
                 cstyle = doc.defaultView.getComputedStyle(node, '');
-                is_disabled = (!(tag == 'textarea' || 
+                is_disabled = (!(tag == 'textarea' ||
                                  tag == 'textbox') ||
                                node.style.display == 'none' ||
                                (cstyle && (cstyle.display == 'none' ||
@@ -683,7 +683,7 @@ var ItsAllText = function() {
                     menu = document.getElementById("itsalltext-contextmenu");
                     menu.setAttribute('hidden', is_disabled);
                 }
-                    
+
             }
         }
         return true;
@@ -694,7 +694,7 @@ var ItsAllText = function() {
         browser.selectedTab = browser.addTab(that.README, null);
     };
 
-  
+
     // Do the startup when things are loaded.
     window.addEventListener("load", function(event){that.pageload(event);}, true);
     // Do the startup when things are unloaded.
@@ -704,7 +704,7 @@ var ItsAllText = function() {
 
 /**
  * Convert an event into a key fingerprint, aka keyprint.
- * @param {Event} event 
+ * @param {Event} event
  * @returns {String} keyprint
  */
 ItsAllText.prototype.eventToKeyprint = function (event) {
@@ -719,7 +719,7 @@ ItsAllText.prototype.eventToKeyprint = function (event) {
 /**
  * Convert a keyprint to a string suitable for human display.
  * @param {String} keyprint
- * @return {String} 
+ * @return {String}
  */
 ItsAllText.prototype.keyprintToString = function (keyprint) {
     var split = keyprint.split(':');
@@ -777,7 +777,7 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
     var uid = this.private_current_uid;
     var cobj = that.getCacheObj(uid);
 
-    var params = {out:null};       
+    var params = {out:null};
     window.openDialog("chrome://itsalltext/chrome/newextension.xul", "",
     "chrome, dialog, modal, resizable=yes", params).focus();
     var ext;
@@ -855,8 +855,8 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
         node.addEventListener('command', function(event){return that.menuExtEdit(event, null, false);}, false);
         node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
-    }        
-   
+    }
+
     // Insert the new magic bits
     for(i=0; i<exts.length; i++) {
         node = document.createElementNS(that.XULNS, 'menuitem');
@@ -890,17 +890,17 @@ ItsAllText.prototype.getLocale = function() {
  */
 ItsAllText.prototype.pageload = function(event) {
     var doc = event.originalTarget;
-    if (!doc || doc.nodeName != "#document") { 
+    if (!doc || doc.nodeName != "#document") {
         return;
     }
     this.debug("pageload(): A page has been loaded:",doc);
-    
+
     // Start watching the preferences.
     this.preference_observer.register();
-    
+
     // Start the monitor
     this.monitor.restart();
-    
+
     var appcontent = document.getElementById("appcontent"); // The Browser
     if (appcontent) {
         // Normal web-page.
@@ -912,7 +912,7 @@ ItsAllText.prototype.pageload = function(event) {
          */
         setTimeout(function() {ItsAllText.onDOMContentLoad({originalTarget: event.originalTarget});}, 5000);
     } else {
-        this.onDOMContentLoad(event); 
+        this.onDOMContentLoad(event);
     }
     // Attach the context menu, if we can.
     var contentAreaContextMenu = doc.getElementById("contentAreaContextMenu");
@@ -928,7 +928,7 @@ ItsAllText.prototype.pageload = function(event) {
  */
 ItsAllText.prototype.pageunload = function(event) {
     var doc = event.originalTarget;
-    /* We don't check for the doc type because we want to 
+    /* We don't check for the doc type because we want to
      * be sure everything is unloaded.
      */
     this.debug("pageunload(): A page has been unloaded",doc);

@@ -4,12 +4,12 @@
 /**
  * Open a filepicker to select the value of the editor.
  */
-function pref_editor_select() {  
+function pref_editor_select() {
     var locale = document.getElementById("strings");
 
     var pref_editor = document.getElementById('pref_editor');
     var nsIFilePicker = Components.interfaces.nsIFilePicker;
- 
+
     var fp = Components.classes["@mozilla.org/filepicker;1"].
         createInstance(nsIFilePicker);
     fp.init(window,
@@ -28,7 +28,7 @@ function pref_editor_select() {
     } catch(e) {
         // Ignore error, the pref may not have been set or who knows.
     }
-  
+
     var rv = fp.show();
     var file;
     var editor;

@@ -12,7 +12,7 @@
   via JavaScript or you can add one or two attributes to a XUL element and
   it'll automatically be set up right.
 
-  The suggested method is to add the correct attributes to your XUL button 
+  The suggested method is to add the correct attributes to your XUL button
   or menuitem and let "It's All Text!" do it for you.
 
   Attributes:
@@ -56,9 +56,9 @@
         var nodes = [];
         var nodesIter = document.evaluate("//node()[@itsalltext-control]",
                                           document, null,
-                                          XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null); 
+                                          XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
 
-        var node = nodesIter.iterateNext(); 
+        var node = nodesIter.iterateNext();
         while (node) {
             nodes.push(node);
             node = nodesIter.iterateNext();
@@ -81,10 +81,10 @@
 /**
  * This is part of the public XUL API.
  * Use this to open an editor for a specific textarea or textbox with
- * the id 'id'.  The file will have the extension 'extension'.  Include 
+ * the id 'id'.  The file will have the extension 'extension'.  Include
  * the leading dot in the extension.
  * @param {String} id The id of textarea or textbody that should be opened in the editor.
- * @param {String} extension The extension of the file used as a temporary file. Example: '.css' (optional) 
+ * @param {String} extension The extension of the file used as a temporary file. Example: '.css' (optional)
  */
 ItsAllText.openEditor = function(id, extension) {
     var node = document.getElementById(id);

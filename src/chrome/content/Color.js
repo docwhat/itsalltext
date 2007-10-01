@@ -86,15 +86,15 @@ var Color = function() {
 			g = this.green;
 			b = this.blue;
 		}
-		
+
 		var strHexR = r.toString(16).toUpperCase();
 		var strHexG = g.toString(16).toUpperCase();
 		var strHexB = b.toString(16).toUpperCase();
-	
+
 		if (strHexR.length < 2) { strHexR = "0" + strHexR; }
 		if (strHexG.length < 2) { strHexG = "0" + strHexG; }
 		if (strHexB.length < 2) { strHexB = "0" + strHexB; }
-	
+
 		return "#" + strHexR + strHexG + strHexB;
 	};
 
@@ -114,7 +114,7 @@ var Color = function() {
 			g = this.green;
 			b = this.blue;
 		}
-	
+
 		return "rgb(" + r + ", " + g + ", " + b + ")";
 	};
 
@@ -131,9 +131,9 @@ var Color = function() {
      * Returns a Color object with the values inverted. Ignores alpha.
      */
     this.invert = function() {
-        return new Color("rgb(" + 
-                         (255 - this.red) + ", " + 
-                         (255 - this.green) + ", " + 
+        return new Color("rgb(" +
+                         (255 - this.red) + ", " +
+                         (255 - this.green) + ", " +
                          (255 - this.blue) + ")");
     };
 
@@ -145,7 +145,7 @@ var Color = function() {
 	this.blend = function(color, steps) {
         var pallet = [];
         var r, g, b, i;
-      
+
         var step = {
             red   : (alphaBlend(color.red, this.red, color.alpha) - this.red) / steps,
             green : (alphaBlend(color.green, this.green, color.alpha) - this.green) / steps,
@@ -159,12 +159,12 @@ var Color = function() {
         }
         return pallet;
 	};
-     
+
     /**
 	 * Constructor function
 	 */
     this.toString = this.hex;
-    
+
     var value;
     var components, pattern;
     var key, base, m;
@@ -175,7 +175,7 @@ var Color = function() {
         g = arguments[1];
         b = arguments[2];
         a = arguments[3];
-      
+
         this.red   = (!isNaN(r)) ? clamp(r, 0, 255) : 0;
         this.green = (!isNaN(g)) ? clamp(g, 0, 255) : 0;
         this.blue  = (!isNaN(b)) ? clamp(b, 0, 255) : 0;
@@ -183,7 +183,7 @@ var Color = function() {
     } else if (arguments.length == 1) {
         /* CSS Colour keyword or value */
         value = keyword[arguments[0]] ? keyword[arguments[0]] : arguments[0];
-      
+
         for (key in func) {
             if (func[key].test(value)) {
                 pattern = key;
@@ -193,7 +193,7 @@ var Color = function() {
         components = value.match(func[pattern]);
         base = 10;
         m = 1; // Multiplier for percentage values
-      
+
         switch (pattern) {
         case "rgb%":
         case "rgba%":
@@ -216,11 +216,11 @@ var Color = function() {
         default:
             components = [0, "255", "255", "255", "1.0"];
         }
-      
+
         this.red   = clamp(Math.round(parseInt(components[1],base) * m), 0, 255);
         this.green = clamp(Math.round(parseInt(components[2],base) * m), 0, 255);
         this.blue  = clamp(Math.round(parseInt(components[3],base) * m), 0, 255);
-      
+
         if (typeof(components[4]) === 'undefined' || isNaN(components[4])) {
             this.alpha = 1;
         } else {
