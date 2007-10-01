@@ -21,7 +21,7 @@
 // @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
 // @todo [wish] Have a menu/context menu item for turning on monitoring/watch.
 // @todo [9] Menu item to pick the file to load into a textarea.
-// @todo [9] Hot-keys for editing or opening the context menu.
+// @todo [9] IDEA: Hot-keys opening the context menu.
 
 var ItsAllText = function() {
     /**
@@ -219,7 +219,7 @@ var ItsAllText = function() {
             if (real_type === 'Float') {
                 value = '' + parseFloat(value);
             }
-            po.private_branch['set'+type+'Pref'](aData);
+            po.private_branch['set'+type+'Pref'](aData, value);
         }
     };
 
@@ -239,7 +239,8 @@ var ItsAllText = function() {
             debug:              'Bool',
             gumdrop_position:   'Char',
             fade_time:          'Float',
-            extensions:         'Char'
+            extensions:         'Char',
+            hotkey:             'Char'
         },
 
         /**
@@ -534,6 +535,64 @@ var ItsAllText = function() {
             pnode = pnode.offsetParent;
         }
         return pos;
+    };
+
+
+    /**
+     * marshals a keypress event.
+     */
+    that.marshalKeyEvent = function(event) {
+        var marshal = [
+                       event.altKey  ? 1 : 0,
+                       event.ctrlKey ? 1 : 0,
+                       event.metaKey ? 1 : 0,
+                       event.shiftKey ? 1 : 0,
+                       event.charCode,
+                       event.keyCode
+        ];
+        marshal = marshal.join(':');
+        if (marshal === '0:0:0:0:0:0') {
+            return '';
+        } else {
+            return marshal;
+        }
+    };
+
+    /**
+     * Converts a marshalled key event into a string.
+     */
+    that.keyMarshalToString = function(km) {
+        var e = km.split(':');
+        var out = [];
+        var c = parseInt(e[5], 10);
+        if (e[0] === '1') {
+            out.push('alt');
+        }
+        if (e[1] === '1') {
+            out.push('ctrl');
+        }
+        if (e[2] === '1') {
+            out.push('meta');
+        }
+        if (e[3] === '1') {
+            out.push('shift');
+        }
+        if (e[4] === '0') {
+            switch (c) {
+            case  8: out.push('Backspace'); break;
+            case  9: out.push('Tab'); break;
+            case 27: out.push('Escape'); break;
+            case 33: out.push('PgUp'); break;
+            case 34: out.push('PgDn'); break;
+            case 35: out.push('End'); break;
+            case 36: out.push('Home'); break;
+            case 46: out.push('Delete'); break;
+            default: out.push('code:'+c); break;
+            }
+        } else {
+            out.push(String.fromCharCode(e[4]).toUpperCase());
+        }
+        return out.join(' ');
     };
 
     /**

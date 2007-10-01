@@ -41,6 +41,32 @@ function pref_editor_select() {
     }
 }
 
+function pref_grab(disp, e) {
+    e.preventDefault();
+    var km  = ItsAllText.marshalKeyEvent(e);
+    if (km === '0:0:0:0:0:8' ||   // Backspace
+        km === '0:0:0:0:0:27' ||  // Escape
+        km === '0:0:0:0:0:46') {  // Del
+        km = '';
+    }
+    ItsAllText.preferences.private_set('hotkey', km);
+    update_hotkey(disp);
+}
+
+function update_hotkey(disp) {
+    var str, km = ItsAllText.preferences.hotkey;
+    if (typeof(km) === 'undefined') {
+        setTimeout(function () { update_hotkey(disp); }, 100);
+        return;
+    }
+    if (km === '') {
+        str = '<none>';
+    } else {
+        str = ItsAllText.keyMarshalToString(km);
+    }
+    document.getElementById(disp).value = str;
+}
+
 function setHelp(text) {
     var help = document.getElementById('help');
     while (help.firstChild) {
@@ -78,4 +104,6 @@ function pref_onload() {
         desc.style.maxWidth = '18em';
         box.appendChild(desc);
     }
+
+    update_hotkey('disp-hotkey');
 }

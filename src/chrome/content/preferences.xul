@@ -9,6 +9,7 @@
          onload="pref_onload();">
 
 <script type="application/x-javascript" src="preferences.js"/>
+<script type="application/x-javascript" src="itsalltext.js"/>
 
 <stringbundleset id="strbundles">
 <stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties"/>
@@ -31,6 +32,8 @@
                 name="extensions.itsalltext.gumdrop_position" type="string"/>
     <preference id="pref_fade_time"
                 name="extensions.itsalltext.fade_time" type="string"/>
+    <preference id="pref_hotkey"
+                name="extensions.itsalltext.hotkey" type="string"/>
     <preference id="pref_debug"
                 name="extensions.itsalltext.debug" type="bool"/>
   </preferences>
@@ -97,6 +100,14 @@
           <hbox>
             <textbox preference="pref_fade_time" id="fade_time" size="3"
             maxlength="3" tabindex="11"/>
+            <spacer/>
+          </hbox>
+        </row>
+        <row align="hotkey">
+          <label value="Hot Key"/>
+          <hbox>
+            <textbox id="disp-hotkey"
+                     onkeypress="pref_grab('disp-hotkey', event);"/>
             <spacer/>
           </hbox>
         </row>

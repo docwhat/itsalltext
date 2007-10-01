@@ -495,6 +495,19 @@ CacheObj.prototype.update = function() {
 };
 
 /**
+ * Capture keypresses to do the hotkey edit.
+ */
+CacheObj.prototype.keypress = function(event) {
+    var km = ItsAllText.marshalKeyEvent(event), cobj;
+    if (km === ItsAllText.preferences.hotkey) {
+        cobj = ItsAllText.getCacheObj(event.target);
+        cobj.edit();
+        event.stopPropagation();
+    }
+    return false;
+};
+
+/**
  * The function to execute when a gumdrop is clicked.
  * @param {Object} event The event that triggered this.
  */
@@ -542,10 +555,11 @@ CacheObj.prototype.addGumDrop = function() {
 
     // Add the textarea mouseovers even if the button is disabled
     var node = cache_object.node;
-    node.addEventListener(   "mouseover",   cache_object.mouseover, false);
-    node.addEventListener(   "mouseout",    cache_object.mouseout,  false);
-    node.addEventListener(   "focus",       cache_object.mouseover, false);
-    node.addEventListener(   "blur",        cache_object.mouseout,  false);
+    node.addEventListener( "mouseover",   cache_object.mouseover, false);
+    node.addEventListener( "mouseout",    cache_object.mouseout,  false);
+    node.addEventListener( "focus",       cache_object.mouseover, false);
+    node.addEventListener( "blur",        cache_object.mouseout,  false);
+    node.addEventListener( "keypress",    cache_object.keypress,  false);
     if (ItsAllText.getDisableGumdrops()) {
         return;
     }
