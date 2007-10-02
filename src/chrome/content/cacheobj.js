@@ -585,7 +585,7 @@ CacheObj.prototype.addGumDrop = function() {
     gumdrop.style.setProperty('padding',  '0',        'important');
     gumdrop.style.setProperty('margin',   '0',        'important');
     gumdrop.style.setProperty('border',   'none',     'important');
-    gumdrop.style.setProperty('zIndex',   '1',        'important'); // we want it just above normal items.
+    gumdrop.style.setProperty('zIndex',   '32768',    'important');
 
     gumdrop.style.setProperty('width',  this.gumdrop_width+'px',  'important');
     gumdrop.style.setProperty('height', this.gumdrop_height+'px', 'important');
