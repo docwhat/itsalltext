@@ -631,7 +631,17 @@ var ItsAllText = function() {
                     location &&
                     location.protocol != 'about:' &&
                     location.protocol != 'chrome:';
-                is_my_readme = location && location.href == that.README;
+                try {
+                    is_my_readme = location && location.href == that.README;
+                    /*
+                     * Avoiding this error.... I hope.
+                     * uncaught exception: [Exception... "Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsIDOMLocation.href]"  nsresult: "0x80004003 (NS_ERROR_INVALID_POINTER)"  location: "JS frame :: chrome://itsalltext/chrome/itsalltext.js :: anonymous :: line 634"  data: no]
+Line 0
+                    */
+                } catch(e) {
+                    is_my_readme = false;
+                    is_usable = false;
+                }
                 if (!(is_usable || is_my_readme)) {
                     that.debuglog('watch(): ignoring -- ',
                                   location, contentType);
@@ -995,7 +1005,7 @@ ItsAllText.prototype.pageunload = function(event) {
     /* We don't check for the doc type because we want to
      * be sure everything is unloaded.
      */
-    this.debug("pageunload(): A page has been unloaded",doc);
+    this.debug("pageunload(): A page has been unloaded", doc);
     this.monitor.unwatch(doc);
     this.preference_observer.unregister();
     this.cleanCacheObjs();
