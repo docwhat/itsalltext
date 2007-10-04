@@ -44,7 +44,9 @@ function pref_editor_select() {
 function pref_grab(disp, e) {
     e.preventDefault();
     var km  = ItsAllText.marshalKeyEvent(e);
-    if (km === '0:0:0:0:0:8' ||   // Backspace
+    const empty_re = /:0:0$/;
+    if (empty_re.test(km)    ||   // Various Alt/Meta keys
+        km === '0:0:0:0:0:8' ||   // Backspace
         km === '0:0:0:0:0:27' ||  // Escape
         km === '0:0:0:0:0:46') {  // Del
         km = '';

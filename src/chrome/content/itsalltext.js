@@ -551,11 +551,39 @@ var ItsAllText = function() {
                        event.keyCode
         ];
         marshal = marshal.join(':');
-        if (marshal === '0:0:0:0:0:0') {
-            return '';
-        } else {
-            return marshal;
-        }
+        return marshal;
+    };
+
+    that.keyMap = {
+        8   : 'Backspace',
+        9   : 'Tab',
+        13  : 'Enter',
+        19  : 'Break',
+        27  : 'Escape',
+        33  : 'PgUp',
+        34  : 'PgDn',
+        35  : 'End',
+        36  : 'Home',
+        37  : 'Left',
+        38  : 'Up',
+        39  : 'Right',
+        40  : 'Down',
+        45  : 'Insert',
+        46  : 'Delete',
+        112 : 'F1',
+        113 : 'F2',
+        114 : 'F3',
+        115 : 'F4',
+        116 : 'F5',
+        117 : 'F6',
+        118 : 'F7',
+        119 : 'F8',
+        120 : 'F9',
+        121 : 'F10',
+        122 : 'F11',
+        144 : 'Num Lock',
+        145 : 'Scroll Lock',
+        ''  : '<none>'
     };
 
     /**
@@ -578,16 +606,10 @@ var ItsAllText = function() {
             out.push('shift');
         }
         if (e[4] === '0') {
-            switch (c) {
-            case  8: out.push('Backspace'); break;
-            case  9: out.push('Tab'); break;
-            case 27: out.push('Escape'); break;
-            case 33: out.push('PgUp'); break;
-            case 34: out.push('PgDn'); break;
-            case 35: out.push('End'); break;
-            case 36: out.push('Home'); break;
-            case 46: out.push('Delete'); break;
-            default: out.push('code:'+c); break;
+            if (that.keyMap.hasOwnProperty(c)) {
+                out.push(that.keyMap[c]);
+            } else {
+                out.push('code:'+c);
             }
         } else {
             out.push(String.fromCharCode(e[4]).toUpperCase());
