@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Setup Tests</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+
+  <body>
+    <h1>Preference Tests</h1>
+
+    <div class="back"><a href=".">back</a></div>
+
+    <p>
+      Purpose: to verify that the preferences exist are work correctly.
+    </p>
+
+    <form action="" method="get">
+      <p>
+        Use this textarea for the tests below:
+        <textarea>testing area</textarea>
+      </p>
+    </form>
+    
+    <ol>
+      <li>
+        Go to the menu <tt>Tools -&gt; It's All Text! -&gt; Preferences</tt>
+      </li>
+      <li>
+        For each of the <tt>Edit button position</tt>s including disable:
+        <ol>
+          <li>Select the setting in the preferences.</li>
+          <li>Mouse over the textare.  The edit button should disappear or 
+          move to it's new spot.
+          </li>
+        </ol>
+      </li>
+      <li>
+        Set the hot key to something (such as alt-e).
+      </li>
+      <li>
+        Click in the textarea.
+      </li>
+      <li>
+        Press the hot key.  An editor should open up.
+      </li>
+      <li>
+        Close the editor.
+      </li>
+      <li>
+        Unset the hot key by pressing Escape, Backspace or Delete.
+      </li>
+    </ol>
+
+    <div class="back"><a href=".">back</a></div>
+  </body>
+</html>

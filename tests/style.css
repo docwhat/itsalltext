@@ -1,20 +1,55 @@
-html, body { background: #ffa; color: #000; 
-             font: 1em sans-serif; }
-h1 { background: #00f; color: #fff; 
-     margin: -1ex -1em 1ex; 
-     padding: 0.8ex 1em 0.2ex; }
-form { margin: 0; padding: 0; }
-textarea { background: #ddd; color: #000; 
-           height: 3em; width: 30em; display: inline; }
+html, body {
+  background: #ffa;
+  color: #000;
+  font-family: Helvetica, sans-serif;
+}
+h1 {
+  background: #00f;
+  color: #fff;
+  margin: -1ex -1em 1ex;
+  padding: 0.8ex 1em 0.2ex;
+}
+form {
+  margin: 0;
+  padding: 0;
+}
+textarea {
+  background: #ddd;
+  color: #000;
+  height: 3em;
+  width: 30em;
+  display: inline;
+}
 
-tt { color: #080; font-weight: bold; font-size: 1.1em; }
+tt {
+  color: #080;
+  font-weight: bold;
+  font-size: 1.1em;
+}
 
-ol li, ul li, p { line-height: 1.2em; margin: 0.4em; }
+ol li, ul li, p {
+  line-height: 1.2em;
+  margin: 0.4em;
+}
 
-.boxed { border: 1px solid #228; min-height: 4em; }
-.back { float: right;}
-.back a { background: white; color: blue; border: 1px solid blue;
-          text-decoration: none; padding: 0.5ex 1ex; }
-.back a:hover { background: #def; }
+.boxed {
+  border: 1px solid #228;
+  min-height: 4em;
+}
+.back {
+  float: right;
+}
+.back a {
+  background: white;
+  color: blue;
+  border: 1px solid blue;
+  text-decoration: none;
+  padding: 0ex 1ex 0.5ex;
+}
+.back a:hover {
+  background: #def;
+}
 
-.note { font-size: xx-small; }
+.note {
+  font-size: xx-small;
+}

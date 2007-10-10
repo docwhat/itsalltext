@@ -4,12 +4,12 @@
 /**
  * Open a filepicker to select the value of the editor.
  */
-function pref_editor_select() {  
+function pref_editor_select() {
     var locale = document.getElementById("strings");
 
     var pref_editor = document.getElementById('pref_editor');
     var nsIFilePicker = Components.interfaces.nsIFilePicker;
- 
+
     var fp = Components.classes["@mozilla.org/filepicker;1"].
         createInstance(nsIFilePicker);
     fp.init(window,
@@ -28,7 +28,7 @@ function pref_editor_select() {
     } catch(e) {
         // Ignore error, the pref may not have been set or who knows.
     }
-  
+
     var rv = fp.show();
     var file;
     var editor;
@@ -39,6 +39,34 @@ function pref_editor_select() {
         editor.style.color = 'inherit';
         editor.style.backgroundColor = 'inherit';
     }
+}
+
+function pref_grab(disp, e) {
+    e.preventDefault();
+    var km  = ItsAllText.marshalKeyEvent(e);
+    const empty_re = /:0:0$/;
+    if (empty_re.test(km)    ||   // Various Alt/Meta keys
+        km === '0:0:0:0:0:8' ||   // Backspace
+        km === '0:0:0:0:0:27' ||  // Escape
+        km === '0:0:0:0:0:46') {  // Del
+        km = '';
+    }
+    ItsAllText.preferences.private_set('hotkey', km);
+    update_hotkey(disp);
+}
+
+function update_hotkey(disp) {
+    var str, km = ItsAllText.preferences.hotkey;
+    if (typeof(km) === 'undefined') {
+        setTimeout(function () { update_hotkey(disp); }, 100);
+        return;
+    }
+    if (km === '') {
+        str = '<none>';
+    } else {
+        str = ItsAllText.keyMarshalToString(km);
+    }
+    document.getElementById(disp).value = str;
 }
 
 function setHelp(text) {
@@ -78,4 +106,6 @@ function pref_onload() {
         desc.style.maxWidth = '18em';
         box.appendChild(desc);
     }
+
+    update_hotkey('disp-hotkey');
 }

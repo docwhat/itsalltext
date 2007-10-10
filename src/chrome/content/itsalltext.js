@@ -1,17 +1,17 @@
 /*
- *  It's All Text! - Easy external editing of web forms. 
- *  
+ *  It's All Text! - Easy external editing of web forms.
+ *
  *  Copyright (C) 2006-2007 Christian Höltje
- *  
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License.
- *  
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- *  
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -19,9 +19,9 @@
 /*jslint nomen: true, evil: false, browser: true */
 
 // @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
-// @todo [3] Have a menu/context menu item for turning on monitoring/watch.
+// @todo [wish] Have a menu/context menu item for turning on monitoring/watch.
 // @todo [9] Menu item to pick the file to load into a textarea.
-// @todo [9] Hot-keys for editing or opening the context menu.
+// @todo [9] IDEA: Hot-keys opening the context menu.
 
 var ItsAllText = function() {
     /**
@@ -36,12 +36,6 @@ var ItsAllText = function() {
      * @type Hash
      */
     that.tracker = {};
-
-    /**
-     * Keeps track of all the refreshes we are running.
-     * @type Array
-     */
-    var cron = [null]; // Eat the 0th position
 
     /**
      * A constant, a string used for things like the preferences.
@@ -110,7 +104,6 @@ var ItsAllText = function() {
      */
     that.log = function() {
         var message = that.logString.apply(that, arguments);
-        var e;
         const consoleService = Components.classes["@mozilla.org/consoleservice;1"];
         var obj = consoleService.getService(Components.interfaces.nsIConsoleService);
         try {
@@ -139,7 +132,7 @@ var ItsAllText = function() {
      */
     that.debug = function() {
         if (that.preferences && that.preferences.debug) {
-            try { Firebug.Console.logFormatted(arguments); } 
+            try { Firebug.Console.logFormatted(arguments); }
             catch(e) {
                 that.log.apply(that,arguments);
             }
@@ -207,7 +200,11 @@ var ItsAllText = function() {
          */
         private_get: function(aData) {
             var po = that.preference_observer;
-            return po.private_branch['get'+(po.types[aData])+'Pref'](aData);
+            var real_type = po.types[aData];
+            var type = real_type === 'Float' ? 'Char' : real_type;
+            var retval = '';
+            retval = po.private_branch['get' + type + 'Pref'](aData);
+            return real_type === 'Float' ? parseFloat(retval) : retval;
         },
 
         /**
@@ -217,7 +214,12 @@ var ItsAllText = function() {
          */
         private_set: function(aData, value) {
             var po = that.preference_observer;
-            return po.private_branch['set'+(po.types[aData])+'Pref'](aData, value);
+            var real_type = po.types[aData];
+            var type = real_type === 'Float' ? 'Char' : real_type;
+            if (real_type === 'Float') {
+                value = '' + parseFloat(value);
+            }
+            po.private_branch['set'+type+'Pref'](aData, value);
         }
     };
 
@@ -235,8 +237,10 @@ var ItsAllText = function() {
             editor:             'Char',
             refresh:            'Int',
             debug:              'Bool',
-            disable_gumdrops:   'Bool',
-            extensions:         'Char'
+            gumdrop_position:   'Char',
+            fade_time:          'Float',
+            extensions:         'Char',
+            hotkey:             'Char'
         },
 
         /**
@@ -251,7 +255,9 @@ var ItsAllText = function() {
             this.private_branch.addObserver("", this, false);
             /* setup the preferences */
             for(var type in this.types) {
-                that.preferences[type] = that.preferences.private_get(type);
+                if (this.types.hasOwnProperty(type)) {
+                    that.preferences[type] = that.preferences.private_get(type);
+                }
             }
         },
 
@@ -278,7 +284,7 @@ var ItsAllText = function() {
                     that.monitor.restart();
                 }
             }
-        }        
+        }
     };
 
     /**
@@ -324,7 +330,7 @@ var ItsAllText = function() {
     /**
      * A Preference Option: What editor should we use?
      *
-     * Note: On some platforms, this can return an 
+     * Note: On some platforms, this can return an
      * NS_ERROR_FILE_INVALID_PATH exception and possibly others.
      *
      * For a complete list of exceptions, see:
@@ -336,7 +342,7 @@ var ItsAllText = function() {
         var retval = null;
 
         if (editor === '' && that.isDarwin()) {
-            editor = '/usr/bin/open'; 
+            editor = '/usr/bin/open';
             that.preferences.private_set('editor', editor);
         }
 
@@ -359,7 +365,7 @@ var ItsAllText = function() {
      * @returns {bool}
      */
     that.getDisableGumdrops = function() {
-        return that.preferences.disable_gumdrops;
+        return that.preferences.gumdrop_position === 'none';
     };
 
     /**
@@ -375,7 +381,7 @@ var ItsAllText = function() {
             return extensions;
         }
     };
-    
+
     /**
      * Open the preferences dialog box.
      * @param{boolean} wait The function won't return until the preference is set.
@@ -417,7 +423,7 @@ var ItsAllText = function() {
                 return; // Don't add a duplicate.
             }
         }
-        
+
         var value = that.preferences.extensions;
         if(value.replace(/[\t\n ]+/g) === '') {
             value = ext;
@@ -427,8 +433,8 @@ var ItsAllText = function() {
         that.preferences.private_set('extensions', value);
     };
 
-    // @todo [3] Profiling and optimization.
-    
+    // @todo [wish] Profiling and optimization.
+
     /**
      * Returns a cache object
      * Note: These UIDs are only unique for Its All Text.
@@ -455,19 +461,19 @@ var ItsAllText = function() {
      * Cleans out all old cache objects.
      */
     that.cleanCacheObjs = function() {
-        doc = typeof(doc) === 'undefined'?null:doc;
         var count = 0;
         var cobj, id, cdoc;
         for(id in that.tracker) {
-            cobj = that.tracker[id];
-            cdoc = cobj.node.ownerDocument;
-            if (!cdoc.defaultView || !cdoc.location) {
-                cobj.destroy();
-                cdoc = null;
-                delete cobj;
-                delete that.tracker[id];
-            } else {
-                count += 1;
+            if (that.tracker.hasOwnProperty(id)) {
+                cobj = that.tracker[id];
+                cdoc = cobj.node.ownerDocument;
+                if (!cdoc.defaultView || !cdoc.location) {
+                    cobj.destroy();
+                    cdoc = null;
+                    delete that.tracker[id];
+                } else {
+                    count += 1;
+                }
             }
         }
         that.debuglog('tracker count:', count);
@@ -485,7 +491,7 @@ var ItsAllText = function() {
         if (!is_chrome) { cobj.addGumDrop(); }
     };
 
-    // @todo [5] Refresh textarea on editor quit.
+    // @todo [wish] Refresh textarea on editor quit.
     // @todo [9] IDEA: support for input elements as well?
 
     /**
@@ -533,6 +539,85 @@ var ItsAllText = function() {
 
 
     /**
+     * marshals a keypress event.
+     */
+    that.marshalKeyEvent = function(event) {
+        var marshal = [
+                       event.altKey  ? 1 : 0,
+                       event.ctrlKey ? 1 : 0,
+                       event.metaKey ? 1 : 0,
+                       event.shiftKey ? 1 : 0,
+                       event.charCode,
+                       event.keyCode
+        ];
+        marshal = marshal.join(':');
+        return marshal;
+    };
+
+    that.keyMap = {
+        8   : 'Backspace',
+        9   : 'Tab',
+        13  : 'Enter',
+        19  : 'Break',
+        27  : 'Escape',
+        33  : 'PgUp',
+        34  : 'PgDn',
+        35  : 'End',
+        36  : 'Home',
+        37  : 'Left',
+        38  : 'Up',
+        39  : 'Right',
+        40  : 'Down',
+        45  : 'Insert',
+        46  : 'Delete',
+        112 : 'F1',
+        113 : 'F2',
+        114 : 'F3',
+        115 : 'F4',
+        116 : 'F5',
+        117 : 'F6',
+        118 : 'F7',
+        119 : 'F8',
+        120 : 'F9',
+        121 : 'F10',
+        122 : 'F11',
+        144 : 'Num Lock',
+        145 : 'Scroll Lock',
+        ''  : '<none>'
+    };
+
+    /**
+     * Converts a marshalled key event into a string.
+     */
+    that.keyMarshalToString = function(km) {
+        var e = km.split(':');
+        var out = [];
+        var c = parseInt(e[5], 10);
+        if (e[0] === '1') {
+            out.push('alt');
+        }
+        if (e[1] === '1') {
+            out.push('ctrl');
+        }
+        if (e[2] === '1') {
+            out.push('meta');
+        }
+        if (e[3] === '1') {
+            out.push('shift');
+        }
+        if (e[4] === '0') {
+            if (that.keyMap.hasOwnProperty(c)) {
+                out.push(that.keyMap[c]);
+            } else {
+                out.push('code:'+c);
+            }
+        } else {
+            out.push(String.fromCharCode(e[4]).toUpperCase());
+        }
+        return out.join(' ');
+    };
+
+    /**
      * This function is called regularly to watch changes to web documents.
      */
     that.monitor = {
@@ -564,12 +649,22 @@ var ItsAllText = function() {
                            contentType=='text/xhtml' ||
                            contentType=='application/xhtml+xml');
                 //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
-                is_usable = (is_html) && 
+                is_usable = (is_html) &&
                     location &&
                     location.protocol != 'about:' &&
                     location.protocol != 'chrome:';
-                is_my_readme = location && location.href == that.README;
-                if (!(is_usable || is_my_readme)) { 
+                try {
+                    is_my_readme = location && location.href == that.README;
+                    /*
+                     * Avoiding this error.... I hope.
+                     * uncaught exception: [Exception... "Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsIDOMLocation.href]"  nsresult: "0x80004003 (NS_ERROR_INVALID_POINTER)"  location: "JS frame :: chrome://itsalltext/chrome/itsalltext.js :: anonymous :: line 634"  data: no]
+Line 0
+                    */
+                } catch(e) {
+                    is_my_readme = false;
+                    is_usable = false;
+                }
+                if (!(is_usable || is_my_readme)) {
                     that.debuglog('watch(): ignoring -- ',
                                   location, contentType);
                     return;
@@ -586,7 +681,7 @@ var ItsAllText = function() {
         watcher: function(offset) {
             var monitor = that.monitor;
             var rate = that.getRefresh();
-            
+
             var now = Date.now();
             if (now - monitor.last_now < Math.round(rate * 0.9)) {
                 that.debuglog('monitor.watcher(',offset,') -- skipping catchup refresh');
@@ -598,12 +693,13 @@ var ItsAllText = function() {
             var documents = monitor.documents;
             //that.debuglog('monitor.watcher(',offset,'): ', documents.length);
             var i, doc;
-            var did_delete = false;
             for(i in documents) {
-                doc = documents[i];
-                if (doc.location) {
-                    //that.debuglog('refreshing', doc.location);
-                    that.refreshDocument(doc);
+                if (documents.hasOwnProperty(i)) {
+                    doc = documents[i];
+                    if (doc.location) {
+                        //that.debuglog('refreshing', doc.location);
+                        that.refreshDocument(doc);
+                    }
                 }
             }
         },
@@ -665,7 +761,7 @@ var ItsAllText = function() {
                 tag = node.nodeName.toLowerCase();
                 doc = node.ownerDocument;
                 cstyle = doc.defaultView.getComputedStyle(node, '');
-                is_disabled = (!(tag == 'textarea' || 
+                is_disabled = (!(tag == 'textarea' ||
                                  tag == 'textbox') ||
                                node.style.display == 'none' ||
                                (cstyle && (cstyle.display == 'none' ||
@@ -683,7 +779,7 @@ var ItsAllText = function() {
                     menu = document.getElementById("itsalltext-contextmenu");
                     menu.setAttribute('hidden', is_disabled);
                 }
-                    
+
             }
         }
         return true;
@@ -694,13 +790,56 @@ var ItsAllText = function() {
         browser.selectedTab = browser.addTab(that.README, null);
     };
 
-  
+
     // Do the startup when things are loaded.
     window.addEventListener("load", function(event){that.pageload(event);}, true);
     // Do the startup when things are unloaded.
     window.addEventListener("unload", function(event){that.pageunload(event);}, true);
 
 };
+
+/**
+ * Convert an event into a key fingerprint, aka keyprint.
+ * @param {Event} event
+ * @returns {String} keyprint
+ */
+ItsAllText.prototype.eventToKeyprint = function (event) {
+    return [ event.ctrlKey,
+             event.altKey,
+             event.metaKey,
+             event.shiftKey,
+             event.keyCode,
+             event.charCode ].join(':');
+};
+
+/**
+ * Convert a keyprint to a string suitable for human display.
+ * @param {String} keyprint
+ * @return {String}
+ */
+ItsAllText.prototype.keyprintToString = function (keyprint) {
+    var split = keyprint.split(':');
+    var string = [];
+    if (split[0] === 'true') {
+        string.push('Ctrl');
+    }
+    if (split[1] === 'true') {
+        string.push('Alt');
+    }
+    if (split[2] === 'true') {
+        string.push('Meta');
+    }
+    if (split[3] === 'true') {
+        string.push('Shift');
+    }
+    if (split[4] === '0') {
+        string.push(String.fromCharCode(split[5]));
+    } else {
+        string.push('keyCode=',split[4]);
+    }
+    return string.join(' ');
+};
+
 
 /**
  * Cleans out the edit directory, deleting all old files.
@@ -734,7 +873,7 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
     var uid = this.private_current_uid;
     var cobj = that.getCacheObj(uid);
 
-    var params = {out:null};       
+    var params = {out:null};
     window.openDialog("chrome://itsalltext/chrome/newextension.xul", "",
     "chrome, dialog, modal, resizable=yes", params).focus();
     var ext;
@@ -812,8 +951,8 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
         node.addEventListener('command', function(event){return that.menuExtEdit(event, null, false);}, false);
         node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
-    }        
-   
+    }
+
     // Insert the new magic bits
     for(i=0; i<exts.length; i++) {
         node = document.createElementNS(that.XULNS, 'menuitem');
@@ -847,17 +986,17 @@ ItsAllText.prototype.getLocale = function() {
  */
 ItsAllText.prototype.pageload = function(event) {
     var doc = event.originalTarget;
-    if (!doc || doc.nodeName != "#document") { 
+    if (!doc || doc.nodeName != "#document") {
         return;
     }
     this.debug("pageload(): A page has been loaded:",doc);
-    
+
     // Start watching the preferences.
     this.preference_observer.register();
-    
+
     // Start the monitor
     this.monitor.restart();
-    
+
     var appcontent = document.getElementById("appcontent"); // The Browser
     if (appcontent) {
         // Normal web-page.
@@ -869,7 +1008,7 @@ ItsAllText.prototype.pageload = function(event) {
          */
         setTimeout(function() {ItsAllText.onDOMContentLoad({originalTarget: event.originalTarget});}, 5000);
     } else {
-        this.onDOMContentLoad(event); 
+        this.onDOMContentLoad(event);
     }
     // Attach the context menu, if we can.
     var contentAreaContextMenu = doc.getElementById("contentAreaContextMenu");
@@ -885,10 +1024,10 @@ ItsAllText.prototype.pageload = function(event) {
  */
 ItsAllText.prototype.pageunload = function(event) {
     var doc = event.originalTarget;
-    /* We don't check for the doc type because we want to 
+    /* We don't check for the doc type because we want to
      * be sure everything is unloaded.
      */
-    this.debug("pageunload(): A page has been unloaded",doc);
+    this.debug("pageunload(): A page has been unloaded", doc);
     this.monitor.unwatch(doc);
     this.preference_observer.unregister();
     this.cleanCacheObjs();
