@@ -493,6 +493,8 @@ var ItsAllText = function() {
 
     // @todo [wish] Refresh textarea on editor quit.
     // @todo [9] IDEA: support for input elements as well?
+    // @todo [5] Minimum size for textareas.
+    // @todo [5] Mark textareas somehow as 'in editor'.
 
     /**
      * Refresh Document.
