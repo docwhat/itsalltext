@@ -203,3 +203,4 @@ realclean: clean
 ## @todo [9] Option to disable yellow fade.
 ## @todo [9] Prevent double yellow fades.
 ## @todo [9] Option to choose yellow fade color.
+## @todo [9] Option to turn off button fade.
