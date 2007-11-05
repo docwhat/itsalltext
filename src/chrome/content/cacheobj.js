@@ -152,7 +152,7 @@ function CacheObj(node) {
  * Destroys the object, unallocating as much as possible to prevent leaks.
  */
 CacheObj.prototype.destroy = function() {
-    ItsAllText.debug('destroying', this.node_id, this);
+    ItsAllText.debug('destroying', this.node_id, this.uid);
     var node = this.node;
     var doc  = this.node.ownerDocument;
     var html = doc.getElementsByTagName('html')[0];
@@ -566,11 +566,16 @@ CacheObj.prototype.addGumDrop = function() {
 
     // Add the textarea mouseovers even if the button is disabled
     var node = cache_object.node;
-    node.addEventListener( "mouseover",   cache_object.mouseover, false);
-    node.addEventListener( "mouseout",    cache_object.mouseout,  false);
-    node.addEventListener( "focus",       cache_object.mouseover, false);
-    node.addEventListener( "blur",        cache_object.mouseout,  false);
-    node.addEventListener( "keypress",    cache_object.keypress,  false);
+    ItsAllText.listen(node, "mouseover", ItsAllText.hitch(cache_object, "mouseover"), false);
+    ItsAllText.listen(node, "mouseout",  ItsAllText.hitch(cache_object, "mouseout"),  false);
+    ItsAllText.listen(node, "focus",     ItsAllText.hitch(cache_object, "mouseover"), false);
+    ItsAllText.listen(node, "blur",      ItsAllText.hitch(cache_object, "mouseout"),  false);
+    ItsAllText.listen(node, "keypress",  ItsAllText.hitch(cache_object, "keypress"),  false);
+// narf    node.addEventListener( "mouseover",   cache_object.mouseover, false);
+// narf    node.addEventListener( "mouseout",    cache_object.mouseout,  false);
+// narf    node.addEventListener( "focus",       cache_object.mouseover, false);
+// narf    node.addEventListener( "blur",        cache_object.mouseout,  false);
+// narf    node.addEventListener( "keypress",    cache_object.keypress,  false);
     if (ItsAllText.getDisableGumdrops()) {
         return;
     }
@@ -604,8 +609,10 @@ CacheObj.prototype.addGumDrop = function() {
     gumdrop.setAttribute(ItsAllText.MYSTRING+'_UID', cache_object.uid);
 
     // Click event handlers
-    gumdrop.addEventListener("click",       cache_object.onClick,   false);
-    gumdrop.addEventListener("contextmenu", cache_object.onContext, false);
+    ItsAllText.listen(gumdrop, "click", ItsAllText.hitch(cache_object, 'onClick'), false);
+    ItsAllText.listen(gumdrop, "contextmenu", ItsAllText.hitch(cache_object, 'onContext'), false);
+// narf    gumdrop.addEventListener("click",       cache_object.onClick,   false);
+// narf    gumdrop.addEventListener("contextmenu", cache_object.onContext, false);
 
     // Insert it into the document
     var parent = node.parentNode;
@@ -618,8 +625,10 @@ CacheObj.prototype.addGumDrop = function() {
     }
 
     // Add mouseovers/outs
-    gumdrop.addEventListener("mouseover",   cache_object.mouseover, false);
-    gumdrop.addEventListener("mouseout",    cache_object.mouseout,  false);
+    ItsAllText.listen(gumdrop, 'mouseover', ItsAllText.hitch(cache_object, 'mouseover'), false);
+    ItsAllText.listen(gumdrop, 'mouseout', ItsAllText.hitch(cache_object, 'mouseout'), false);
+// narf    gumdrop.addEventListener("mouseover",   cache_object.mouseover, false);
+// narf    gumdrop.addEventListener("mouseout",    cache_object.mouseout,  false);
 
     cache_object.mouseout(null);
     cache_object.adjust();

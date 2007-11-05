@@ -38,6 +38,12 @@ var ItsAllText = function() {
     that.tracker = {};
 
     /**
+     * A serial for tracking ids
+     * @type Integer
+     */
+    that.serial_id = 0;
+
+    /**
      * A constant, a string used for things like the preferences.
      * @type String
      */
@@ -132,9 +138,11 @@ var ItsAllText = function() {
      */
     that.debug = function() {
         if (that.preferences && that.preferences.debug) {
-            try { Firebug.Console.logFormatted(arguments); }
-            catch(e) {
-                that.log.apply(that,arguments);
+            try {
+                Firebug.Console.logFormatted(arguments);
+                var message = that.logString.apply(that, arguments);
+                window.dump(message+'\n');
+            } catch(e) {
             }
         }
     };
@@ -476,7 +484,7 @@ var ItsAllText = function() {
                 }
             }
         }
-        that.debuglog('tracker count:', count);
+        that.debug('tracker count:', count);
     };
 
     /**
@@ -667,12 +675,21 @@ Line 0
                     is_usable = false;
                 }
                 if (!(is_usable || is_my_readme)) {
-                    that.debuglog('watch(): ignoring -- ',
-                                  location, contentType);
+                    that.debug('watch(): ignoring -- ', location, contentType);
                     return;
                 }
             }
 
+            var documents = that.monitor.documents;
+            var i;
+            for(i in documents) {
+                if (documents[i] === doc) {
+                    // Found it, don't watch it twice.
+                    that.debug('narf: double watch: ' + doc.location + '\n');
+                    return;
+                }
+            }
+            that.debug('watch()ing: ' + doc.location + '\n');
             that.refreshDocument(doc);
             that.monitor.documents.push(doc);
         },
@@ -686,20 +703,18 @@ Line 0
 
             var now = Date.now();
             if (now - monitor.last_now < Math.round(rate * 0.9)) {
-                that.debuglog('monitor.watcher(',offset,') -- skipping catchup refresh');
+                that.debug('monitor.watcher(',offset,') -- skipping catchup refresh');
                 return;
             }
             monitor.last_now = now;
 
             /* Walk the documents looking for changes */
             var documents = monitor.documents;
-            //that.debuglog('monitor.watcher(',offset,'): ', documents.length);
             var i, doc;
             for(i in documents) {
                 if (documents.hasOwnProperty(i)) {
                     doc = documents[i];
                     if (doc.location) {
-                        //that.debuglog('refreshing', doc.location);
                         that.refreshDocument(doc);
                     }
                 }
@@ -714,7 +729,7 @@ Line 0
             var i;
             for(i in documents) {
                 if (documents[i] === doc) {
-                    that.debug('unwatching', doc);
+                    that.debug('unwatching', doc && doc.location);
                     delete documents[i];
                 }
             }
@@ -725,16 +740,6 @@ Line 0
                 }
             }
         }
-    };
-
-    /**
-     * Callback whenever the DOM content in a window or tab is loaded.
-     * @param {Object} event An event passed in.
-     */
-    that.onDOMContentLoad = function(event) {
-        var doc = event.originalTarget;
-        that.monitor.watch(doc);
-        return;
     };
 
     /**
@@ -794,11 +799,68 @@ Line 0
 
 
     // Do the startup when things are loaded.
-    window.addEventListener("load", function(event){that.pageload(event);}, true);
+    that.listen(window, 'load', that.hitch(that, 'pageload'));
+    //narf window.addEventListener("load", that.pageload, true);
     // Do the startup when things are unloaded.
-    window.addEventListener("unload", function(event){that.pageunload(event);}, true);
+    //narf window.addEventListener("unload", function(event){that.pageunload(event);}, true);
+    that.listen(window, 'unload', that.hitch(that, 'pageunload'));
 
 };
+
+/**
+ * This wraps the call to object.method to ensure that 'this' is correct.
+ * This is borrowed from GreaseMonkey (though the concept has been around)
+ * @method hitch
+ * @param {Object} object
+ * @param {String} method The method on object to call
+ * @returns {Function} A wrapped call to object.method() which passes the arguments.
+ */
+ItsAllText.prototype.hitch = function(object, method) {
+  if (!object[method]) {
+    throw "method '" + method + "' does not exist on object '" + object + "'";
+  }
+
+  var staticArgs = Array.prototype.splice.call(arguments, 2, arguments.length);
+
+  return function() {
+    // make a copy of staticArgs (don't modify it because it gets reused for
+    // every invocation).
+    var args = staticArgs.concat();
+
+    // add all the new arguments
+    for (var i = 0; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+
+    // invoke the original function with the correct this object and
+    // the combined list of static and dynamic arguments.
+    return object[method].apply(object, args);
+  };
+}
+
+/**
+ * @method listen
+ * @param source {HTMLElement} The element to listen for events on.
+ * @param event {String} The name of the event to listen for.
+ * @param listener {Function} The function to run when the event is triggered.
+ * @param opt_capture {Boolean} Should the event be captured?
+ */
+ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
+  Components.lookupMethod(source, "addEventListener")(
+    event, listener, opt_capture);
+}
+
+/**
+ * @method unlisten
+ * @param source {HTMLElement} The element with the event
+ * @param event {String} The name of the event.
+ * @param listener {Function} The function that was to be run when the event is triggered.
+ * @param opt_capture {Boolean} Should the event be captured?
+ */
+ItsAllText.prototype.unlisten = function (source, event, listener, opt_capture) {
+  Components.lookupMethod(source, "removeEventListener")(
+    event, listener, opt_capture);
+}
 
 /**
  * Convert an event into a key fingerprint, aka keyprint.
@@ -894,15 +956,17 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
  * @param {string} ext
  * @param {boolean} clobber
  */
-ItsAllText.prototype.menuExtEdit = function(event, ext, clobber) {
-    var that = this;
-    var uid = that.private_current_uid;
+ItsAllText.prototype.menuExtEdit = function(ext, clobber, event) {
+    var uid = this.private_current_uid;
+    for (var i=0; i < arguments.length; i++) {
+        this.debug('narf '+i+': '+arguments[i]+'\n');
+    }
     if (ext !== null) {
         ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
     }
-    ItsAllText.debug('menuExtEdit:',uid, ext, clobber);
-    var cobj = that.getCacheObj(uid);
-    that.monitor.watch(cobj.node.ownerDocument);
+    this.debug('menuExtEdit:',uid, ext, clobber);
+    var cobj = this.getCacheObj(uid);
+    this.monitor.watch(cobj.node.ownerDocument);
     cobj.edit(ext, clobber);
 };
 
@@ -950,7 +1014,7 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     if (cobj.edit_count <= 0 && cobj.file && cobj.file.exists()) {
         node = document.createElementNS(that.XULNS, 'menuitem');
         node.setAttribute('label', that.localeFormat('edit_existing', [cobj.extension]));
-        node.addEventListener('command', function(event){return that.menuExtEdit(event, null, false);}, false);
+        that.listen(node, 'command', that.hitch(that, 'menuExtEdit', null, false), false);
         node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
     }
@@ -961,7 +1025,8 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
         node.setAttribute('label', that.localeFormat('edit_ext', [exts[i]]));
         (function() {
             var ext=exts[i];
-            node.addEventListener('command', function(event){return that.menuExtEdit(event, ext);}, false);
+            that.listen(node, 'command', that.hitch(that, 'menuExtEdit', ext, true), false);
+            //narf node.addEventListener('command', function(event){return that.menuExtEdit(event, ext);}, false);
         })();
         node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
@@ -983,15 +1048,27 @@ ItsAllText.prototype.getLocale = function() {
 };
 
 /**
+ * An event to watch a document.
+ * @method watchDocument
+ */
+ItsAllText.prototype.watchDocument = function (event) {
+    var doc = event.originalTarget;
+    // This setTimeout is like a yield() --
+    // it put it at the end of the thread stack.
+    setTimeout(this.hitch(this.monitor, 'watch', doc), 1);
+};
+
+/**
  * Initialize the module.  Should be called once, when a window is loaded.
  * @private
  */
 ItsAllText.prototype.pageload = function(event) {
     var doc = event.originalTarget;
+    this.debug('narfy0 load ' + doc.nodeName + '\n');
     if (!doc || doc.nodeName != "#document") {
         return;
     }
-    this.debug("pageload(): A page has been loaded:",doc);
+    this.debug("pageload(): A page has been loaded:",doc && doc.location);
 
     // Start watching the preferences.
     this.preference_observer.register();
@@ -999,24 +1076,19 @@ ItsAllText.prototype.pageload = function(event) {
     // Start the monitor
     this.monitor.restart();
 
+    // Schedule a watch when the content is loaded.
     var appcontent = document.getElementById("appcontent"); // The Browser
     if (appcontent) {
-        // Normal web-page.
-        appcontent.addEventListener("DOMContentLoaded", this.onDOMContentLoad,
-                                    true);
-        /* This is a fallback.  It seems that sometimes I get here
-         * AFTER the DOMContentLoaded event has fired. :-( Better late
-         * than never, I guess.
-         */
-        setTimeout(function() {ItsAllText.onDOMContentLoad({originalTarget: event.originalTarget});}, 5000);
-    } else {
-        this.onDOMContentLoad(event);
+        this.debug('narfy1 load ' + doc.location + '\n');
+        this.listen(appcontent, 'load', this.hitch(this, 'watchDocument'), true);
+        //narf appcontent.addEventListener("load", This.watchDocument, true);
     }
+
     // Attach the context menu, if we can.
     var contentAreaContextMenu = doc.getElementById("contentAreaContextMenu");
     if (contentAreaContextMenu) {
-        contentAreaContextMenu.addEventListener("popupshowing",
-                                                this.onContextMenu, false);
+        this.listen(contentAreaContextMenu, 'popupshowing', this.hitch(this, 'onContextMenu'), false);
+        //narf contentAreaContextMenu.addEventListener("popupshowing",this.onContextMenu, false);
     }
 };
 
@@ -1029,7 +1101,7 @@ ItsAllText.prototype.pageunload = function(event) {
     /* We don't check for the doc type because we want to
      * be sure everything is unloaded.
      */
-    this.debug("pageunload(): A page has been unloaded", doc);
+    this.debug("pageunload(): A page has been unloaded", doc && doc.location);
     this.monitor.unwatch(doc);
     this.preference_observer.unregister();
     this.cleanCacheObjs();

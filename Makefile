@@ -26,7 +26,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 0.8.2
+VERSION    := 0.8.2.2
 
 
 # NOTE: do not create files or directories in here that have
@@ -158,7 +158,7 @@ showlint: lint
 narf: .narf-stamp
 
 .narf-stamp:
-	$(Q)grep -nri 'narf' [a-z0-9]* ; test $$? = 1
+	$(Q)grep -nri 'narf' [a-z0-9]* ; test $$? = 1 || :
 	$(Q)touch $@
 
 ##
