@@ -1,0 +1,8 @@
+Tabbed Browser events and JS:
+http://developer.mozilla.org/en/docs/Code_snippets:Tabbed_browser
+
+DOM Events (note the mutator events):
+http://en.wikipedia.org/wiki/DOM_Events
+
+I'm going to assume that keeping references to DOMElements are
+bad. :-(

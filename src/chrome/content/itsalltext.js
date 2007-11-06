@@ -67,6 +67,8 @@ var ItsAllText = function() {
     /* The XUL Namespace */
     that.XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 
+    that.thread_id = Math.round(new Date().getTime() * Math.random());
+
     /**
      * Formats a locale string, replacing $N with the arguments in arr.
      * @param {String} name Locale property name
@@ -99,7 +101,7 @@ var ItsAllText = function() {
                 args[i] = 'toStringFailed';
             }
         }
-        args.unshift(that.MYSTRING+':');
+        args.unshift(that.MYSTRING + ' [' + this.thread_id + ']:');
         return args.join(' ');
     };
 
@@ -137,11 +139,11 @@ var ItsAllText = function() {
      * @param {Object} message One or more objects can be passed in to display.
      */
     that.debug = function() {
+        var message = that.logString.apply(that, arguments);
+        window.dump(message+'\n');
         if (that.preferences && that.preferences.debug) {
             try {
                 Firebug.Console.logFormatted(arguments);
-                var message = that.logString.apply(that, arguments);
-                window.dump(message+'\n');
             } catch(e) {
             }
         }
@@ -293,6 +295,7 @@ var ItsAllText = function() {
                 }
             }
         }
+
     };
 
     /**
@@ -484,7 +487,7 @@ var ItsAllText = function() {
                 }
             }
         }
-        that.debug('tracker count:', count);
+        that.debug('textarea count (tracker):', count);
     };
 
     /**
@@ -685,11 +688,11 @@ Line 0
             for(i in documents) {
                 if (documents[i] === doc) {
                     // Found it, don't watch it twice.
-                    that.debug('narf: double watch: ' + doc.location + '\n');
+                    that.debug('narf: double watch: ', doc.location);
                     return;
                 }
             }
-            that.debug('watch()ing: ' + doc.location + '\n');
+            that.debug('watch()ing: ', doc && doc.location);
             that.refreshDocument(doc);
             that.monitor.documents.push(doc);
         },
@@ -729,7 +732,7 @@ Line 0
             var i;
             for(i in documents) {
                 if (documents[i] === doc) {
-                    that.debug('unwatching', doc && doc.location);
+                    that.debug('unwatch()ing', doc && doc.location);
                     delete documents[i];
                 }
             }
@@ -800,11 +803,16 @@ Line 0
 
     // Do the startup when things are loaded.
     that.listen(window, 'load', that.hitch(that, 'pageload'));
-    //narf window.addEventListener("load", that.pageload, true);
-    // Do the startup when things are unloaded.
-    //narf window.addEventListener("unload", function(event){that.pageunload(event);}, true);
     that.listen(window, 'unload', that.hitch(that, 'pageunload'));
 
+
+    /* This helps debug the monitor and page and memory usage. */
+    if (1) { //narf
+        var f = function () {
+            that.debug(' -- MARK -- '+ that.monitor.documents.length);
+        }
+        setInterval(f, 1000 * 7);
+    }
 };
 
 /**
@@ -958,9 +966,6 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
  */
 ItsAllText.prototype.menuExtEdit = function(ext, clobber, event) {
     var uid = this.private_current_uid;
-    for (var i=0; i < arguments.length; i++) {
-        this.debug('narf '+i+': '+arguments[i]+'\n');
-    }
     if (ext !== null) {
         ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
     }
@@ -1026,7 +1031,6 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
         (function() {
             var ext=exts[i];
             that.listen(node, 'command', that.hitch(that, 'menuExtEdit', ext, true), false);
-            //narf node.addEventListener('command', function(event){return that.menuExtEdit(event, ext);}, false);
         })();
         node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
@@ -1049,13 +1053,25 @@ ItsAllText.prototype.getLocale = function() {
 
 /**
  * An event to watch a document.
- * @method watchDocument
+ * This must be a stand-alone constant function so that it will replace previous versions if they exist.
+ * @method contentLoad
  */
-ItsAllText.prototype.watchDocument = function (event) {
-    var doc = event.originalTarget;
-    // This setTimeout is like a yield() --
-    // it put it at the end of the thread stack.
-    setTimeout(this.hitch(this.monitor, 'watch', doc), 1);
+ItsAllText.prototype.contentLoad = function (event) {
+    var doc = event.target;
+    var unsafeWin = doc.defaultView.wrappedJSObject;
+    this.debug('contentLoad() ', doc && doc.location);
+    this.monitor.watch(doc);
+    this.listen(unsafeWin, 'pagehide', this.hitch(this, 'contentUnload'));
+};
+/**
+ * An event to watch a document.
+ * This must be a stand-alone constant function so that it will replace previous versions if they exist.
+ * @method contentUnload
+ */
+ItsAllText.prototype.contentUnload = function (event) {
+    var doc = event.target;
+    this.debug('contentUnload() ', doc && doc.location);
+    this.monitor.unwatch(doc);
 };
 
 /**
@@ -1064,7 +1080,6 @@ ItsAllText.prototype.watchDocument = function (event) {
  */
 ItsAllText.prototype.pageload = function(event) {
     var doc = event.originalTarget;
-    this.debug('narfy0 load ' + doc.nodeName + '\n');
     if (!doc || doc.nodeName != "#document") {
         return;
     }
@@ -1077,18 +1092,16 @@ ItsAllText.prototype.pageload = function(event) {
     this.monitor.restart();
 
     // Schedule a watch when the content is loaded.
-    var appcontent = document.getElementById("appcontent"); // The Browser
-    if (appcontent) {
-        this.debug('narfy1 load ' + doc.location + '\n');
-        this.listen(appcontent, 'load', this.hitch(this, 'watchDocument'), true);
-        //narf appcontent.addEventListener("load", This.watchDocument, true);
+    var appContent = document.getElementById("appcontent"); // The Browser
+    this.appContent = appContent;
+    if (appContent) {
+        this.listen(appContent, 'DOMContentLoaded', this.hitch(this, 'contentLoad'), true);
     }
 
     // Attach the context menu, if we can.
     var contentAreaContextMenu = doc.getElementById("contentAreaContextMenu");
     if (contentAreaContextMenu) {
         this.listen(contentAreaContextMenu, 'popupshowing', this.hitch(this, 'onContextMenu'), false);
-        //narf contentAreaContextMenu.addEventListener("popupshowing",this.onContextMenu, false);
     }
 };
 
