@@ -191,7 +191,9 @@ var ItsAllText = function() {
         /* Load the various bits needed to make this work. */
         var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
         loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
+        loader.loadSubScript('chrome://itsalltext/content/monitor.js', that);
         loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
+        that.new_monitor = new that.new_monitor(that);
     };
     loadthings();
 
@@ -291,7 +293,7 @@ var ItsAllText = function() {
             if (that.preferences) {
                 that.preferences[aData] = that.preferences.private_get(aData);
                 if (aData == 'refresh') {
-                    that.monitor.restart();
+                    that.new_monitor.restart();
                 }
             }
         }
@@ -313,7 +315,7 @@ var ItsAllText = function() {
     that.getRefresh = function() {
         var refresh = that.preferences.refresh;
         if (!refresh || refresh < 1) {
-            that.debug('Invalid refresh gotten:',refresh);
+            that.debug('Invalid refresh:',refresh);
             refresh = 1;
         }
         var retval = 1000*refresh;
@@ -455,15 +457,29 @@ var ItsAllText = function() {
     that.getCacheObj = function(node) {
         var cobj = null;
         var str = that.MYSTRING+"_UID";
-        if (typeof(node) == 'string') {
-            cobj = that.tracker[node];
+        var id = null;
+        if (typeof(node) === 'string') {
+            id = node;
+        } else if (node && node.hasAttribute(str)) {
+            id = node.getAttribute(str);
+        }
+        if (id && that.tracker.hasOwnProperty(id)) {
+            return that.tracker[id];
         } else {
-            if (node && node.hasAttribute(str)) {
-                cobj = that.tracker[node.getAttribute(str)];
-            }
-            if (!cobj) {
-                cobj = new ItsAllText.CacheObj(node);
-            }
+            return null;
+        }
+    };
+
+    /**
+     * Creates a cache object, unless one exists already.
+     * Note: These UIDs are only unique for Its All Text.
+     * @param {DOMElement} node A dom object node or id to one.
+     * @returns {String} the UID or null.
+     */
+    that.makeCacheObj = function(node) {
+        var cobj = that.getCacheObj(node);
+        if (!cobj) {
+            cobj = new ItsAllText.CacheObj(node);
         }
         return cobj;
     };
@@ -633,20 +649,20 @@ var ItsAllText = function() {
     /**
      * This function is called regularly to watch changes to web documents.
      */
-    that.monitor = {
+    that.old_monitor = {
         id: null,
         last_now:0,
         documents: [],
         /**
-         * Starts or restarts the document monitor.
+         * Starts or restarts the document old_monitor.
          */
         restart: function() {
             var rate = that.getRefresh();
-            var id   = that.monitor.id;
+            var id   = that.old_monitor.id;
             if (id) {
                 clearInterval(id);
             }
-            that.monitor.id = setInterval(that.monitor.watcher, rate);
+            that.old_monitor.id = setInterval(that.old_monitor.watcher, rate);
         },
         /**
          * watches the document 'doc'.
@@ -683,7 +699,7 @@ Line 0
                 }
             }
 
-            var documents = that.monitor.documents;
+            var documents = that.old_monitor.documents;
             var i;
             for(i in documents) {
                 if (documents[i] === doc) {
@@ -694,25 +710,25 @@ Line 0
             }
             that.debug('watch()ing: ', doc && doc.location);
             that.refreshDocument(doc);
-            that.monitor.documents.push(doc);
+            that.old_monitor.documents.push(doc);
         },
         /**
          * Callback to be used by restart()
          * @private
          */
         watcher: function(offset) {
-            var monitor = that.monitor;
+            var old_monitor = that.old_monitor;
             var rate = that.getRefresh();
 
             var now = Date.now();
-            if (now - monitor.last_now < Math.round(rate * 0.9)) {
-                that.debug('monitor.watcher(',offset,') -- skipping catchup refresh');
+            if (now - old_monitor.last_now < Math.round(rate * 0.9)) {
+                that.debug('old_monitor.watcher(',offset,') -- skipping catchup refresh');
                 return;
             }
-            monitor.last_now = now;
+            old_monitor.last_now = now;
 
             /* Walk the documents looking for changes */
-            var documents = monitor.documents;
+            var documents = old_monitor.documents;
             var i, doc;
             for(i in documents) {
                 if (documents.hasOwnProperty(i)) {
@@ -728,7 +744,7 @@ Line 0
          * @param {Object} doc The document to watch.
          */
         unwatch: function(doc) {
-            var documents = that.monitor.documents;
+            var documents = that.old_monitor.documents;
             var i;
             for(i in documents) {
                 if (documents[i] === doc) {
@@ -802,17 +818,31 @@ Line 0
 
 
     // Do the startup when things are loaded.
-    that.listen(window, 'load', that.hitch(that, 'pageload'));
-    that.listen(window, 'unload', that.hitch(that, 'pageunload'));
+    that.listen(window, 'load', function () {
+        // Add a callback to be run every time a document loads.
+        // note that this includes frames/iframes within the document
+        that.listen(gBrowser, "load",
+                    that.hitch(that.new_monitor, 'registerPage'), true);
+        that.listen(gBrowser, "unload",
+                    that.hitch(that.new_monitor, 'unregisterPage'), true);
 
+        // Start watching the preferences.
+        that.preference_observer.register();
 
-    /* This helps debug the monitor and page and memory usage. */
-    if (1) { //narf
-        var f = function () {
-            that.debug(' -- MARK -- '+ that.monitor.documents.length);
+        // Setup the context menu whenever it is shown.
+        var contentAreaContextMenu = document.getElementById("contentAreaContextMenu");
+        if (contentAreaContextMenu) {
+            that.listen(contentAreaContextMenu, 'popupshowing', that.hitch(that, 'onContextMenu'), false);
         }
-        setInterval(f, 1000 * 7);
-    }
+    }, false);
+
+    that.listen(window, 'unload', function () {
+        var doc = event.originalTarget;
+        that.debug("pageunload(): A page has been unloaded", doc && doc.location);
+        that.preference_observer.unregister();
+        that.cleanCacheObjs();
+    }, false);
+
 };
 
 /**
@@ -971,7 +1001,7 @@ ItsAllText.prototype.menuExtEdit = function(ext, clobber, event) {
     }
     this.debug('menuExtEdit:',uid, ext, clobber);
     var cobj = this.getCacheObj(uid);
-    this.monitor.watch(cobj.node.ownerDocument);
+    //narf this.monitor.watch(cobj.node.ownerDocument);
     cobj.edit(ext, clobber);
 };
 
@@ -1050,76 +1080,6 @@ ItsAllText.prototype.getLocale = function() {
      */
     return obj.createBundle("chrome://itsalltext/locale/itsalltext.properties");
 };
-
-/**
- * An event to watch a document.
- * This must be a stand-alone constant function so that it will replace previous versions if they exist.
- * @method contentLoad
- */
-ItsAllText.prototype.contentLoad = function (event) {
-    var doc = event.target;
-    var unsafeWin = doc.defaultView.wrappedJSObject;
-    this.debug('contentLoad() ', doc && doc.location);
-    this.monitor.watch(doc);
-    this.listen(unsafeWin, 'pagehide', this.hitch(this, 'contentUnload'));
-};
-/**
- * An event to watch a document.
- * This must be a stand-alone constant function so that it will replace previous versions if they exist.
- * @method contentUnload
- */
-ItsAllText.prototype.contentUnload = function (event) {
-    var doc = event.target;
-    this.debug('contentUnload() ', doc && doc.location);
-    this.monitor.unwatch(doc);
-};
-
-/**
- * Initialize the module.  Should be called once, when a window is loaded.
- * @private
- */
-ItsAllText.prototype.pageload = function(event) {
-    var doc = event.originalTarget;
-    if (!doc || doc.nodeName != "#document") {
-        return;
-    }
-    this.debug("pageload(): A page has been loaded:",doc && doc.location);
-
-    // Start watching the preferences.
-    this.preference_observer.register();
-
-    // Start the monitor
-    this.monitor.restart();
-
-    // Schedule a watch when the content is loaded.
-    var appContent = document.getElementById("appcontent"); // The Browser
-    this.appContent = appContent;
-    if (appContent) {
-        this.listen(appContent, 'DOMContentLoaded', this.hitch(this, 'contentLoad'), true);
-    }
-
-    // Attach the context menu, if we can.
-    var contentAreaContextMenu = doc.getElementById("contentAreaContextMenu");
-    if (contentAreaContextMenu) {
-        this.listen(contentAreaContextMenu, 'popupshowing', this.hitch(this, 'onContextMenu'), false);
-    }
-};
-
-/**
- * Uninitialize the module.  Should be called once, when a window is unloaded.
- * @private
- */
-ItsAllText.prototype.pageunload = function(event) {
-    var doc = event.originalTarget;
-    /* We don't check for the doc type because we want to
-     * be sure everything is unloaded.
-     */
-    this.debug("pageunload(): A page has been unloaded", doc && doc.location);
-    this.monitor.unwatch(doc);
-    this.preference_observer.unregister();
-    this.cleanCacheObjs();
-};
-
 
 ItsAllText = new ItsAllText();
 

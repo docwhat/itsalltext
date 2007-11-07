@@ -50,7 +50,7 @@
 
     var onload = function (event) {
         /* Start watching the document, but force it. */
-        ItsAllText.monitor.watch(document, true);
+        ItsAllText.monitor.startPage(document, true);
 
         /* Turn on all the hidden CSS */
         var nodes = [], i;

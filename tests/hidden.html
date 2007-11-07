@@ -12,25 +12,40 @@
        var dis2 = document.getElementById('dis2');
        var vis2 = document.getElementById('vis2');
 
+       var dis3 = document.getElementById('dis3');
+       var vis3 = document.getElementById('vis3');
+
        if(dis.style.display == 'none') {
          dis.style.display = '';
-       } else { 
+       } else {
          dis.style.display = 'none';
        }
        if(vis.style.visibility == 'hidden') {
          vis.style.visibility = '';
-       } else { 
+       } else {
          vis.style.visibility = 'hidden';
        }
+
        if(dis2.className == 'nodis') {
            dis2.className = '';
-       } else { 
+       } else {
            dis2.className = 'nodis';
        }
        if(vis2.className == 'novis') {
            vis2.className = '';
-       } else { 
+       } else {
            vis2.className = 'novis';
+       }
+
+       if(dis3.className == 'nodis') {
+           dis3.className = '';
+       } else {
+           dis3.className = 'nodis';
+       }
+       if(vis3.className == 'novis') {
+           vis3.className = '';
+       } else {
+           vis3.className = 'novis';
        }
        return false;
      }
@@ -55,33 +70,45 @@
     <form action="" method="get">
       <ol>
         <li>
-          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
-          <br>
-            <div class="boxed">
-              &nbsp;<textarea id="dis" style="display: none;">display: none</textarea>
-            </div>
+          <div class="boxed">
+            &nbsp;<textarea id="dis" style="display: none;">display: none</textarea>
+          </div>
         </li>
         <li>
-          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
-          <br>
-            <div class="boxed">
-              &nbsp;<textarea id="dis2" class="nodis">display: none</textarea>
-            </div>
+          <div class="boxed">
+            &nbsp;<textarea id="dis2" class="nodis">display: none</textarea>
+          </div>
         </li>
         <li>
-          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
-          <br>
-            <div class="boxed">
-              <textarea id="vis" style="visibility: hidden;">visibility: hidden</textarea>
-            </div>
+          <div class="boxed">
+            <textarea id="vis" style="visibility: hidden;">visibility: hidden</textarea>
+          </div>
         </li>
         <li>
-          In the boxed area below, there should <em>not</em> be a button or a textarea visible.
-          <br>
-            <div class="boxed">
-              <textarea id="vis2" class="novis">visibility: hidden</textarea>
-            </div>
+          <div class="boxed">
+            <textarea id="vis2" class="novis">visibility: hidden</textarea>
+          </div>
         </li>
+
+        <li>
+          <div class="boxed">
+            <div id="dis3" class="nodis">
+              <div>
+                <textarea>nested display: none</textarea>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="boxed">
+            <div id="vis3" class="novis">
+              <div>
+                <textarea>nested visibility: hidden</textarea>
+              </div>
+            </div>
+          </div>
+        </li>
+
         <li>
           Click on the button to toggle the hiddeness/visibility of
           the textareas.  The edit button should appear within a few
