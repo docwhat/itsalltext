@@ -33,6 +33,10 @@ function new_monitor(iat) {
 
 }
 
+new_monitor.destroy = function () {
+    delete this.iat;
+};
+
 new_monitor.prototype.hitched_restart = function () {
     var rate = this.iat.getRefresh();
     var id   = this.id;
@@ -61,6 +65,8 @@ new_monitor.prototype.registerPage = function (event) {
         /* appContent is the browser chrome. */
         var appContent = document.getElementById("appcontent");
         this.iat.listen(appContent, 'DOMContentLoaded', this.startPage, true);
+        this.iat.listen(gBrowser.tabContainer, 'TabSelect', this.watcher, true);
+        this.iat.debug('RegisterPage: END');
     }
 };
 
@@ -74,13 +80,25 @@ new_monitor.prototype.unregisterPage = function (event) {
     // Remove any other handlers.
     var appContent = document.getElementById("appcontent");
     this.iat.unlisten(appContent, 'DOMContentLoaded', this.startPage, true);
+    this.iat.unlisten(gBrowser.tabContainer, 'TabSelect', this.watcher, true);
 };
 
-new_monitor.prototype.hitched_watcher = function (init) {
+new_monitor.prototype.hitched_watcher = function (offset, init) {
+    if (offset.type === 'TabSelect') {
+        init = true;
+    }
+    var rate = this.iat.getRefresh();
+    var now = Date.now();
+    if (!init && now - this.last_watcher_call < Math.round(rate * 0.9)) {
+        this.iat.debug('watcher(',offset,'/',(now - this.last_watcher_call),') -- skipping catchup refresh');
+        return;
+    }
+    this.last_watcher_call = now;
+
     var doc = gBrowser.selectedBrowser.contentDocument;
-    this.iat.debug('watcher: ', init, doc);
+    this.iat.debug('watcher: ', offset, init, doc && doc.location);
     var nodes = [];
-    var i, cobj;
+    var i, cobj, node;
     var is_html = this.isHTML(doc);
     var is_xul  = this.isXUL(doc);
     if (is_html) {
@@ -91,25 +109,22 @@ new_monitor.prototype.hitched_watcher = function (init) {
         nodes = doc.getElementsByTagName('textbox');
     } else {
         this.unregisterPage(doc);
+        return;
     }
     for(i=0; i < nodes.length; i++) {
+        node = nodes[i];
         if (init) {
-            cobj = ItsAllText.makeCacheObj(node);
+            cobj = ItsAllText.makeCacheObj(node, is_html);
         } else {
             cobj = ItsAllText.getCacheObj(node);
         }
         if (cobj) {
             cobj.update();
-            if (init && is_html) {
-                cobj.addGumDrop();
-            }
         }
     }
 };
 
 new_monitor.prototype.hitched_startPage = function (event, force) {
-    this.iat.debug('narf');
-    
     var doc = event.originalTarget;
     this.iat.debug('startPage', doc && doc.location, force);
     if (!(force || this.isHTML(doc))) {
@@ -121,7 +136,7 @@ new_monitor.prototype.hitched_startPage = function (event, force) {
     this.iat.listen(unsafeWin, 'pagehide', this.iat.hitch(this, 'stopPage'));
 
     // Kick off a watcher now...
-    this.watcher();
+    this.watcher(0, true);
     // Set up the future ones
     this.restart();
 };
@@ -132,6 +147,7 @@ new_monitor.prototype.hitched_stopPage = function (event) {
 };
 
 new_monitor.prototype.isXUL = function (doc) {
+    var contentType = doc && doc.contentType;
     var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
     var is_my_readme;
     try {

@@ -529,7 +529,7 @@ CacheObj.prototype.onContext = function(event) {
      *
      * Excuse me while I scream.
      *
-     * See Mozilla bugs: 
+     * See Mozilla bugs:
      * https://bugzilla.mozilla.org/show_bug.cgi?id=287357
      * https://bugzilla.mozilla.org/show_bug.cgi?id=291083
      */

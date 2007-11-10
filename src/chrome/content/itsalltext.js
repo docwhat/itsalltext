@@ -474,12 +474,16 @@ var ItsAllText = function() {
      * Creates a cache object, unless one exists already.
      * Note: These UIDs are only unique for Its All Text.
      * @param {DOMElement} node A dom object node or id to one.
+     * @param {Boolean} create_gumdrop Should a gumdrop be created (html).
      * @returns {String} the UID or null.
      */
-    that.makeCacheObj = function(node) {
+    that.makeCacheObj = function(node, create_gumdrop) {
         var cobj = that.getCacheObj(node);
         if (!cobj) {
             cobj = new ItsAllText.CacheObj(node);
+            if (create_gumdrop) {
+                cobj.addGumDrop();
+            }
         }
         return cobj;
     };
@@ -839,8 +843,9 @@ Line 0
     that.listen(window, 'unload', function () {
         var doc = event.originalTarget;
         that.debug("pageunload(): A page has been unloaded", doc && doc.location);
-        that.preference_observer.unregister();
         that.cleanCacheObjs();
+        that.preference_observer.unregister();
+        that.new_monitor.destroy();
     }, false);
 
 };
