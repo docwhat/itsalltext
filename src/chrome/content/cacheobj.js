@@ -579,7 +579,7 @@ CacheObj.prototype.addGumDrop = function() {
     if (ItsAllText.getDisableGumdrops()) {
         return;
     }
-    ItsAllText.debug('addGumDrop()',cache_object.node_id,cache_object.uid);
+    ItsAllText.debug('addGumDrop()',cache_object);
 
     var doc = node.ownerDocument;
     if (!node.parentNode) { return; }

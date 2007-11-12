@@ -46,10 +46,10 @@ new_monitor.prototype.hitched_restart = function () {
     this.id = setInterval(this.watcher, rate);
 };
 
-new_monitor.prototype.registerPage = function (event) {
+new_monitor.prototype.hitched_registerPage = function (event) {
     if (event.originalTarget instanceof HTMLDocument) {
         var doc = event.originalTarget;
-        if (event.originalTarget.defaultView.frameElement) {
+        if (doc.defaultView.frameElement) {
             // Frame within a tab was loaded. doc should be the root document of
             // the frameset. If you don't want do anything when frames/iframes
             // are loaded in this web page, uncomment the following line:
@@ -65,22 +65,10 @@ new_monitor.prototype.registerPage = function (event) {
         /* appContent is the browser chrome. */
         var appContent = document.getElementById("appcontent");
         this.iat.listen(appContent, 'DOMContentLoaded', this.startPage, true);
+        this.iat.listen(document, 'unload', this.stopPage, true);
         this.iat.listen(gBrowser.tabContainer, 'TabSelect', this.watcher, true);
         this.iat.debug('RegisterPage: END');
     }
-};
-
-new_monitor.prototype.unregisterPage = function (event) {
-    var doc = event.originalTarget;
-    this.iat.debug('unregisterPage', doc && doc.location);
-
-    // Stop any monitoring.
-    this.stopPage(event);
-
-    // Remove any other handlers.
-    var appContent = document.getElementById("appcontent");
-    this.iat.unlisten(appContent, 'DOMContentLoaded', this.startPage, true);
-    this.iat.unlisten(gBrowser.tabContainer, 'TabSelect', this.watcher, true);
 };
 
 new_monitor.prototype.hitched_watcher = function (offset, init) {
@@ -95,7 +83,14 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
     }
     this.last_watcher_call = now;
 
-    var doc = gBrowser.selectedBrowser.contentDocument;
+    var doc;
+    if (typeof(gBrowser) === 'undefined') {
+        /* If we're in chrome. */
+        doc = document;
+    } else {
+        /* If we're in a tabbed browser. */
+        doc = gBrowser.selectedBrowser.contentDocument;
+    }
     this.iat.debug('watcher: ', offset, init, doc && doc.location);
     var nodes = [];
     var i, cobj, node;
@@ -108,7 +103,7 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
         /* XUL */
         nodes = doc.getElementsByTagName('textbox');
     } else {
-        this.unregisterPage(doc);
+        this.stopPage({originalTarget: doc});
         return;
     }
     for(i=0; i < nodes.length; i++) {
@@ -128,12 +123,14 @@ new_monitor.prototype.hitched_startPage = function (event, force) {
     var doc = event.originalTarget;
     this.iat.debug('startPage', doc && doc.location, force);
     if (!(force || this.isHTML(doc))) {
-        this.unregisterPage(event);
+        this.stopPage(event);
         return;
     }
 
     var unsafeWin = doc.defaultView.wrappedJSObject;
-    this.iat.listen(unsafeWin, 'pagehide', this.iat.hitch(this, 'stopPage'));
+    if (unsafeWin) {
+        this.iat.listen(unsafeWin, 'pagehide', this.stopPage);
+    }
 
     // Kick off a watcher now...
     this.watcher(0, true);
@@ -144,6 +141,9 @@ new_monitor.prototype.hitched_startPage = function (event, force) {
 new_monitor.prototype.hitched_stopPage = function (event) {
     var doc = event.originalTarget;
     this.iat.debug('stopPage', doc && doc.location);
+
+    var unsafeWin = doc.defaultView.wrappedJSObject;
+    this.iat.unlisten(unsafeWin, 'pagehide', this.stopPage);
 };
 
 new_monitor.prototype.isXUL = function (doc) {

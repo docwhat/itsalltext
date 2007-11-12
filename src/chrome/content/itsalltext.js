@@ -822,13 +822,15 @@ Line 0
 
 
     // Do the startup when things are loaded.
-    that.listen(window, 'load', function () {
-        // Add a callback to be run every time a document loads.
-        // note that this includes frames/iframes within the document
-        that.listen(gBrowser, "load",
-                    that.hitch(that.new_monitor, 'registerPage'), true);
-        that.listen(gBrowser, "unload",
-                    that.hitch(that.new_monitor, 'unregisterPage'), true);
+    that.listen(window, 'load', function (event) {
+        if (typeof(gBrowser) === 'undefined') {
+            that.new_monitor.registerPage(event);
+        } else {
+            // Add a callback to be run every time a document loads.
+            // note that this includes frames/iframes within the document
+            that.listen(gBrowser, "load",
+                        that.new_monitor.registerPage, true);
+        }
 
         // Start watching the preferences.
         that.preference_observer.register();
@@ -840,7 +842,10 @@ Line 0
         }
     }, false);
 
-    that.listen(window, 'unload', function () {
+    that.listen(window, 'unload', function (event) {
+        if (typeof(gBrowser) === 'undefined') {
+            that.new_monitor.stopPage(event);
+        }
         var doc = event.originalTarget;
         that.debug("pageunload(): A page has been unloaded", doc && doc.location);
         that.cleanCacheObjs();
@@ -889,8 +894,10 @@ ItsAllText.prototype.hitch = function(object, method) {
  * @param opt_capture {Boolean} Should the event be captured?
  */
 ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
-  Components.lookupMethod(source, "addEventListener")(
-    event, listener, opt_capture);
+    opt_capture = !!opt_capture;
+    this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
+    Components.lookupMethod(source, "addEventListener")(
+        event, listener, opt_capture);
 }
 
 /**
@@ -901,8 +908,10 @@ ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
  * @param opt_capture {Boolean} Should the event be captured?
  */
 ItsAllText.prototype.unlisten = function (source, event, listener, opt_capture) {
-  Components.lookupMethod(source, "removeEventListener")(
-    event, listener, opt_capture);
+    opt_capture = !!opt_capture;
+    this.debug("unlisten(%o, %o, -, %o)", source, event, opt_capture);
+    Components.lookupMethod(source, "removeEventListener")(
+        event, listener, opt_capture);
 }
 
 /**
