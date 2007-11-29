@@ -179,7 +179,7 @@ docs/.stamp: $(SOURCES_JS)
 .PHONY: todo
 todo: .todo
 	$(Q)cat $<
-.todo: $(SOURCES) Makefile
+.todo: $(SOURCES) Makefile notes.txt
 	$(Q)grep -hE '[@]todo' $^ | perl -p -e 's!^.*[@]todo\s*!!' | sort -n > "$@"
 
 

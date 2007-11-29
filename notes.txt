@@ -23,3 +23,4 @@ bad. :-(
   problems with their code in addition to warnings for your own
   extension. You can filter those with Console2.
 
+@todo [3] Firemacs conflict in FF 2.0.0.10
