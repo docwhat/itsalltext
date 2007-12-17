@@ -50,7 +50,7 @@
   <!-- The merge point is the Tools menu -->
   <menupopup id="menu_ToolsPopup">
     <menu id="menu_itsalltext" class="menuitem-iconic"
-          image="chrome://itsalltext/chrome/icon16.png"
+          image="chrome://itsalltext/chrome/icon.png"
           label="&top.label;"
           insertbefore="sanitizeSeparator">
       <menupopup>
