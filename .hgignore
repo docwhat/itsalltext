@@ -4,3 +4,4 @@ syntax:regexp
 ^[^/]+\.xpi/
 ^\.todo$
 \.[^/]+-stamp$
+^(.*/|)\.DS_Store$
