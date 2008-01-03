@@ -455,7 +455,6 @@ var ItsAllText = function() {
      * @returns {String} the UID or null.
      */
     that.getCacheObj = function(node) {
-        var cobj = null;
         var str = that.MYSTRING+"_UID";
         var id = null;
         if (typeof(node) === 'string') {
@@ -884,7 +883,7 @@ ItsAllText.prototype.hitch = function(object, method) {
     // the combined list of static and dynamic arguments.
     return object[method].apply(object, args);
   };
-}
+};
 
 /**
  * @method listen
@@ -898,7 +897,7 @@ ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
     this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
     Components.lookupMethod(source, "addEventListener")(
         event, listener, opt_capture);
-}
+};
 
 /**
  * @method unlisten
@@ -912,7 +911,7 @@ ItsAllText.prototype.unlisten = function (source, event, listener, opt_capture) 
     this.debug("unlisten(%o, %o, -, %o)", source, event, opt_capture);
     Components.lookupMethod(source, "removeEventListener")(
         event, listener, opt_capture);
-}
+};
 
 /**
  * Convert an event into a key fingerprint, aka keyprint.
