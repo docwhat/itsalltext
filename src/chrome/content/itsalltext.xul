@@ -4,7 +4,7 @@
 <overlay id="ItsAllTextOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script type="application/x-javascript" src="chrome://itsalltext/chrome/itsalltext.js" />
+  <script type="application/x-javascript" src="chrome://itsalltext/content/itsalltext.js" />
 
   <!-- The merge point is contentAreaContextMenu -->
   <popup id="contentAreaContextMenu">
@@ -50,7 +50,7 @@
   <!-- The merge point is the Tools menu -->
   <menupopup id="menu_ToolsPopup">
     <menu id="menu_itsalltext" class="menuitem-iconic"
-          image="chrome://itsalltext/chrome/icon.png"
+          image="chrome://itsalltext/content/icon.png"
           label="&top.label;"
           insertbefore="sanitizeSeparator">
       <menupopup>

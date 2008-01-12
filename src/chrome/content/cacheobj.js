@@ -362,7 +362,7 @@ CacheObj.prototype.edit = function(extension, clobber) {
                       exists: program ? program.exists() : false,
                       path: ItsAllText.preferences.editor,
                       exception: e.name };
-        window.openDialog('chrome://itsalltext/chrome/badeditor.xul',
+        window.openDialog('chrome://itsalltext/content/badeditor.xul',
                           null,
                           "chrome,titlebar,toolbar,centerscreen,modal",
                           params);

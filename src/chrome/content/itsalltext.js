@@ -419,7 +419,7 @@ var ItsAllText = function() {
                 win.document.documentElement.showPane(pane);
             }
         } else {
-            openDialog('chrome://itsalltext/chrome/preferences.xul',
+            openDialog('chrome://itsalltext/content/preferences.xul',
                        "", features, paneID);
         }
     };
@@ -989,7 +989,7 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
     var cobj = that.getCacheObj(uid);
 
     var params = {out:null};
-    window.openDialog("chrome://itsalltext/chrome/newextension.xul", "",
+    window.openDialog("chrome://itsalltext/content/newextension.xul", "",
     "chrome, dialog, modal, resizable=yes", params).focus();
     var ext;
     if (params.out) {
