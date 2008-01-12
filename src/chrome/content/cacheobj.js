@@ -532,21 +532,23 @@ CacheObj.prototype.onContext = function(event) {
      * See Mozilla bugs:
      * https://bugzilla.mozilla.org/show_bug.cgi?id=287357
      * https://bugzilla.mozilla.org/show_bug.cgi?id=291083
+     *
+     * This is actually fixed in FF3 by replacing it with something
+     * sane....openPopup()
      */
     var cobj = ItsAllText.getCacheObj(event.target);
     var popup = ItsAllText.rebuildMenu(cobj.uid);
-    /*
-    popup.showPopup(popup,
-                    event.screenX, event.screenY,
-                    'context', null, null);
-    */
+
     if (popup.openPopup) {
-        popup.openPopup(null, 'after_pointer', null, null, true, null);
+        /* FF3 breath of sanity. */
+        popup.openPopup(cobj.button, 'end_before',
+                        0, cobj.gumdrop_height,
+                        true, false);
     } else {
         document.popupNode = popup;
         popup.showPopup(document.documentElement,
                         event.screenX, event.screenY,
-                        'popup', null, null);
+                        'popup', false, false);
     }
     event.stopPropagation();
     return false;
