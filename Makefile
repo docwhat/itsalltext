@@ -28,6 +28,7 @@ PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
 VERSION    := 0.8.2.2
 
+
 # NOTE: do not create files or directories in here that have
 #       spaces or other special characters in their names!
 SOURCES_CHROME:=$(shell find src/chrome -type f\
