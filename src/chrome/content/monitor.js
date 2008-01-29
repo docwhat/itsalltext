@@ -67,12 +67,14 @@ new_monitor.prototype.hitched_registerPage = function (event) {
         this.iat.listen(appContent, 'DOMContentLoaded', this.startPage, true);
         this.iat.listen(document, 'unload', this.stopPage, true);
         this.iat.listen(gBrowser.tabContainer, 'TabSelect', this.watcher, true);
+        this.startPage({originalTarget: doc});
         this.iat.debug('RegisterPage: END');
     }
 };
 
 new_monitor.prototype.hitched_watcher = function (offset, init) {
-    if (offset.type === 'TabSelect') {
+    if (typeof(offset) === 'number' &&
+        offset.type === 'TabSelect') {
         init = true;
     }
     var rate = this.iat.getRefresh();

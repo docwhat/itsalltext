@@ -821,7 +821,9 @@ Line 0
 
 
     // Do the startup when things are loaded.
+    // TODONOW: move to separate function
     that.listen(window, 'load', function (event) {
+        that.debug('!!load', event);
         if (typeof(gBrowser) === 'undefined') {
             that.new_monitor.registerPage(event);
         } else {
@@ -841,6 +843,7 @@ Line 0
         }
     }, false);
 
+    // TODONOW: move to separate function
     that.listen(window, 'unload', function (event) {
         if (typeof(gBrowser) === 'undefined') {
             that.new_monitor.stopPage(event);

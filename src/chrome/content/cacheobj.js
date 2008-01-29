@@ -483,6 +483,7 @@ CacheObj.prototype.fade = function(steps, delay) {
  */
 CacheObj.prototype.update = function() {
     var value;
+    ItsAllText.debug('narf update', this.file.path);
     if (this.hasChanged()) {
         value = this.read();
         if (value !== null) {
