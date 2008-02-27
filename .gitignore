@@ -1,0 +1,6 @@
+docs/*
+lint/*
+stage1/*
+final/*
+*.xpi
+.*-stamp
