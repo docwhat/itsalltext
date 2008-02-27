@@ -1,7 +1,0 @@
-syntax:regexp
-^(docs|lint|stage1|final)/
-^\.[^/]+/
-^[^/]+\.xpi/
-^\.todo$
-\.[^/]+-stamp$
-^(.*/|)\.DS_Store$
