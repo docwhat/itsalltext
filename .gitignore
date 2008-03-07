@@ -4,3 +4,4 @@ stage1/*
 final/*
 *.xpi
 .*-stamp
+.todo
