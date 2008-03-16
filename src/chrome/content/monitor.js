@@ -1,3 +1,5 @@
+/*extern HTMLDocument, gBrowser, ItsAllText */
+/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -16,17 +18,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*jslint nomen: true, evil: false, browser: true */
-
 function new_monitor(iat) {
+    var hitch_re = /^hitched_/,
+        method;
     this.iat = iat;
     this.iat.debug('new_monitor');
 
-    var hitch_re = /^hitched_/;
     for (method in this) {
         if (hitch_re.test(method)) {
 
-            this.iat.debug('hitching ', method ,' -> ', method.replace(hitch_re, ''));
+            this.iat.debug('hitching ', method, ' -> ', method.replace(hitch_re, ''));
             this[method.replace(hitch_re, '')] = this.iat.hitch(this, method);
         }
     }
@@ -38,8 +39,8 @@ new_monitor.destroy = function () {
 };
 
 new_monitor.prototype.hitched_restart = function () {
-    var rate = this.iat.getRefresh();
-    var id   = this.id;
+    var rate = this.iat.getRefresh(),
+        id   = this.id;
     if (id) {
         clearInterval(id);
     }
@@ -47,8 +48,9 @@ new_monitor.prototype.hitched_restart = function () {
 };
 
 new_monitor.prototype.hitched_registerPage = function (event) {
+    var doc, appContent;
     if (event.originalTarget instanceof HTMLDocument) {
-        var doc = event.originalTarget;
+        doc = event.originalTarget;
         if (doc.defaultView.frameElement) {
             // Frame within a tab was loaded. doc should be the root document of
             // the frameset. If you don't want do anything when frames/iframes
@@ -56,14 +58,14 @@ new_monitor.prototype.hitched_registerPage = function (event) {
             // return;
             // Find the root document:
             while (doc.defaultView.frameElement) {
-                doc=doc.defaultView.frameElement.ownerDocument;
+                doc = doc.defaultView.frameElement.ownerDocument;
             }
         }
 
         this.iat.debug('registerPage: ', doc && doc.location);
 
         /* appContent is the browser chrome. */
-        var appContent = document.getElementById("appcontent");
+        appContent = document.getElementById("appcontent");
         this.iat.listen(appContent, 'DOMContentLoaded', this.startPage, true);
         this.iat.listen(document, 'unload', this.stopPage, true);
         this.iat.listen(gBrowser.tabContainer, 'TabSelect', this.watcher, true);
@@ -77,15 +79,21 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
         offset.type === 'TabSelect') {
         init = true;
     }
-    var rate = this.iat.getRefresh();
-    var now = Date.now();
+    var rate = this.iat.getRefresh(),
+        now = Date.now(),
+        doc,
+        nodes = [],
+        i,
+        cobj,
+        node,
+        is_html,
+        is_xul;
     if (!init && now - this.last_watcher_call < Math.round(rate * 0.9)) {
-        this.iat.debug('watcher(',offset,'/',(now - this.last_watcher_call),') -- skipping catchup refresh');
+        this.iat.debug('watcher(', offset, '/', (now - this.last_watcher_call), ') -- skipping catchup refresh');
         return;
     }
     this.last_watcher_call = now;
 
-    var doc;
     if (typeof(gBrowser) === 'undefined') {
         /* If we're in chrome. */
         doc = document;
@@ -94,10 +102,8 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
         doc = gBrowser.selectedBrowser.contentDocument;
     }
     this.iat.debug('watcher: ', offset, init, doc && doc.location);
-    var nodes = [];
-    var i, cobj, node;
-    var is_html = this.isHTML(doc);
-    var is_xul  = this.isXUL(doc);
+    is_html = this.isHTML(doc);
+    is_xul  = this.isXUL(doc);
     if (is_html) {
         /* HTML */
         nodes = doc.getElementsByTagName('textarea');
@@ -108,7 +114,7 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
         this.stopPage({originalTarget: doc});
         return;
     }
-    for(i=0; i < nodes.length; i++) {
+    for (i = 0; i < nodes.length; i++) {
         node = nodes[i];
         if (init) {
             cobj = ItsAllText.makeCacheObj(node, is_html);
@@ -122,14 +128,15 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
 };
 
 new_monitor.prototype.hitched_startPage = function (event, force) {
-    var doc = event.originalTarget;
+    var doc = event.originalTarget,
+        unsafeWin;
     this.iat.debug('startPage', doc && doc.location, force);
     if (!(force || this.isHTML(doc))) {
         this.stopPage(event);
         return;
     }
 
-    var unsafeWin = doc.defaultView.wrappedJSObject;
+    unsafeWin = doc.defaultView.wrappedJSObject;
     if (unsafeWin) {
         this.iat.listen(unsafeWin, 'pagehide', this.stopPage);
     }
@@ -141,33 +148,38 @@ new_monitor.prototype.hitched_startPage = function (event, force) {
 };
 
 new_monitor.prototype.hitched_stopPage = function (event) {
-    var doc = event.originalTarget;
+    var doc = event.originalTarget,
+        unsafeWin;
     this.iat.debug('stopPage', doc && doc.location);
 
-    var unsafeWin = doc.defaultView.wrappedJSObject;
+    unsafeWin = doc.defaultView.wrappedJSObject;
     this.iat.unlisten(unsafeWin, 'pagehide', this.stopPage);
 };
 
 new_monitor.prototype.isXUL = function (doc) {
-    var contentType = doc && doc.contentType;
-    var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
-    var is_my_readme;
+    var contentType = doc && doc.contentType,
+        is_xul = (contentType == 'application/vnd.mozilla.xul+xml'),
+        is_my_readme;
     try {
         is_my_readme = location && location.href == this.iat.README;
-    } catch(e) {
+    } catch (e) {
         is_my_readme = false;
     }
     return is_xul && !is_my_readme;
 };
 
 new_monitor.prototype.isHTML = function (doc) {
-    var contentType, location, is_html, is_usable, is_my_readme;
+    var contentType,
+        location,
+        is_html,
+        is_usable,
+        is_my_readme;
     /* Check that this is a document we want to play with. */
     contentType = doc.contentType;
     location = doc.location;
-    is_html = (contentType=='text/html' ||
-               contentType=='text/xhtml' ||
-               contentType=='application/xhtml+xml');
+    is_html = (contentType == 'text/html' ||
+               contentType == 'text/xhtml' ||
+               contentType == 'application/xhtml+xml');
     is_usable = is_html &&
                 location &&
                 location.protocol !== 'about:' &&
@@ -179,7 +191,7 @@ new_monitor.prototype.isHTML = function (doc) {
          * uncaught exception: [Exception... "Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsIDOMLocation.href]"  nsresult: "0x80004003 (NS_ERROR_INVALID_POINTER)"  location: "JS frame :: chrome://itsalltext/chrome/itsalltext.js :: anonymous :: line 634"  data: no]
          * Line 0
          */
-    } catch(e) {
+    } catch (e) {
         is_my_readme = false;
         is_usable = false;
     }

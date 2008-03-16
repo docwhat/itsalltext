@@ -1,3 +1,5 @@
+/*extern Components, ItsAllText */
+/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
 // @todo [6] [pref] Better strategy for getting the default editor: EDITOR env variable or view_source.editor.path
 // @todo [8] [pref] Option to make the textarea uneditable when using editor.
 
@@ -5,19 +7,23 @@
  * Open a filepicker to select the value of the editor.
  */
 function pref_editor_select() {
-    var locale = document.getElementById("strings");
+    var locale = document.getElementById("strings"),
+        pref_editor = document.getElementById('pref_editor'),
+        nsIFilePicker = Components.interfaces.nsIFilePicker,
+        fp,
+        initdir,
+        rv,
+        file,
+        editor;
 
-    var pref_editor = document.getElementById('pref_editor');
-    var nsIFilePicker = Components.interfaces.nsIFilePicker;
-
-    var fp = Components.classes["@mozilla.org/filepicker;1"].
+    fp = Components.classes["@mozilla.org/filepicker;1"].
         createInstance(nsIFilePicker);
     fp.init(window,
             locale.getString('picker.window.title'),
             nsIFilePicker.modeOpen);
     fp.appendFilters(nsIFilePicker.filterApps);
 
-    var initdir = Components.classes["@mozilla.org/file/local;1"].
+    initdir = Components.classes["@mozilla.org/file/local;1"].
         createInstance(Components.interfaces.nsILocalFile);
     try {
         initdir.initWithPath(pref_editor.value);
@@ -25,13 +31,11 @@ function pref_editor_select() {
         if (initdir.exists() && initdir.isDirectory()) {
             fp.displayDirectory = initdir;
         }
-    } catch(e) {
+    } catch (e) {
         // Ignore error, the pref may not have been set or who knows.
     }
 
-    var rv = fp.show();
-    var file;
-    var editor;
+    rv = fp.show();
     if (rv == nsIFilePicker.returnOK) {
         file = fp.file;
         pref_editor.value = file.path;
@@ -42,9 +46,12 @@ function pref_editor_select() {
 }
 
 function update_hotkey(disp) {
-    var str, km = ItsAllText.preferences.hotkey;
+    var str,
+        km = ItsAllText.preferences.hotkey;
     if (typeof(km) === 'undefined') {
-        setTimeout(function () { update_hotkey(disp); }, 100);
+        setTimeout(function () {
+                update_hotkey(disp);
+            }, 100);
         return;
     }
     if (km === '') {
@@ -70,21 +77,21 @@ function pref_grab(disp, e) {
 }
 
 function setHelp(text) {
-    var help = document.getElementById('help');
+    var help = document.getElementById('help'),
+        textnode = document.createTextNode(text);
     while (help.firstChild) {
         help.removeChild(help.firstChild);
     }
-    var textnode = document.createTextNode(text);
     help.appendChild(textnode);
 }
 
 function pref_onload() {
-    var locale = document.getElementById("strings");
+    var locale = document.getElementById("strings"),
+        editor,
+        box,
+        desc,
+        textnode;
     document.getElementById('browse').focus();
-    var editor;
-    var box;
-    var desc;
-    var textnode;
     if (window['arguments'] && window['arguments'][0] && window['arguments'][0] == 'badeditor') {
         editor = document.getElementById('editor');
         editor.style.color = 'black';

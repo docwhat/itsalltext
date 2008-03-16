@@ -20,8 +20,7 @@
 # but I strongly suggest you get jslint and jsmin working.
 JSLINT     := jslint
 YC         := yuicompressor
-#JSMIN      := jsmin
-JSMIN      := cat
+YC_JSFLAGS := --type js --charset UTF-8
 ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
@@ -42,6 +41,8 @@ SOURCES_NONCHROME:=src/chrome.manifest src/gpl.txt src/install.rdf src/defaults/
 SOURCES:=$(SOURCES_CHROME) $(SOURCES_NONCHROME)
 SOURCES_JS:=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
 SOURCES_JS_LINT:=$(patsubst %.js, lint/%.js.lint, $(SOURCES_JS))
+SOURCES_JS_WARN:=$(patsubst %.js, lint/%.js.warn, $(SOURCES_JS))
+SOURCES_JS_LINT_PRE:=$(patsubst %.lint, %.lint-pre, $(filter %.lint,$(SOURCES_JS_LINT)))
 JARS:=chrome/content.jar chrome/en-US.jar
 
 STAGE1_OUT:=$(patsubst src/%, stage1/%, $(SOURCES))
@@ -97,7 +98,7 @@ stage1/%: src/%
 
 stage1/%.js: src/%.js
 	$(Q)mkdir -p $(dir $@)
-	$(Q)cat $< | sed 's/999.@@VERSION@@/$(VERSION)/g' | $(JSMIN) > $@
+	$(Q)$(YC) $(YC_JSFLAGS) -o $@ $<
 
 
 #################
@@ -133,23 +134,33 @@ build: final
 ##
 ## Lint checks for possible problems.
 .PHONY: lint
-lint: $(SOURCES_JS_LINT)
+lint: $(SOURCES_JS_LINT) $(SOURCES_JS_WARN)
 
-$(SOURCES_JS_LINT): lint/%.js.lint: %.js Makefile
-	$(info linting $(notdir $<) ...)
+.INTERMEDIATE: $(SOURCES_JS_LINT_PRE)
+
+$(SOURCES_JS_LINT_PRE): lint/%.js.lint-pre: %.js Makefile
 	$(Q)mkdir -p $(dir $@)
-	$(Q)perl -p -e 's/^(\s*)const(\s+)/$$1var$$2/' $< > $@.pre
-	$(Q)echo "*** Linting $<" > $@
-	$(Q)$(JSLINT) -p $@.pre >> $@
-	$(Q)$(YC) --type js --charset UTF-8 --warn -o /dev/null $@.pre >> $@ 2>&1
+	$(Q)perl -p -e 's!^(\s*)(const)(\s+)!$$1var$$3!' $< > $@
+
+$(SOURCES_JS_LINT): %.js.lint: %.js.lint-pre
+	$(info linting $(patsubst %.lint-pre,%,$(notdir $<)) ...)
+	$(Q)rm -f $@
+	$(Q)$(JSLINT) -p $< |\
+		perl -p -e 's!^(jslint: linting )lint/(.*)\.lint-pre!********* $$1$$2!' >> $@
+$(SOURCES_JS_WARN): lint/%.js.warn: %.js Makefile
+	$(info warning $(patsubst %.lint-pre,%,$(notdir $<)) ...)
+	$(Q)echo '********* checking $< *********' > $@
+	$(Q)$(YC) $(YC_JSFLAGS) --verbose -o /dev/null $< 2>&1 |\
+		grep -vE '^\[INFO\] It is recommended to use Sun' >> $@
 
 .PHONY: lintcheck
 lintcheck: $(SOURCES_JS_LINT)
-	$(Q)egrep -q '^lint at |^\[WARNING\]' $(SOURCES_JS_LINT) ; test $$? != 0
+	$(Q)egrep -q '^lint at '    $(SOURCES_JS_LINT) ; test $$? != 0
+	$(Q)egrep -q '^\[WARNING\]' $(SOURCES_JS_WARN) ; test $$? != 0
 
 .PHONY: showlint
 showlint: lint
-	$(Q)find ./lint -type f -name '*.lint' -print0 | xargs -0 cat | egrep -v '^jslint: No problems found in'
+	$(Q)find ./lint -type f \( -name '*.lint' -o -name '*.warn' \) -print0 | xargs -0 cat
 
 ##
 ## Narf is a magick keyword that should stop builds from working

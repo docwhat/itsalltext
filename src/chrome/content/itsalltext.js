@@ -1,3 +1,6 @@
+/*extern Components, Firebug, getBoolPref, openDialog, getBrowser, gBrowser */
+/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
+
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -16,20 +19,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*jslint nomen: true, evil: false, browser: true */
-
 // @todo [9] IDEA: dropdown list for charsets (utf-8, western-iso, default)?
 // @todo [wish] Have a menu/context menu item for turning on monitoring/watch.
 // @todo [9] Menu item to pick the file to load into a textarea.
 // @todo [9] IDEA: Hot-keys opening the context menu.
 
-var ItsAllText = function() {
+var ItsAllText = function () {
     /**
      * This data is all private, which prevents security problems and it
      * prevents clutter and collection.
      * @type Object
      */
-    var that = this;
+    var that = this,
+        loadthings;
 
     /**
      * Used for tracking all the all the textareas that we are watching.
@@ -75,7 +77,7 @@ var ItsAllText = function() {
      * @param {Array} arr Array of strings to replace in the string.
      * @returns String
      */
-    that.localeFormat = function(name, arr) {
+    that.localeFormat = function (name, arr) {
         return this.getLocale().formatStringFromName(name, arr, arr.length);
     };
     /**
@@ -83,7 +85,7 @@ var ItsAllText = function() {
      * @param {String} name Locale property name
      * @returns String
      */
-    that.localeString = function(name) {
+    that.localeString = function (name) {
         return this.getLocale().GetStringFromName(name);
     };
 
@@ -91,12 +93,13 @@ var ItsAllText = function() {
      * Create an error message from given arguments.
      * @param {Object} message One or more objects to be made into strings...
      */
-    that.logString = function() {
-        var args = Array.prototype.slice.apply(arguments,[0]);
-        for (var i=0; i<args.length; i++) {
+    that.logString = function () {
+        var args = Array.prototype.slice.apply(arguments, [0]),
+            i;
+        for (i = 0; i < args.length; i++) {
             try {
                 args[i] = "" + args[i];
-            } catch(e) {
+            } catch (e) {
                 Components.utils.reportError(e);
                 args[i] = 'toStringFailed';
             }
@@ -110,14 +113,14 @@ var ItsAllText = function() {
      * I release this.
      * @param {Object} message One or more objects can be passed in to display.
      */
-    that.log = function() {
-        var message = that.logString.apply(that, arguments);
+    that.log = function () {
         const consoleService = Components.classes["@mozilla.org/consoleservice;1"];
-        var obj = consoleService.getService(Components.interfaces.nsIConsoleService);
+        var message = that.logString.apply(that, arguments),
+            obj = consoleService.getService(Components.interfaces.nsIConsoleService);
         try {
             // idiom: Convert arguments to an array for easy handling.
             obj.logStringMessage(message);
-        } catch(e) {
+        } catch (e) {
             Components.utils.reportError(message);
         }
     };
@@ -127,9 +130,9 @@ var ItsAllText = function() {
      * globally logged (firebug only logs locally).
      * @param {Object} message One or more objects can be passed in to display.
      */
-    that.debuglog = function() {
+    that.debuglog = function () {
         if (that.preferences.debug) {
-            that.log.apply(that,arguments);
+            that.log.apply(that, arguments);
         }
     };
 
@@ -138,13 +141,13 @@ var ItsAllText = function() {
      * Requires Firebug.
      * @param {Object} message One or more objects can be passed in to display.
      */
-    that.debug = function() {
+    that.debug = function () {
         var message = that.logString.apply(that, arguments);
-        window.dump(message+'\n');
+        window.dump(message + '\n');
         if (that.preferences && that.preferences.debug) {
             try {
                 Firebug.Console.logFormatted(arguments);
-            } catch(e) {
+            } catch (e) {
             }
         }
     };
@@ -154,7 +157,7 @@ var ItsAllText = function() {
      * @param {String} path A path to initialize the object with (optional).
      * @returns {nsILocalFile}
      */
-    that.factoryFile = function(path) {
+    that.factoryFile = function (path) {
         var file = Components.
             classes["@mozilla.org/file/local;1"].
             createInstance(Components.interfaces.nsILocalFile);
@@ -168,7 +171,7 @@ var ItsAllText = function() {
      * Returns the directory where we put files to edit.
      * @returns nsILocalFile The location where we should write editable files.
      */
-    that.getEditDir = function() {
+    that.getEditDir = function () {
         /* Where is the directory that we use. */
         var fobj = Components.classes["@mozilla.org/file/directory_service;1"].
             getService(Components.interfaces.nsIProperties).
@@ -176,7 +179,7 @@ var ItsAllText = function() {
         fobj.append(that.MYSTRING);
         if (!fobj.exists()) {
             fobj.create(Components.interfaces.nsIFile.DIRECTORY_TYPE,
-                        parseInt('0700',8));
+                        parseInt('0700', 8));
         }
         if (!fobj.isDirectory()) {
             that.error(that.localeFormat('problem_making_directory', [fobj.path]));
@@ -187,7 +190,7 @@ var ItsAllText = function() {
     /* Clean the edit directory whenever we create a new window. */
     that.cleanEditDir();
 
-    var loadthings = function() {
+    loadthings = function () {
         /* Load the various bits needed to make this work. */
         var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
         loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
@@ -210,11 +213,11 @@ var ItsAllText = function() {
          * @param {String} aData The name of the pref to fetch.
          * @returns {Object} The value of the preference.
          */
-        private_get: function(aData) {
-            var po = that.preference_observer;
-            var real_type = po.types[aData];
-            var type = real_type === 'Float' ? 'Char' : real_type;
-            var retval = '';
+        private_get: function (aData) {
+            var po = that.preference_observer,
+                real_type = po.types[aData],
+                type = real_type === 'Float' ? 'Char' : real_type,
+                retval = '';
             retval = po.private_branch['get' + type + 'Pref'](aData);
             return real_type === 'Float' ? parseFloat(retval) : retval;
         },
@@ -224,14 +227,14 @@ var ItsAllText = function() {
          * @param {String} aData The name of the pref to change.
          * @param {Object} value The value to set.
          */
-        private_set: function(aData, value) {
-            var po = that.preference_observer;
-            var real_type = po.types[aData];
-            var type = real_type === 'Float' ? 'Char' : real_type;
+        private_set: function (aData, value) {
+            var po = that.preference_observer,
+                real_type = po.types[aData],
+                type = real_type === 'Float' ? 'Char' : real_type;
             if (real_type === 'Float') {
                 value = '' + parseFloat(value);
             }
-            po.private_branch['set'+type+'Pref'](aData, value);
+            po.private_branch['set' + type + 'Pref'](aData, value);
         }
     };
 
@@ -258,15 +261,16 @@ var ItsAllText = function() {
         /**
          * Register the observer.
          */
-        register: function() {
+        register: function () {
             var prefService = Components.
                 classes["@mozilla.org/preferences-service;1"].
-                getService(Components.interfaces.nsIPrefService);
-            this.private_branch = prefService.getBranch("extensions."+that.MYSTRING+".");
+                getService(Components.interfaces.nsIPrefService),
+                type;
+            this.private_branch = prefService.getBranch("extensions." + that.MYSTRING + ".");
             this.private_branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
             this.private_branch.addObserver("", this, false);
             /* setup the preferences */
-            for(var type in this.types) {
+            for (type in this.types) {
                 if (this.types.hasOwnProperty(type)) {
                     that.preferences[type] = that.preferences.private_get(type);
                 }
@@ -277,8 +281,10 @@ var ItsAllText = function() {
          * Unregister the observer. Not currently used, but may be
          * useful in the future.
          */
-        unregister: function() {
-            if (!this.private_branch) {return;}
+        unregister: function () {
+            if (!this.private_branch) {
+                return;
+            }
             this.private_branch.removeObserver("", this);
         },
 
@@ -288,8 +294,10 @@ var ItsAllText = function() {
          * @param {String} aData The name of the pref that's been changed (relative to the aSubject).
          * @param {String} aTopic The string defined by NS_PREFBRANCH_PREFCHANGE_TOPIC_ID
          */
-        observe: function(aSubject, aTopic, aData) {
-            if (aTopic != "nsPref:changed") {return;}
+        observe: function (aSubject, aTopic, aData) {
+            if (aTopic != "nsPref:changed") {
+                return;
+            }
             if (that.preferences) {
                 that.preferences[aData] = that.preferences.private_get(aData);
                 if (aData == 'refresh') {
@@ -304,7 +312,7 @@ var ItsAllText = function() {
      * A Preference Option: What character set should the file use?
      * @returns {String} the charset to be used.
      */
-    that.getCharset = function() {
+    that.getCharset = function () {
         return that.preferences.charset;
     };
 
@@ -312,14 +320,13 @@ var ItsAllText = function() {
      * A Preference Option: How often should we search for new content?
      * @returns {int} The number of seconds between checking for new content.
      */
-    that.getRefresh = function() {
+    that.getRefresh = function () {
         var refresh = that.preferences.refresh;
         if (!refresh || refresh < 1) {
-            that.debug('Invalid refresh:',refresh);
+            that.debug('Invalid refresh:', refresh);
             refresh = 1;
         }
-        var retval = 1000*refresh;
-        return retval;
+        return 1000 * refresh;
 
     };
 
@@ -327,7 +334,7 @@ var ItsAllText = function() {
      * Returns true if the system is running Mac OS X.
      * @returns {boolean} Is this a Mac OS X system?
      */
-    that.isDarwin = function() {
+    that.isDarwin = function () {
         /* more help:
          http://developer.mozilla.org/en/docs/Code_snippets:Miscellaneous#Operating_system_detection
         */
@@ -350,9 +357,9 @@ var ItsAllText = function() {
      * http://lxr.mozilla.org/seamonkey/source/xpcom/base/nsError.h#262
      * @returns {nsILocalFile} A file object of the editor.
      */
-    that.getEditor = function() {
-        var editor = that.preferences.editor;
-        var retval = null;
+    that.getEditor = function () {
+        var editor = that.preferences.editor,
+            retval = null;
 
         if (editor === '' && that.isDarwin()) {
             editor = '/usr/bin/open';
@@ -369,7 +376,7 @@ var ItsAllText = function() {
      * A Preference Option: should we display debugging info?
      * @returns {bool}
      */
-    that.getDebug = function() {
+    that.getDebug = function () {
         return that.preferences.debug;
     };
 
@@ -377,7 +384,7 @@ var ItsAllText = function() {
      * A Preference Option: Are the edit gumdrops disabled?
      * @returns {bool}
      */
-    that.getDisableGumdrops = function() {
+    that.getDisableGumdrops = function () {
         return that.preferences.gumdrop_position === 'none';
     };
 
@@ -385,9 +392,9 @@ var ItsAllText = function() {
      * A Preference Option: The list of extensions
      * @returns Array
      */
-    that.getExtensions = function() {
-        var string = that.preferences.extensions.replace(/[\n\t ]+/g,'');
-        var extensions = string.split(',');
+    that.getExtensions = function () {
+        var string = that.preferences.extensions.replace(/[\n\t ]+/g, ''),
+            extensions = string.split(',');
         if (extensions.length === 0) {
             return ['.txt'];
         } else {
@@ -403,15 +410,14 @@ var ItsAllText = function() {
      * and utilityOverlay.js's openPreferences()
      */
     that.openPreferences = function (wait) {
-        wait = typeof(wait)=='boolean'?wait:false;
-        var paneID = that.MYSTRING + '_preferences';
-        var instantApply = getBoolPref("browser.preferences.instantApply", false) && !wait;
-        var features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-
-        const xpcom_wm = Components.classes["@mozilla.org/appshell/window-mediator;1"];
-        var wm = xpcom_wm.getService(Components.interfaces.nsIWindowMediator);
-        var win = wm.getMostRecentWindow("Browser:Preferences");
-        var pane;
+        wait = typeof(wait) == 'boolean' ? wait : false;
+        var paneID = that.MYSTRING + '_preferences',
+            instantApply = getBoolPref("browser.preferences.instantApply", false) && !wait,
+            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal"),
+            xpcom_wm = Components.classes["@mozilla.org/appshell/window-mediator;1"],
+            wm = xpcom_wm.getService(Components.interfaces.nsIWindowMediator),
+            win = wm.getMostRecentWindow("Browser:Preferences"),
+            pane;
         if (win) {
             win.focus();
             if (paneID) {
@@ -428,20 +434,22 @@ var ItsAllText = function() {
      * A Preference Option: Append an extension
      * @returns Array
      */
-    that.appendExtensions = function(ext) {
-        ext = ext.replace(/[\n\t ]+/g,'');
-        var current = that.getExtensions();
-        for(var i=0; i<current.length; i++) {
-            if(ext == current[i]) {
+    that.appendExtensions = function (ext) {
+        var current = that.getExtensions(),
+            value,
+            i;
+        ext = ext.replace(/[\n\t ]+/g, '');
+        for (i = 0; i < current.length; i++) {
+            if (ext == current[i]) {
                 return; // Don't add a duplicate.
             }
         }
 
-        var value = that.preferences.extensions;
-        if(value.replace(/[\t\n ]+/g) === '') {
+        value = that.preferences.extensions;
+        if (value.replace(/[\t\n ]+/g) === '') {
             value = ext;
         } else {
-            value = [value,',',ext].join('');
+            value = [value, ',', ext].join('');
         }
         that.preferences.private_set('extensions', value);
     };
@@ -449,51 +457,14 @@ var ItsAllText = function() {
     // @todo [wish] Profiling and optimization.
 
     /**
-     * Returns a cache object
-     * Note: These UIDs are only unique for Its All Text.
-     * @param {Object} node A dom object node or ID to one.
-     * @returns {String} the UID or null.
-     */
-    that.getCacheObj = function(node) {
-        var str = that.MYSTRING+"_UID";
-        var id = null;
-        if (typeof(node) === 'string') {
-            id = node;
-        } else if (node && node.hasAttribute(str)) {
-            id = node.getAttribute(str);
-        }
-        if (id && that.tracker.hasOwnProperty(id)) {
-            return that.tracker[id];
-        } else {
-            return null;
-        }
-    };
-
-    /**
-     * Creates a cache object, unless one exists already.
-     * Note: These UIDs are only unique for Its All Text.
-     * @param {DOMElement} node A dom object node or id to one.
-     * @param {Boolean} create_gumdrop Should a gumdrop be created (html).
-     * @returns {String} the UID or null.
-     */
-    that.makeCacheObj = function(node, create_gumdrop) {
-        var cobj = that.getCacheObj(node);
-        if (!cobj) {
-            cobj = new ItsAllText.CacheObj(node);
-            if (create_gumdrop) {
-                cobj.addGumDrop();
-            }
-        }
-        return cobj;
-    };
-
-    /**
      * Cleans out all old cache objects.
      */
-    that.cleanCacheObjs = function() {
-        var count = 0;
-        var cobj, id, cdoc;
-        for(id in that.tracker) {
+    that.cleanCacheObjs = function () {
+        var count = 0,
+            cobj,
+            id,
+            cdoc;
+        for (id in that.tracker) {
             if (that.tracker.hasOwnProperty(id)) {
                 cobj = that.tracker[id];
                 cdoc = cobj.node.ownerDocument;
@@ -513,12 +484,16 @@ var ItsAllText = function() {
      * Refresh Textarea.
      * @param {Object} node A specific textarea dom object to update.
      */
-    that.refreshTextarea = function(node, is_chrome) {
+    that.refreshTextarea = function (node, is_chrome) {
         var cobj = ItsAllText.getCacheObj(node);
-        if(!cobj) { return; }
+        if (!cobj) {
+            return;
+        }
 
         cobj.update();
-        if (!is_chrome) { cobj.addGumDrop(); }
+        if (!is_chrome) {
+            cobj.addGumDrop();
+        }
     };
 
     // @todo [wish] Refresh textarea on editor quit.
@@ -530,19 +505,19 @@ var ItsAllText = function() {
      * Refresh Document.
      * @param {Object} doc The document to refresh.
      */
-    that.refreshDocument = function(doc) {
-        if(!doc.location) {
+    that.refreshDocument = function (doc) {
+        if (!doc.location) {
             return; // it's being cached, but not shown.
         }
         var is_chrome = (doc.location.protocol == 'chrome:' &&
-                         doc.location.href != that.README);
-        var nodes = doc.getElementsByTagName('textarea');
-        var i;
-        for(i=0; i < nodes.length; i++) {
+                         doc.location.href != that.README),
+            nodes = doc.getElementsByTagName('textarea'),
+            i;
+        for (i = 0; i < nodes.length; i++) {
             that.refreshTextarea(nodes[i], is_chrome);
         }
         nodes = doc.getElementsByTagName('textbox');
-        for(i=0; i < nodes.length; i++) {
+        for (i = 0; i < nodes.length; i++) {
             that.refreshTextarea(nodes[i], is_chrome);
         }
     };
@@ -553,13 +528,13 @@ var ItsAllText = function() {
      * @param {Object} container If unset, then this will use the offsetParent of node. Pass in null to go all the way to the root.
      * @return {Array} The X & Y page offsets
      */
-    that.getContainingBlockOffset = function(node, container) {
-        if(typeof(container) == 'undefined') {
+    that.getContainingBlockOffset = function (node, container) {
+        if (typeof(container) == 'undefined') {
             container = node.offsetParent;
         }
-        var pos = [node.offsetLeft, node.offsetTop];
-        var pnode = node.offsetParent;
-        while(pnode && (container === null || pnode != container)) {
+        var pos = [node.offsetLeft, node.offsetTop],
+            pnode = node.offsetParent;
+        while (pnode && (container === null || pnode != container)) {
             pos[0] += pnode.offsetLeft || 0;
             pos[1] += pnode.offsetTop  || 0;
             pos[0] -= pnode.scrollLeft || 0;
@@ -573,15 +548,13 @@ var ItsAllText = function() {
     /**
      * marshals a keypress event.
      */
-    that.marshalKeyEvent = function(event) {
-        var marshal = [
-                       event.altKey  ? 1 : 0,
+    that.marshalKeyEvent = function (event) {
+        var marshal = [event.altKey  ? 1 : 0,
                        event.ctrlKey ? 1 : 0,
                        event.metaKey ? 1 : 0,
                        event.shiftKey ? 1 : 0,
                        event.charCode,
-                       event.keyCode
-        ];
+                       event.keyCode];
         marshal = marshal.join(':');
         return marshal;
     };
@@ -621,10 +594,10 @@ var ItsAllText = function() {
     /**
      * Converts a marshalled key event into a string.
      */
-    that.keyMarshalToString = function(km) {
-        var e = km.split(':');
-        var out = [];
-        var c = parseInt(e[5], 10);
+    that.keyMarshalToString = function (km) {
+        var e = km.split(':'),
+            out = [],
+            c = parseInt(e[5], 10);
         if (e[0] === '1') {
             out.push('alt');
         }
@@ -641,7 +614,7 @@ var ItsAllText = function() {
             if (that.keyMap.hasOwnProperty(c)) {
                 out.push(that.keyMap[c]);
             } else {
-                out.push('code:'+c);
+                out.push('code:' + c);
             }
         } else {
             out.push(String.fromCharCode(e[4]).toUpperCase());
@@ -654,14 +627,14 @@ var ItsAllText = function() {
      */
     that.old_monitor = {
         id: null,
-        last_now:0,
+        last_now: 0,
         documents: [],
         /**
          * Starts or restarts the document old_monitor.
          */
-        restart: function() {
-            var rate = that.getRefresh();
-            var id   = that.old_monitor.id;
+        restart: function () {
+            var rate = that.getRefresh(),
+                id   = that.old_monitor.id;
             if (id) {
                 clearInterval(id);
             }
@@ -671,15 +644,22 @@ var ItsAllText = function() {
          * watches the document 'doc'.
          * @param {Object} doc The document to watch.
          */
-        watch: function(doc, force) {
-            var contentType, location, is_html, is_usable, is_my_readme;
+        watch: function (doc, force) {
+            // fish
+            var contentType,
+                location,
+                is_html,
+                is_usable,
+                is_my_readme,
+                documents,
+                i;
             if (!force) {
                 /* Check that this is a document we want to play with. */
                 contentType = doc.contentType;
                 location = doc.location;
-                is_html = (contentType=='text/html' ||
-                           contentType=='text/xhtml' ||
-                           contentType=='application/xhtml+xml');
+                is_html = (contentType == 'text/html' ||
+                           contentType == 'text/xhtml' ||
+                           contentType == 'application/xhtml+xml');
                 //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
                 is_usable = (is_html) &&
                     location &&
@@ -692,7 +672,7 @@ var ItsAllText = function() {
                      * uncaught exception: [Exception... "Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsIDOMLocation.href]"  nsresult: "0x80004003 (NS_ERROR_INVALID_POINTER)"  location: "JS frame :: chrome://itsalltext/chrome/itsalltext.js :: anonymous :: line 634"  data: no]
 Line 0
                     */
-                } catch(e) {
+                } catch (e) {
                     is_my_readme = false;
                     is_usable = false;
                 }
@@ -702,9 +682,8 @@ Line 0
                 }
             }
 
-            var documents = that.old_monitor.documents;
-            var i;
-            for(i in documents) {
+            documents = that.old_monitor.documents;
+            for (i in documents) {
                 if (documents[i] === doc) {
                     // Found it, don't watch it twice.
                     that.debug('narf: double watch: ', doc.location);
@@ -719,21 +698,22 @@ Line 0
          * Callback to be used by restart()
          * @private
          */
-        watcher: function(offset) {
-            var old_monitor = that.old_monitor;
-            var rate = that.getRefresh();
-
-            var now = Date.now();
+        watcher: function (offset) {
+            var old_monitor = that.old_monitor,
+                rate = that.getRefresh(),
+                now = Date.now(),
+                documents,
+                i,
+                doc;
             if (now - old_monitor.last_now < Math.round(rate * 0.9)) {
-                that.debug('old_monitor.watcher(',offset,') -- skipping catchup refresh');
+                that.debug('old_monitor.watcher(', offset, ') -- skipping catchup refresh');
                 return;
             }
             old_monitor.last_now = now;
 
             /* Walk the documents looking for changes */
-            var documents = old_monitor.documents;
-            var i, doc;
-            for(i in documents) {
+            documents = old_monitor.documents;
+            for (i in documents) {
                 if (documents.hasOwnProperty(i)) {
                     doc = documents[i];
                     if (doc.location) {
@@ -746,19 +726,19 @@ Line 0
          * Stops watching doc.
          * @param {Object} doc The document to watch.
          */
-        unwatch: function(doc) {
-            var documents = that.old_monitor.documents;
-            var i;
-            for(i in documents) {
+        unwatch: function (doc) {
+            var documents = that.old_monitor.documents,
+                i;
+            for (i in documents) {
                 if (documents[i] === doc) {
                     that.debug('unwatch()ing', doc && doc.location);
                     delete documents[i];
                 }
             }
             that.cleanCacheObjs();
-            for(i=documents.length - 1; i >= 0; i--) {
-                if(typeof(documents[i]) === 'undefined') {
-                    documents.splice(i,1);
+            for (i = documents.length - 1; i >= 0; i--) {
+                if (typeof(documents[i]) === 'undefined') {
+                    documents.splice(i, 1);
                 }
             }
         }
@@ -768,9 +748,9 @@ Line 0
      * Open the editor for a selected node.
      * @param {Object} node The textarea to get.
      */
-    that.onEditNode = function(node) {
+    that.onEditNode = function (node) {
         var cobj = that.getCacheObj(node);
-        if(cobj) {
+        if (cobj) {
             cobj.edit();
         }
         return;
@@ -780,9 +760,9 @@ Line 0
      * Triggered when the context menu is shown.
      * @param {Object} event The event passed in by the event handler.
      */
-    that.onContextMenu = function(event) {
+    that.onContextMenu = function (event) {
         var tid, node, tag, is_disabled, cobj, menu, cstyle, doc;
-        if(event.target) {
+        if (event.target) {
             tid = event.target.id;
             if (tid == "itsalltext-context-popup" ||
                 tid == "contentAreaContextMenu") {
@@ -814,8 +794,8 @@ Line 0
         return true;
     };
 
-    that.openReadme = function() {
-        browser = getBrowser();
+    that.openReadme = function () {
+        var browser = getBrowser();
         browser.selectedTab = browser.addTab(that.README, null);
     };
 
@@ -865,27 +845,28 @@ Line 0
  * @param {String} method The method on object to call
  * @returns {Function} A wrapped call to object.method() which passes the arguments.
  */
-ItsAllText.prototype.hitch = function(object, method) {
-  if (!object[method]) {
-    throw "method '" + method + "' does not exist on object '" + object + "'";
-  }
-
-  var staticArgs = Array.prototype.splice.call(arguments, 2, arguments.length);
-
-  return function() {
-    // make a copy of staticArgs (don't modify it because it gets reused for
-    // every invocation).
-    var args = staticArgs.concat();
-
-    // add all the new arguments
-    for (var i = 0; i < arguments.length; i++) {
-      args.push(arguments[i]);
+ItsAllText.prototype.hitch = function (object, method) {
+    if (!object[method]) {
+        throw "method '" + method + "' does not exist on object '" + object + "'";
     }
 
-    // invoke the original function with the correct this object and
-    // the combined list of static and dynamic arguments.
-    return object[method].apply(object, args);
-  };
+    var staticArgs = Array.prototype.splice.call(arguments, 2, arguments.length);
+
+    return function () {
+        // make a copy of staticArgs (don't modify it because it gets reused for
+        // every invocation).
+        var args = staticArgs.concat(),
+            i;
+
+        // add all the new arguments
+        for (i = 0; i < arguments.length; i++) {
+            args.push(arguments[i]);
+        }
+
+        // invoke the original function with the correct this object and
+        // the combined list of static and dynamic arguments.
+        return object[method].apply(object, args);
+    };
 };
 
 /**
@@ -936,8 +917,8 @@ ItsAllText.prototype.eventToKeyprint = function (event) {
  * @return {String}
  */
 ItsAllText.prototype.keyprintToString = function (keyprint) {
-    var split = keyprint.split(':');
-    var string = [];
+    var split = keyprint.split(':'),
+        string = [];
     if (split[0] === 'true') {
         string.push('Ctrl');
     }
@@ -953,7 +934,7 @@ ItsAllText.prototype.keyprintToString = function (keyprint) {
     if (split[4] === '0') {
         string.push(String.fromCharCode(split[5]));
     } else {
-        string.push('keyCode=',split[4]);
+        string.push('keyCode=', split[4]);
     }
     return string.join(' ');
 };
@@ -962,20 +943,20 @@ ItsAllText.prototype.keyprintToString = function (keyprint) {
 /**
  * Cleans out the edit directory, deleting all old files.
  */
-ItsAllText.prototype.cleanEditDir = function(force) {
+ItsAllText.prototype.cleanEditDir = function (force) {
     force = typeof(force) === 'boolean'?force:false;
-    var last_week = Date.now() - (1000*60*60*24*7);
-    var fobj = this.getEditDir();
-    var entries = fobj.directoryEntries;
-    var entry;
+    var last_week = Date.now() - (1000 * 60 * 60 * 24 * 7),
+        fobj = this.getEditDir(),
+        entries = fobj.directoryEntries,
+        entry;
     while (entries.hasMoreElements()) {
         entry = entries.getNext();
         entry.QueryInterface(Components.interfaces.nsIFile);
-        if(force || !entry.exists() || entry.lastModifiedTime < last_week){
-            try{
+        if (force || !entry.exists() || entry.lastModifiedTime < last_week) {
+            try {
                 entry.remove(false);
-            } catch(e) {
-                this.log('unable to remove',entry,'because:',e);
+            } catch (e) {
+                this.log('unable to remove', entry, 'because:', e);
             }
         }
     }
@@ -986,18 +967,17 @@ ItsAllText.prototype.cleanEditDir = function(force) {
  * The command that is called when picking a new extension.
  * @param {Event} event
  */
-ItsAllText.prototype.menuNewExtEdit = function(event) {
-    var that = this;
-    var uid = this.private_current_uid;
-    var cobj = that.getCacheObj(uid);
-
-    var params = {out:null};
+ItsAllText.prototype.menuNewExtEdit = function (event) {
+    var that = this,
+        uid = this.private_current_uid,
+        cobj = that.getCacheObj(uid),
+        params = {out: null},
+        ext;
     window.openDialog("chrome://itsalltext/content/newextension.xul", "",
     "chrome, dialog, modal, resizable=yes", params).focus();
-    var ext;
     if (params.out) {
-        ext = params.out.extension.replace(/[\n\t ]+/g,'');
-        if(params.out.do_save) {
+        ext = params.out.extension.replace(/[\n\t ]+/g, '');
+        if (params.out.do_save) {
             that.appendExtensions(ext);
         }
         cobj.edit(ext);
@@ -1010,13 +990,13 @@ ItsAllText.prototype.menuNewExtEdit = function(event) {
  * @param {string} ext
  * @param {boolean} clobber
  */
-ItsAllText.prototype.menuExtEdit = function(ext, clobber, event) {
-    var uid = this.private_current_uid;
+ItsAllText.prototype.menuExtEdit = function (ext, clobber, event) {
+    var uid = this.private_current_uid,
+        cobj;
     if (ext !== null) {
         ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
     }
-    this.debug('menuExtEdit:',uid, ext, clobber);
-    var cobj = this.getCacheObj(uid);
+    this.debug('menuExtEdit:', uid, ext, clobber);
     //narf this.monitor.watch(cobj.node.ownerDocument);
     cobj.edit(ext, clobber);
 };
@@ -1026,27 +1006,27 @@ ItsAllText.prototype.menuExtEdit = function(ext, clobber, event) {
  * @private
  * @param {String} uid The UID to show in the option menu.
  */
-ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
+ItsAllText.prototype.rebuildMenu = function (uid, menu_id, is_disabled) {
     menu_id = typeof(menu_id) == 'string'?menu_id:'itsalltext-optionmenu';
-    is_disabled = (typeof(is_disabled) == 'undefined'||!is_disabled)?false:(is_disabled&&true);
-    var i;
-    var that = this;
-    var exts = that.getExtensions();
-    var menu = document.getElementById(menu_id);
-    var items = menu.childNodes;
-    var items_length = items.length - 1; /* We ignore the preferences item */
-    var node;
+    is_disabled = (typeof(is_disabled) === 'undefined' || !is_disabled) ? false : (is_disabled && true);
+    var i,
+        that = this,
+        exts = that.getExtensions(),
+        menu = document.getElementById(menu_id),
+        items = menu.childNodes,
+        items_length = items.length - 1, /* We ignore the preferences item */
+        node,
+        magic_stop_node = null,
+        magic_start = null,
+        magic_stop = null,
+        cobj = that.getCacheObj(uid);
     that.private_current_uid = uid;
-    var magic_stop_node = null;
-    var magic_start = null;
-    var magic_stop = null;
-    var cobj = that.getCacheObj(uid);
 
     // Find the beginning and end of the magic replacement parts.
-    for(i=0; i<items_length; i++) {
+    for (i = 0; i < items_length; i++) {
         node = items[i];
         if (node.nodeName.toLowerCase() == 'menuseparator') {
-            if(magic_start === null) {
+            if (magic_start === null) {
                 magic_start = i;
             } else if (magic_stop === null) {
                 magic_stop = i;
@@ -1058,7 +1038,7 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     }
 
     // Remove old magic bits
-    for(i = magic_stop - 1; i > magic_start; i--) {
+    for (i = magic_stop - 1; i > magic_start; i--) {
         menu.removeChild(items[i]);
     }
 
@@ -1071,11 +1051,11 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
     }
 
     // Insert the new magic bits
-    for(i=0; i<exts.length; i++) {
+    for (i = 0; i < exts.length; i++) {
         node = document.createElementNS(that.XULNS, 'menuitem');
         node.setAttribute('label', that.localeFormat('edit_ext', [exts[i]]));
-        (function() {
-            var ext=exts[i];
+        (function () {
+            var ext = exts[i];
             that.listen(node, 'command', that.hitch(that, 'menuExtEdit', ext, true), false);
         })();
         node.setAttribute('disabled', is_disabled?'true':'false');
@@ -1087,9 +1067,9 @@ ItsAllText.prototype.rebuildMenu = function(uid, menu_id, is_disabled) {
 /**
  * Returns the locale object for translation.
  */
-ItsAllText.prototype.getLocale = function() {
-    const string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"];
-    var obj = string_bundle.getService(Components.interfaces.nsIStringBundleService);
+ItsAllText.prototype.getLocale = function () {
+    var string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"],
+        obj = string_bundle.getService(Components.interfaces.nsIStringBundleService);
     /**
      * A localization bundle.  Use it like so:
      * ItsAllText.locale.getStringFromName('blah');

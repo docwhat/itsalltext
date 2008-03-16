@@ -1,3 +1,6 @@
+/*extern Components, ItsAllText, XPathResult */
+/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
+
 /*
   This file is used to allow external editors to work inside your chrome XUL.
 
@@ -45,7 +48,9 @@
 
 (function () {
     /* Load up the main It's All Text! file */
-    var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+    var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader),
+        openEditorCommand,
+        onload;
     objScriptLoader.loadSubScript('chrome://itsalltext/content/itsalltext.js');
 
     /**
@@ -56,11 +61,15 @@
      * @param {String} id The id of textarea or textbody that should be opened in the editor.
      * @param {String} extension The extension of the file used as a temporary file. Example: '.css' (optional)
      */
-    var openEditorCommand = function(event) {
-        var id = this.getAttribute("itsalltext-control");
-        var extension = this.getAttribute("itsalltext-extension");
-        var node = document.getElementById(id);
-        var narf=ItsAllText.debug;
+    openEditorCommand = function (event) {
+        var id = this.getAttribute("itsalltext-control"),
+        extension = this.getAttribute("itsalltext-extension"),
+        node,
+        cache_object,
+        narf = ItsAllText.debug;
+
+        node = document.getElementById(id);
+
         narf('oec narf 1', id, extension, node);
 
         /* The only way I can adjust the background of the textbox is
@@ -69,9 +78,11 @@
         node.style.MozAppearance = 'none';
         narf('oec narf 2');
 
-        var cache_object = node && ItsAllText.getCacheObj(node);
+        cache_object = node && ItsAllText.getCacheObj(node);
         narf('oec narf 3', cache_object);
-        if(!cache_object) { return; }
+        if (!cache_object) {
+            return;
+        }
         narf('oec narf 4');
         cache_object.edit(extension);
 
@@ -80,22 +91,25 @@
     };
 
 
-    var onload = function (event) {
+    onload = function (event) {
+        var nodes = [],
+        node,
+        i,
+        nodesIter;
         /* Start watching the document, but force it. */
         ItsAllText.new_monitor.startPage({originalTarget: document}, true);
 
         /* Turn on all the hidden CSS */
-        var nodes = [], i;
-        var nodesIter = document.evaluate("//node()[@itsalltext-control]",
+        nodesIter = document.evaluate("//node()[@itsalltext-control]",
                                           document, null,
                                           XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
 
-        var node = nodesIter.iterateNext();
+        node = nodesIter.iterateNext();
         while (node) {
             nodes.push(node);
             node = nodesIter.iterateNext();
         }
-        for(i in nodes) {
+        for (i in nodes) {
             if (nodes.hasOwnProperty(i)) {
                 node = nodes[i];
                 node.addEventListener('command', openEditorCommand, true);

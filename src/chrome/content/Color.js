@@ -1,3 +1,4 @@
+/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
 /**
  * Author: Lachlan Hunt
  * Date: 2005-11-24
@@ -16,10 +17,24 @@
  *   Color("rgba(255, 255, 255, 1.0)");
  *   Color("white"); - CSS 2.1 Color keywords only
  */
-var Color = function() {
+var Color = function () {
+    var keyword,
+        func,
+        clamp,
+        alphaBlend,
+        value,
+        components,
+        pattern,
+        key,
+        base,
+        m,
+        r,
+        g,
+        b,
+        a;
 
     // CSS 2.1 Colour Keywords
-	var keyword = {
+    keyword = {
         maroon   : "#800000",
         red      : "#ff0000",
         orange   : "#ffA500",
@@ -40,7 +55,7 @@ var Color = function() {
     };
 
     // CSS Functional Notations and Hex Patterns
-	var func = {
+    func = {
         rgb   : /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\);?$/,
         "rgb%"  : /^rgb\(\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*\);?$/,
         rgba  : /^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*((?:\d+(?:\.\d+)?)|(?:\.\d+))\s*\);?$/,
@@ -50,87 +65,100 @@ var Color = function() {
     };
 
     /**
-	 * Clamp the value between the low value and the high value
+     * Clamp the value between the low value and the high value
      * @private
-	 */
-	var clamp = function(value, low, high) {
-		if (value < low) {
-			value = low;
-		}
-		else if (value > high) {
-			value = high;
-		}
-		return value;
-	};
+     */
+    clamp = function (value, low, high) {
+        if (value < low) {
+            value = low;
+        }
+        else if (value > high) {
+            value = high;
+        }
+        return value;
+    };
 
     /**
      * @private
      */
-    var alphaBlend = function(forground, background, alpha) {
-		return Math.round(background * (1.0 - alpha) + forground * (alpha));
-	};
+    alphaBlend = function (forground, background, alpha) {
+        return Math.round(background * (1.0 - alpha) + forground * (alpha));
+    };
 
-	/*
-	 * Return the colour in hexadecimal notation: #RRGGBB. e.g. #FF9933
-	 * @param bg - Optional parameter used for calculating the colour if an alpha value less than 1.0 has been specified.
-	 *             If not specified, the alpha value will be ignored.
-	 */
-    this.hex = function(bg) {
-        var r, g, b;
-		if (bg) {
-			r = alphaBlend(this.red, bg.red, this.alpha);
-			g = alphaBlend(this.green, bg.green, this.alpha);
-			b = alphaBlend(this.blue, bg.blue, this.alpha);
-		} else {
-			r = this.red;
-			g = this.green;
-			b = this.blue;
-		}
+    /*
+     * Return the colour in hexadecimal notation: #RRGGBB. e.g. #FF9933
+     * @param bg - Optional parameter used for calculating the colour if an alpha value less than 1.0 has been specified.
+     *             If not specified, the alpha value will be ignored.
+     */
+    this.hex = function (bg) {
+        var r,
+            g,
+            b,
+            strHexR,
+            strHexG,
+            strHexB;
+        if (bg) {
+            r = alphaBlend(this.red, bg.red, this.alpha);
+            g = alphaBlend(this.green, bg.green, this.alpha);
+            b = alphaBlend(this.blue, bg.blue, this.alpha);
+        } else {
+            r = this.red;
+            g = this.green;
+            b = this.blue;
+        }
 
-		var strHexR = r.toString(16).toUpperCase();
-		var strHexG = g.toString(16).toUpperCase();
-		var strHexB = b.toString(16).toUpperCase();
+        strHexR = r.toString(16).toUpperCase();
+        strHexG = g.toString(16).toUpperCase();
+        strHexB = b.toString(16).toUpperCase();
 
-		if (strHexR.length < 2) { strHexR = "0" + strHexR; }
-		if (strHexG.length < 2) { strHexG = "0" + strHexG; }
-		if (strHexB.length < 2) { strHexB = "0" + strHexB; }
+        if (strHexR.length < 2) {
+            strHexR = "0" + strHexR;
+        }
+        if (strHexG.length < 2) {
+            strHexG = "0" + strHexG;
+        }
+        if (strHexB.length < 2) {
+            strHexB = "0" + strHexB;
+        }
 
-		return "#" + strHexR + strHexG + strHexB;
-	};
-
-    /**
-	 * Return the colour in CSS rgb() functional notation, using integers 0-255: rgb(255, 255 255);
-	 * @param bg - Optional parameter used for calculating the colour if an alpha value less than 1.0 has been specified.
-	 *             If not specified, the alpha value will be ignored.
-	 */
-	this.rgb = function(bg) {
-        var r, g, b;
-		if (bg) {
-			r = alphaBlend(this.red, bg.red, this.alpha);
-			g = alphaBlend(this.green, bg.green, this.alpha);
-			b = alphaBlend(this.blue, bg.blue, this.alpha);
-		} else {
-			r = this.red;
-			g = this.green;
-			b = this.blue;
-		}
-
-		return "rgb(" + r + ", " + g + ", " + b + ")";
-	};
+        return "#" + strHexR + strHexG + strHexB;
+    };
 
     /**
-	 * Return the colour in CSS rgba() functional notation, using integers 0-255 for color components: rgb(255, 255 255, 1.0);
-	 * @param bg - Optional parameter used for calculating the colour if an alpha value less than 1.0 has been specified.
-	 *             If not specified, and there is an alpha value, black will be used as the background colour.
-	 */
-	this.rgba = function() {
-		return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
-	};
+     * Return the colour in CSS rgb() functional notation, using integers 0-255: rgb(255, 255 255);
+     * @param bg - Optional parameter used for calculating the colour if an alpha value less than 1.0 has been specified.
+     *             If not specified, the alpha value will be ignored.
+     */
+    this.rgb = function (bg) {
+        var r,
+            g,
+            b;
+        if (bg) {
+            r = alphaBlend(this.red, bg.red, this.alpha);
+            g = alphaBlend(this.green, bg.green, this.alpha);
+            b = alphaBlend(this.blue, bg.blue, this.alpha);
+        } else {
+            r = this.red;
+            g = this.green;
+            b = this.blue;
+        }
+
+        return "rgb(" + r + ", " + g + ", " + b + ")";
+    };
+
+    /**
+     * Return the colour in CSS rgba() functional notation, using integers 0-255 for color components: rgb(255, 255 255, 1.0);
+     * @param bg - Optional parameter used for calculating the colour if an alpha value less than 1.0 has been specified.
+     *             If not specified, and there is an alpha value, black will be used as the background colour.
+     */
+    this.rgba = function () {
+        return "rgba(" + this.red + ", " + this.green + ", " + this.blue + ", " + this.alpha + ")";
+    };
 
     /**
      * Returns a Color object with the values inverted. Ignores alpha.
      */
-    this.invert = function() {
+    this.invert = function () {
         return new Color("rgb(" +
                          (255 - this.red) + ", " +
                          (255 - this.green) + ", " +
@@ -138,15 +166,17 @@ var Color = function() {
     };
 
     /**
-	 * Blend this colour with the colour specified and return a pallet with all the steps in between.
-	 * @param color - The colour to blend with
-	 * @param steps - The number of steps to take to reach the color.
-	 */
-	this.blend = function(color, steps) {
-        var pallet = [];
-        var r, g, b, i;
-
-        var step = {
+     * Blend this colour with the colour specified and return a pallet with all the steps in between.
+     * @param color - The colour to blend with
+     * @param steps - The number of steps to take to reach the color.
+     */
+    this.blend = function (color, steps) {
+        var pallet = [],
+            r,
+            g,
+            b,
+            i,
+            step = {
             red   : (alphaBlend(color.red, this.red, color.alpha) - this.red) / steps,
             green : (alphaBlend(color.green, this.green, color.alpha) - this.green) / steps,
             blue  : (alphaBlend(color.blue,  this.blue,  color.alpha) - this.blue) / steps
@@ -158,17 +188,13 @@ var Color = function() {
             pallet.push(new Color(r, g, b));
         }
         return pallet;
-	};
+    };
 
     /**
-	 * Constructor function
-	 */
+     * Constructor function
+     */
     this.toString = this.hex;
 
-    var value;
-    var components, pattern;
-    var key, base, m;
-    var r, g, b, a;
     if (arguments.length >= 3) {
         /* r, g, b or r, g, b, a */
         r = arguments[0];
@@ -217,9 +243,9 @@ var Color = function() {
             components = [0, "255", "255", "255", "1.0"];
         }
 
-        this.red   = clamp(Math.round(parseInt(components[1],base) * m), 0, 255);
-        this.green = clamp(Math.round(parseInt(components[2],base) * m), 0, 255);
-        this.blue  = clamp(Math.round(parseInt(components[3],base) * m), 0, 255);
+        this.red   = clamp(Math.round(parseInt(components[1], base) * m), 0, 255);
+        this.green = clamp(Math.round(parseInt(components[2], base) * m), 0, 255);
+        this.blue  = clamp(Math.round(parseInt(components[3], base) * m), 0, 255);
 
         if (typeof(components[4]) === 'undefined' || isNaN(components[4])) {
             this.alpha = 1;

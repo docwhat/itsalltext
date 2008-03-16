@@ -1,3 +1,5 @@
+/*extern ItsAllText, Components */
+/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -16,15 +18,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*jslint nomen: true, evil: false, browser: true */
-
 /**
  * A Cache object is used to manage the node and the file behind it.
  * @constructor
  * @param {Object} node A DOM Node to watch.
  */
 function CacheObj(node) {
-    var that = this;
+    var that = this,
+        doc = node.ownerDocument,
+        host,
+        hash,
+        extension;
 
     /* Gumdrop Image URL */
     that.gumdrop_url    = 'chrome://itsalltext/locale/gumdrop.png';
@@ -43,7 +47,6 @@ function CacheObj(node) {
     that.is_focused = false;
 
     that.node_id = that.getNodeIdentifier(node);
-    var doc = node.ownerDocument;
 
     /* This is a unique identifier for use on the web page to prevent the
      * web page from knowing what it's connected to.
@@ -54,19 +57,19 @@ function CacheObj(node) {
                                  that.node_id ].join(':'));
     // @todo [security] Add a serial to the uid hash.
 
-    node.setAttribute(ItsAllText.MYSTRING+'_UID', that.uid);
+    node.setAttribute(ItsAllText.MYSTRING + '_UID', that.uid);
     ItsAllText.tracker[that.uid] = that;
 
     /* Figure out where we will store the file.  While the filename can
      * change, the directory that the file is stored in should not!
      */
-    var host = window.escape(doc.location.hostname);
-    var hash = that.hashString([ doc.location.protocol,
-                                 doc.location.port,
-                                 doc.location.search,
-                                 doc.location.pathname,
-                                 that.node_id ].join(':'));
-    that.base_filename = [host, hash.slice(0,10)].join('.');
+    host = window.escape(doc.location.hostname);
+    hash = that.hashString([ doc.location.protocol,
+                             doc.location.port,
+                             doc.location.search,
+                             doc.location.pathname,
+                             that.node_id].join(':'));
+    that.base_filename = [host, hash.slice(0, 10)].join('.');
     /* The current extension.
      * @type String
      */
@@ -83,7 +86,7 @@ function CacheObj(node) {
     that.edit_count = 0;
 
     /* Set the default extension and create the nsIFile object. */
-    var extension = node.getAttribute('itsalltext-extension');
+    extension = node.getAttribute('itsalltext-extension');
     if (typeof(extension) != 'string' || !extension.match(/^[.a-z0-9]+$/i)) {
         extension = ItsAllText.getExtensions()[0];
     }
@@ -96,7 +99,7 @@ function CacheObj(node) {
      * the mouse waved over it.
      * @param {Event} event The event object.
      */
-    that.mouseover = function(event) {
+    that.mouseover = function (event) {
         if (event.type === 'focus') {
             that.is_focused = true;
         }
@@ -116,7 +119,7 @@ function CacheObj(node) {
      * the mouse waved over it and the moved off.
      * @param {Event} event The event object.
      */
-    that.mouseout = function(event) {
+    that.mouseout = function (event) {
         if (that.button_fade_timer) {
             clearTimeout(that.button_fade_timer);
         }
@@ -126,13 +129,14 @@ function CacheObj(node) {
         }
         that.is_focused = false;
 
-        var style = that.button?that.button.style:null, f;
-        var cur  = 0.7;
-        var dest = 0;
-        var fps  = 12;
-        var num_frames = (ItsAllText.preferences.fade_time * fps);
-        var increment = (cur - dest) / num_frames;
-        var wait = (1 / fps) / 1000;
+        var style = that.button?that.button.style:null,
+            f,
+            cur  = 0.7,
+            dest = 0,
+            fps  = 12,
+            num_frames = (ItsAllText.preferences.fade_time * fps),
+            increment = (cur - dest) / num_frames,
+            wait = (1 / fps) / 1000;
         if (style) {
             f = function () {
                 cur -= increment;
@@ -151,14 +155,14 @@ function CacheObj(node) {
 /**
  * Destroys the object, unallocating as much as possible to prevent leaks.
  */
-CacheObj.prototype.destroy = function() {
+CacheObj.prototype.destroy = function () {
     ItsAllText.debug('destroying', this.node_id, this.uid);
-    var node = this.node;
-    var doc  = this.node.ownerDocument;
-    var html = doc.getElementsByTagName('html')[0];
+    var node = this.node,
+        doc  = this.node.ownerDocument,
+        html = doc.getElementsByTagName('html')[0];
 
-    node.removeAttribute(ItsAllText.MYSTRING+'_UID');
-    html.removeAttribute(ItsAllText.MYSTRING+'_id_serial');
+    node.removeAttribute(ItsAllText.MYSTRING + '_UID');
+    html.removeAttribute(ItsAllText.MYSTRING + '_id_serial');
 
     delete this.node;
     delete this.button;
@@ -170,7 +174,7 @@ CacheObj.prototype.destroy = function() {
  * Set the extension for the file to ext.
  * @param {String} ext The extension.  Must include the dot.  Example: .txt
  */
-CacheObj.prototype.setExtension = function(ext) {
+CacheObj.prototype.setExtension = function (ext) {
     if (ext == this.extension && this.file) {
         return; /* It's already set.  No problem. */
     }
@@ -178,7 +182,7 @@ CacheObj.prototype.setExtension = function(ext) {
     /* Create the nsIFile object */
     var file = ItsAllText.factoryFile();
     file.initWithFile(ItsAllText.getEditDir());
-    file.append([this.base_filename,ext].join(''));
+    file.append([this.base_filename, ext].join(''));
 
     this.extension = ext;
     this.file = file;
@@ -193,13 +197,13 @@ CacheObj.prototype.setExtension = function(ext) {
  * if the file exists already.  It also deletes all existing files for
  * this cache object.
  */
-CacheObj.prototype.initFromExistingFile = function() {
-    var base = this.base_filename;
-    var fobj = ItsAllText.getEditDir();
-    var entries = fobj.directoryEntries;
-    var ext = null;
-    var tmpfiles = /(\.bak|.tmp|~)$/;
-    var entry;
+CacheObj.prototype.initFromExistingFile = function () {
+    var base = this.base_filename,
+        fobj = ItsAllText.getEditDir(),
+        entries = fobj.directoryEntries,
+        ext = null,
+        tmpfiles = /(\.bak|.tmp|~)$/,
+        entry;
     while (entries.hasMoreElements()) {
         entry = entries.getNext();
         entry.QueryInterface(Components.interfaces.nsIFile);
@@ -209,10 +213,10 @@ CacheObj.prototype.initFromExistingFile = function() {
                 ext = entry.leafName.slice(base.length);
                 continue;
             }
-            try{
+            try {
                 entry.remove(false);
-            } catch(e) {
-                that.debug('unable to remove',entry,'because:',e);
+            } catch (e) {
+                ItsAllText.debug('unable to remove', entry, 'because:', e);
             }
         }
     }
@@ -226,21 +230,27 @@ CacheObj.prototype.initFromExistingFile = function() {
  * Returns a unique identifier for the node, within the document.
  * @returns {String} the unique identifier.
  */
-CacheObj.prototype.getNodeIdentifier = function(node) {
-    var id   = node.getAttribute('id');
-    var name, doc, attr, serial;
+CacheObj.prototype.getNodeIdentifier = function (node) {
+    var id   = node.getAttribute('id'),
+        name,
+        doc,
+        attr,
+        serial;
     if (!id) {
         name = node.getAttribute('name');
         doc = node.ownerDocument.getElementsByTagName('html')[0];
-        attr = ItsAllText.MYSTRING+'_id_serial';
+        attr = ItsAllText.MYSTRING + '_id_serial';
 
         /* Get a serial that's unique to this document */
         serial = doc.getAttribute(attr);
-        if (serial) { serial = parseInt(serial, 10)+1;
-        } else { serial = 1; }
-        id = [ItsAllText.MYSTRING,'generated_id',name,serial].join('_');
-        doc.setAttribute(attr,serial);
-        node.setAttribute('id',id);
+        if (serial) {
+            serial = parseInt(serial, 10) + 1;
+        } else {
+            serial = 1;
+        }
+        id = [ItsAllText.MYSTRING, 'generated_id', name, serial].join('_');
+        doc.setAttribute(attr, serial);
+        node.setAttribute('id', id);
     }
     return id;
 };
@@ -249,12 +259,11 @@ CacheObj.prototype.getNodeIdentifier = function(node) {
  * Convert to this object to a useful string.
  * @returns {String} A string representation of this object.
  */
-CacheObj.prototype.toString = function() {
+CacheObj.prototype.toString = function () {
     return [ "CacheObj",
-             " uid=",this.uid,
-             " timestamp=",this.timestamp,
-             " size=",this.size
-    ].join('');
+             " uid=", this.uid,
+             " timestamp=", this.timestamp,
+             " size=", this.size].join('');
 };
 
 /**
@@ -262,7 +271,7 @@ CacheObj.prototype.toString = function() {
  *
  * @param {boolean} clobber Should an existing file be clobbered?
  */
-CacheObj.prototype.write = function(clobber) {
+CacheObj.prototype.write = function (clobber) {
     clobber = typeof(clobber) === 'boolean'?clobber:true;
     var foStream, conv, text;
 
@@ -273,7 +282,7 @@ CacheObj.prototype.write = function(clobber) {
 
         /* write, create, truncate */
         foStream.init(this.file, 0x02 | 0x08 | 0x20,
-                      parseInt('0600',8), 0);
+                      parseInt('0600', 8), 0);
 
         /* We convert to charset */
         conv = Components.
@@ -305,9 +314,9 @@ CacheObj.prototype.write = function(clobber) {
  * @param {String} attr The CSS-style attribute to fetch (not DOM name).
  * @returns attribute
  */
-CacheObj.prototype.getStyle = function(node, attr) {
-    var view  = node ? node.ownerDocument.defaultView : null;
-    var style = view.getComputedStyle(node, '');
+CacheObj.prototype.getStyle = function (node, attr) {
+    var view  = node ? node.ownerDocument.defaultView : null,
+        style = view.getComputedStyle(node, '');
     return  style.getPropertyCSSValue(attr).cssText;
 };
 
@@ -319,29 +328,38 @@ CacheObj.prototype.getStyle = function(node, attr) {
  * @param {String} extension The extension of the file to edit.
  * @param {boolean} clobber Should an existing file be clobbered?
  */
-CacheObj.prototype.edit = function(extension, clobber) {
-    ItsAllText.debug('edit(',extension,', ',clobber,')');
+CacheObj.prototype.edit = function (extension, clobber) {
+    ItsAllText.debug('edit(', extension, ', ', clobber, ')');
     extension = typeof(extension) === 'string'?extension:this.extension;
     this.setExtension(extension);
 
-    var filename = this.write(clobber);
+    var filename = this.write(clobber),
+        program = null,
+        process,
+        args,
+        result,
+        ec,
+        params,
+        procutil;
+    procutil = Components.classes["@mozilla.org/process/util;1"];
     this.initial_background = this.node.style.backgroundColor;
     this.initial_color      = this.node.style.color;
-    var program = null;
-    const procutil = Components.classes["@mozilla.org/process/util;1"];
 
-    var process;
-    var args, result, ec, params;
 
     try {
         program = ItsAllText.getEditor();
         // checks
-        if (program === null)        { throw {name:"Editor is not set."}; }
-        if (!program.exists())       { throw {name:"NS_ERROR_FILE_NOT_FOUND"}; }
+        if (program === null) {
+            throw {name: "Editor is not set."};
+        }
+        if (!program.exists()) {
+            throw {name: "NS_ERROR_FILE_NOT_FOUND"};
+        }
         /* Mac check because of
          * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
         if (!(ItsAllText.isDarwin() || program.isExecutable())) {
-            throw {name:"NS_ERROR_FILE_ACCESS_DENIED"}; }
+            throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
+        }
 
         // create an nsIProcess
         process = procutil.createInstance(Components.interfaces.nsIProcess);
@@ -357,16 +375,16 @@ CacheObj.prototype.edit = function(extension, clobber) {
         ec = process.run(false, args, args.length, result);
         this.private_is_watching = true;
         this.edit_count++;
-    } catch(e) {
-        params = {out:null,
-                      exists: program ? program.exists() : false,
-                      path: ItsAllText.preferences.editor,
-                      exception: e.name };
+    } catch (e) {
+        params = { out: null,
+                   exists: program ? program.exists() : false,
+                   path: ItsAllText.preferences.editor,
+                   exception: e.name };
         window.openDialog('chrome://itsalltext/content/badeditor.xul',
                           null,
-                          "chrome,titlebar,toolbar,centerscreen,modal",
+                          "chrome, titlebar, toolbar, centerscreen, modal",
                           params);
-        if(params.out !== null && params.out.do_preferences) {
+        if (params.out !== null && params.out.do_preferences) {
             ItsAllText.openPreferences(true);
             this.edit(extension);
         }
@@ -376,12 +394,12 @@ CacheObj.prototype.edit = function(extension, clobber) {
 /**
  * Delete the file from disk.
  */
-CacheObj.prototype.remove = function() {
-    if(this.file.exists()) {
+CacheObj.prototype.remove = function () {
+    if (this.file.exists()) {
         try {
             this.file.remove();
-        } catch(e) {
-            that.debug('remove(',this.file.path,'): ',e);
+        } catch (e) {
+            ItsAllText.debug('remove(', this.file.path, '): ', e);
             return false;
         }
     }
@@ -391,16 +409,18 @@ CacheObj.prototype.remove = function() {
 /**
  * Read the file from disk.
  */
-CacheObj.prototype.read = function() {
+CacheObj.prototype.read = function () {
     /* read file, reset ts & size */
-    var DEFAULT_REPLACEMENT_CHARACTER = 65533;
-    var buffer = [];
-    var fis, istream, str;
+    var DEFAULT_REPLACEMENT_CHARACTER = 65533,
+        buffer = [],
+        fis,
+        istream,
+        str;
 
     try {
         fis = Components.classes["@mozilla.org/network/file-input-stream;1"].
             createInstance(Components.interfaces.nsIFileInputStream);
-        fis.init(this.file, 0x01, parseInt('00400',8), 0);
+        fis.init(this.file, 0x01, parseInt('00400', 8), 0);
         // MODE_RDONLY | PERM_IRUSR
 
         istream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].
@@ -419,7 +439,7 @@ CacheObj.prototype.read = function() {
         this.size      = this.file.fileSize;
 
         return buffer.join('');
-    } catch(e) {
+    } catch (e) {
         return null;
     }
 };
@@ -428,15 +448,15 @@ CacheObj.prototype.read = function() {
  * Has the file object changed?
  * @returns {boolean} returns true if the file has changed on disk.
  */
- CacheObj.prototype.hasChanged = function() {
-     /* Check exists.  Check ts and size. */
-     return this.private_is_watching &&
-         this.file &&
-         this.file.exists() &&
-         this.file.isReadable() &&
-         (this.file.lastModifiedTime != this.timestamp ||
-          this.file.fileSize         != this.size);
- };
+CacheObj.prototype.hasChanged = function () {
+    /* Check exists.  Check ts and size. */
+    return this.private_is_watching &&
+           this.file &&
+           this.file.exists() &&
+           this.file.isReadable() &&
+           (this.file.lastModifiedTime != this.timestamp ||
+            this.file.fileSize         != this.size);
+};
 
 /**
  * Part of the fading technique.
@@ -444,14 +464,14 @@ CacheObj.prototype.read = function() {
  * @param {int}    step   Size of a step.
  * @param {delay}  delay  Delay in microseconds.
  */
-CacheObj.prototype.fadeStep = function(background_pallet, color_pallet, step, delay) {
+CacheObj.prototype.fadeStep = function (background_pallet, color_pallet, step, delay) {
     var that = this;
-    return function() {
+    return function () {
         if (step < background_pallet.length) {
             that.node.style.backgroundColor = background_pallet[step].hex();
             that.node.style.color = color_pallet[step].hex();
             step++;
-            setTimeout(that.fadeStep(background_pallet, color_pallet, step, delay),delay);
+            setTimeout(that.fadeStep(background_pallet, color_pallet, step, delay), delay);
         } else {
             that.node.style.backgroundColor = that.initial_background;
             that.node.style.color = that.initial_color;
@@ -464,16 +484,16 @@ CacheObj.prototype.fadeStep = function(background_pallet, color_pallet, step, de
  * @param {int} steps  Number of steps in the transition.
  * @param {int} delay  How long to wait between delay (microseconds).
  */
-CacheObj.prototype.fade = function(steps, delay) {
-    var color             = this.getStyle(this.node, 'color');
-    var color_stop        = new ItsAllText.Color(color);
-    var color_start       = new ItsAllText.Color('black');
-    var color_pallet      = color_start.blend(color_stop, steps);
+CacheObj.prototype.fade = function (steps, delay) {
+    var color             = this.getStyle(this.node, 'color'),
+        color_stop        = new ItsAllText.Color(color),
+        color_start       = new ItsAllText.Color('black'),
+        color_pallet      = color_start.blend(color_stop, steps),
 
-    var background        = this.getStyle(this.node, 'background-color');
-    var background_stop   = new ItsAllText.Color(background);
-    var background_start  = new ItsAllText.Color('yellow');
-    var background_pallet = background_start.blend(background_stop, steps);
+        background        = this.getStyle(this.node, 'background-color'),
+        background_stop   = new ItsAllText.Color(background),
+        background_start  = new ItsAllText.Color('yellow'),
+        background_pallet = background_start.blend(background_stop, steps);
     setTimeout(this.fadeStep(background_pallet, color_pallet, 0, delay), delay);
 };
 
@@ -481,7 +501,7 @@ CacheObj.prototype.fade = function(steps, delay) {
  * Update the node from the file.
  * @returns {boolean} Returns true ifthe file changed.
  */
-CacheObj.prototype.update = function() {
+CacheObj.prototype.update = function () {
     var value;
     ItsAllText.debug('narf update', this.file.path);
     if (this.hasChanged()) {
@@ -498,7 +518,7 @@ CacheObj.prototype.update = function() {
 /**
  * Capture keypresses to do the hotkey edit.
  */
-CacheObj.prototype.keypress = function(event) {
+CacheObj.prototype.keypress = function (event) {
     var km = ItsAllText.marshalKeyEvent(event), cobj;
     if (km === ItsAllText.preferences.hotkey) {
         cobj = ItsAllText.getCacheObj(event.target);
@@ -512,7 +532,7 @@ CacheObj.prototype.keypress = function(event) {
  * The function to execute when a gumdrop is clicked.
  * @param {Object} event The event that triggered this.
  */
-CacheObj.prototype.onClick = function(event) {
+CacheObj.prototype.onClick = function (event) {
     var cobj = ItsAllText.getCacheObj(event.target);
     cobj.edit();
     event.stopPropagation();
@@ -523,7 +543,7 @@ CacheObj.prototype.onClick = function(event) {
  * The function to execute when a gumdrop is right clicked (context)
  * @param {Object} event The event that triggered this.
  */
-CacheObj.prototype.onContext = function(event) {
+CacheObj.prototype.onContext = function (event) {
     /* This took forever to fix; roughly 80+ man hours were spent
      * over 5 months trying to make this stupid thing work.
      * The documentation is completely wrong and useless.
@@ -537,8 +557,8 @@ CacheObj.prototype.onContext = function(event) {
      * This is actually fixed in FF3 by replacing it with something
      * sane....openPopup()
      */
-    var cobj = ItsAllText.getCacheObj(event.target);
-    var popup = ItsAllText.rebuildMenu(cobj.uid);
+    var cobj = ItsAllText.getCacheObj(event.target),
+        popup = ItsAllText.rebuildMenu(cobj.uid);
 
     if (popup.openPopup) {
         /* FF3 breath of sanity. */
@@ -560,15 +580,20 @@ CacheObj.prototype.onContext = function(event) {
  * Add the gumdrop to a textarea.
  * @param {Object} cache_object The Cache Object that contains the node.
  */
-CacheObj.prototype.addGumDrop = function() {
-    var cache_object = this;
+CacheObj.prototype.addGumDrop = function () {
+    var cache_object = this,
+        node,
+        doc,
+        gumdrop,
+        parent,
+        nextSibling;
     if (cache_object.button !== null) {
         cache_object.adjust();
         return; /*already done*/
     }
 
     // Add the textarea mouseovers even if the button is disabled
-    var node = cache_object.node;
+    node = cache_object.node;
     ItsAllText.listen(node, "mouseover", ItsAllText.hitch(cache_object, "mouseover"), false);
     ItsAllText.listen(node, "mouseout",  ItsAllText.hitch(cache_object, "mouseout"),  false);
     ItsAllText.listen(node, "focus",     ItsAllText.hitch(cache_object, "mouseover"), false);
@@ -582,12 +607,14 @@ CacheObj.prototype.addGumDrop = function() {
     if (ItsAllText.getDisableGumdrops()) {
         return;
     }
-    ItsAllText.debug('addGumDrop()',cache_object);
+    ItsAllText.debug('addGumDrop()', cache_object);
 
-    var doc = node.ownerDocument;
-    if (!node.parentNode) { return; }
+    doc = node.ownerDocument;
+    if (!node.parentNode) {
+        return;
+    }
 
-    var gumdrop = doc.createElementNS(ItsAllText.XHTMLNS, "img");
+    gumdrop = doc.createElementNS(ItsAllText.XHTMLNS, "img");
     gumdrop.setAttribute('src', this.gumdrop_url);
 
     if (ItsAllText.getDebug()) {
@@ -606,10 +633,10 @@ CacheObj.prototype.addGumDrop = function() {
     gumdrop.style.setProperty('border',   'none',     'important');
     gumdrop.style.setProperty('zIndex',   '32768',    'important');
 
-    gumdrop.style.setProperty('width',  this.gumdrop_width+'px',  'important');
-    gumdrop.style.setProperty('height', this.gumdrop_height+'px', 'important');
+    gumdrop.style.setProperty('width',  this.gumdrop_width + 'px', 'important');
+    gumdrop.style.setProperty('height', this.gumdrop_height + 'px', 'important');
 
-    gumdrop.setAttribute(ItsAllText.MYSTRING+'_UID', cache_object.uid);
+    gumdrop.setAttribute(ItsAllText.MYSTRING + '_UID', cache_object.uid);
 
     // Click event handlers
     ItsAllText.listen(gumdrop, "click", ItsAllText.hitch(cache_object, 'onClick'), false);
@@ -618,8 +645,8 @@ CacheObj.prototype.addGumDrop = function() {
 // narf    gumdrop.addEventListener("contextmenu", cache_object.onContext, false);
 
     // Insert it into the document
-    var parent = node.parentNode;
-    var nextSibling = node.nextSibling;
+    parent = node.parentNode;
+    nextSibling = node.nextSibling;
 
     if (nextSibling) {
         parent.insertBefore(gumdrop, nextSibling);
@@ -640,22 +667,31 @@ CacheObj.prototype.addGumDrop = function() {
 /**
  * Updates the position of the gumdrop, incase the textarea shifts around.
  */
-CacheObj.prototype.adjust = function() {
-    var gumdrop  = this.button;
-    var el       = this.node;
-    var doc      = el.ownerDocument;
+CacheObj.prototype.adjust = function () {
+    var gumdrop  = this.button,
+        el       = this.node,
+        doc      = el.ownerDocument,
+        style,
+        display,
+        cstyle,
+        left,
+        top,
+        coord,
+        pos;
 
     if (ItsAllText.getDisableGumdrops()) {
-        if(gumdrop && gumdrop.style.display != 'none') {
+        if (gumdrop && gumdrop.style.display != 'none') {
             gumdrop.style.setProperty('display', 'none', 'important');
         }
         return;
     }
 
-    var style    = gumdrop.style;
-    if (!gumdrop || !el) { return; }
-    var display  = '';
-    var cstyle = doc.defaultView && doc.defaultView.getComputedStyle(el, '');
+    style    = gumdrop.style;
+    if (!gumdrop || !el) {
+        return;
+    }
+    display  = '';
+    cstyle = doc.defaultView && doc.defaultView.getComputedStyle(el, '');
     if ((cstyle && (cstyle.display == 'none' ||
                     cstyle.visibility == 'hidden')) ||
         el.getAttribute('readonly') ||
@@ -671,10 +707,9 @@ CacheObj.prototype.adjust = function() {
      * Position the gumdrop.
      * Updates in case the DOM changes.
      */
-    var left, top, coord;
-    var pos = ItsAllText.preferences.gumdrop_position;
+    pos = ItsAllText.preferences.gumdrop_position;
     if (pos === 'upper-right' || pos === 'lower-right') {
-        left = Math.max(1, el.offsetWidth-this.gumdrop_width);
+        left = Math.max(1, el.offsetWidth - this.gumdrop_width);
     } else {
         left = 0;
     }
@@ -691,11 +726,15 @@ CacheObj.prototype.adjust = function() {
         left += coord[0];
         top  += coord[1];
     }
-    if(left && top) {
-        left = [left,'px'].join('');
-        top  = [top,'px'].join('');
-        if(style.left != left) { style.setProperty('left', left, 'important');}
-        if(style.top != top)   { style.setProperty('top',  top, 'important');}
+    if (left && top) {
+        left = [left, 'px'].join('');
+        top  = [top, 'px'].join('');
+        if (style.left != left) {
+            style.setProperty('left', left, 'important');
+        }
+        if (style.top != top) {
+            style.setProperty('top',  top, 'important');
+        }
     }
 };
 
@@ -706,36 +745,81 @@ CacheObj.prototype.adjust = function() {
  * @param {String} some_string The string to hash.
  * @returns {String} a hashed string.
  */
-CacheObj.prototype.hashString = function(some_string) {
-    var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+CacheObj.prototype.hashString = function (some_string) {
+    var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter),
+        result = {},
+        data,
+        ch,
+        hash,
+        toHexString,
+        retval = [],
+        i;
     converter.charset = "UTF-8";
 
     /* result is the result of the hashing.  It's not yet a string,
      * that'll be in retval.
      * result.value will contain the array length
      */
-    var result = {};
+    result = {};
 
     /* data is an array of bytes */
-    var data = converter.convertToByteArray(some_string, result);
-    var ch   = Components.classes["@mozilla.org/security/hash;1"].createInstance(Components.interfaces.nsICryptoHash);
+    data = converter.convertToByteArray(some_string, result);
+    ch   = Components.classes["@mozilla.org/security/hash;1"].createInstance(Components.interfaces.nsICryptoHash);
 
     ch.init(ch.MD5);
     ch.update(data, data.length);
-    var hash = ch.finish(true);
+    hash = ch.finish(true);
 
     // return the two-digit hexadecimal code for a byte
-    var toHexString = function(charCode) {
+    toHexString = function (charCode) {
         return ("0" + charCode.toString(36)).slice(-2);
     };
 
     // convert the binary hash data to a hex string.
-    var retval = [], i;
-    for(i in hash) {
+    for (i in hash) {
         if (hash.hasOwnProperty(i)) {
             retval[i] = toHexString(hash.charCodeAt(i));
         }
     }
 
-    return(retval.join(""));
+    return (retval.join(""));
+};
+
+/**
+ * Returns a cache object
+ * Note: These UIDs are only unique for Its All Text.
+ * @param {Object} node A dom object node or ID to one.
+ * @returns {String} the UID or null.
+ */
+ItsAllText.getCacheObj = function (node) {
+    var str = ItsAllText.MYSTRING + "_UID",
+        id = null;
+    if (typeof(node) === 'string') {
+        id = node;
+    } else if (node && node.hasAttribute(str)) {
+        id = node.getAttribute(str);
+    }
+    if (id && ItsAllText.tracker.hasOwnProperty(id)) {
+        return ItsAllText.tracker[id];
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Creates a cache object, unless one exists already.
+ * Note: These UIDs are only unique for Its All Text.
+ * @param {DOMElement} node A dom object node or id to one.
+ * @param {Boolean} create_gumdrop Should a gumdrop be created (html).
+ * @returns {String} the UID or null.
+ */
+ItsAllText.makeCacheObj = function (node, create_gumdrop) {
+    var cobj = ItsAllText.getCacheObj(node);
+    if (!cobj) {
+        cobj = new ItsAllText.CacheObj(node);
+        if (create_gumdrop) {
+            cobj.addGumDrop();
+        }
+    }
+    return cobj;
 };
