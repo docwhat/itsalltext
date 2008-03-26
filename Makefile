@@ -26,7 +26,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 0.8.2
+VERSION    := 0.8.3
 
 
 # NOTE: do not create files or directories in here that have
@@ -141,7 +141,7 @@ $(SOURCES_JS_LINT): lint/%.js.lint: %.js Makefile
 	$(Q)perl -p -e 's/^(\s*)const(\s+)/$$1var$$2/' $< > $@.pre
 	$(Q)echo "*** Linting $<" > $@
 	$(Q)$(JSLINT) -p $@.pre >> $@
-	$(Q)$(YC) --type js --charset UTF-8 --warn -o /dev/null $@.pre >> $@ 2>&1
+#	$(Q)$(YC) --type js --charset UTF-8 --verbose -o /dev/null $@.pre >> $@ 2>&1
 
 .PHONY: lintcheck
 lintcheck: $(SOURCES_JS_LINT)

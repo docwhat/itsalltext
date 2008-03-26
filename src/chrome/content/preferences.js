@@ -41,20 +41,6 @@ function pref_editor_select() {
     }
 }
 
-function pref_grab(disp, e) {
-    e.preventDefault();
-    var km  = ItsAllText.marshalKeyEvent(e);
-    const empty_re = /:0:0$/;
-    if (empty_re.test(km)    ||   // Various Alt/Meta keys
-        km === '0:0:0:0:0:8' ||   // Backspace
-        km === '0:0:0:0:0:27' ||  // Escape
-        km === '0:0:0:0:0:46') {  // Del
-        km = '';
-    }
-    ItsAllText.preferences.private_set('hotkey', km);
-    update_hotkey(disp);
-}
-
 function update_hotkey(disp) {
     var str, km = ItsAllText.preferences.hotkey;
     if (typeof(km) === 'undefined') {
@@ -67,6 +53,20 @@ function update_hotkey(disp) {
         str = ItsAllText.keyMarshalToString(km);
     }
     document.getElementById(disp).value = str;
+}
+
+function pref_grab(disp, e) {
+    e.preventDefault();
+    var km  = ItsAllText.marshalKeyEvent(e);
+    const empty_re = /:0:0$/;
+    if (empty_re.test(km)    ||   // Various Alt/Meta keys
+        km === '0:0:0:0:0:8' ||   // Backspace
+        km === '0:0:0:0:0:27' ||  // Escape
+        km === '0:0:0:0:0:46') {  // Del
+        km = '';
+    }
+    ItsAllText.preferences.private_set('hotkey', km);
+    update_hotkey(disp);
 }
 
 function setHelp(text) {
