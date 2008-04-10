@@ -138,7 +138,7 @@ lint: $(SOURCES_JS_LINT) $(SOURCES_JS_WARN)
 
 .INTERMEDIATE: $(SOURCES_JS_LINT_PRE)
 
-$(SOURCES_JS_LINT_PRE): lint/%.js.lint-pre: %.js Makefile
+$(SOURCES_JS_LINT_PRE): lint/%.js.lint-pre: %.js
 	$(Q)mkdir -p $(dir $@)
 	$(Q)perl -p -e 's!^(\s*)(const)(\s+)!$$1var$$3!' $< > $@
 
@@ -147,14 +147,14 @@ $(SOURCES_JS_LINT): %.js.lint: %.js.lint-pre
 	$(Q)rm -f $@
 	$(Q)$(JSLINT) -p $< |\
 		perl -p -e 's!^(jslint: linting )lint/(.*)\.lint-pre!********* $$1$$2!' >> $@
-$(SOURCES_JS_WARN): lint/%.js.warn: %.js Makefile
+$(SOURCES_JS_WARN): lint/%.js.warn: %.js
 	$(info warning $(patsubst %.lint-pre,%,$(notdir $<)) ...)
 	$(Q)echo '********* checking $< *********' > $@
 	$(Q)$(YC) $(YC_JSFLAGS) --verbose -o /dev/null $< 2>&1 |\
 		grep -vE '^\[INFO\] It is recommended to use Sun' >> $@
 
 .PHONY: lintcheck
-lintcheck: $(SOURCES_JS_LINT)
+lintcheck: $(SOURCES_JS_LINT) $(SOURCES_JS_WARN)
 	$(Q)egrep -q '^lint at '    $(SOURCES_JS_LINT) ; test $$? != 0
 	$(Q)egrep -q '^\[WARNING\]' $(SOURCES_JS_WARN) ; test $$? != 0
 
