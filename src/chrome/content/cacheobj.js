@@ -521,7 +521,7 @@ CacheObj.prototype.update = function () {
 CacheObj.prototype.keypress = function (event) {
     var km = ItsAllText.marshalKeyEvent(event), cobj;
     if (km === ItsAllText.preferences.hotkey) {
-        cobj = ItsAllText.getCacheObj(event.target);
+        cobj = CacheObj.get(event.target);
         cobj.edit();
         event.stopPropagation();
     }
@@ -533,7 +533,7 @@ CacheObj.prototype.keypress = function (event) {
  * @param {Object} event The event that triggered this.
  */
 CacheObj.prototype.onClick = function (event) {
-    var cobj = ItsAllText.getCacheObj(event.target);
+    var cobj = CacheObj.get(event.target);
     cobj.edit();
     event.stopPropagation();
     return false;
@@ -557,7 +557,7 @@ CacheObj.prototype.onContext = function (event) {
      * This is actually fixed in FF3 by replacing it with something
      * sane....openPopup()
      */
-    var cobj = ItsAllText.getCacheObj(event.target),
+    var cobj = CacheObj.get(event.target),
         popup = ItsAllText.rebuildMenu(cobj.uid);
 
     if (popup.openPopup) {
@@ -791,7 +791,7 @@ CacheObj.prototype.hashString = function (some_string) {
  * @param {Object} node A dom object node or ID to one.
  * @returns {String} the UID or null.
  */
-ItsAllText.getCacheObj = function (node) {
+CacheObj.get = function (node) {
     var str = ItsAllText.MYSTRING + "_UID",
         id = null;
     if (typeof(node) === 'string') {
@@ -813,10 +813,10 @@ ItsAllText.getCacheObj = function (node) {
  * @param {Boolean} create_gumdrop Should a gumdrop be created (html).
  * @returns {String} the UID or null.
  */
-ItsAllText.makeCacheObj = function (node, create_gumdrop) {
-    var cobj = ItsAllText.getCacheObj(node);
+CacheObj.make = function (node, create_gumdrop) {
+    var cobj = CacheObj.get(node);
     if (!cobj) {
-        cobj = new ItsAllText.CacheObj(node);
+        cobj = new CacheObj(node);
         if (create_gumdrop) {
             cobj.addGumDrop();
         }

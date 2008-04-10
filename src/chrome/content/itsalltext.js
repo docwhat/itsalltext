@@ -485,7 +485,7 @@ var ItsAllText = function () {
      * @param {Object} node A specific textarea dom object to update.
      */
     that.refreshTextarea = function (node, is_chrome) {
-        var cobj = ItsAllText.getCacheObj(node);
+        var cobj = ItsAllText.CacheObj.get(node);
         if (!cobj) {
             return;
         }
@@ -749,7 +749,7 @@ Line 0
      * @param {Object} node The textarea to get.
      */
     that.onEditNode = function (node) {
-        var cobj = that.getCacheObj(node);
+        var cobj = that.CacheObj.get(node);
         if (cobj) {
             cobj.edit();
         }
@@ -779,7 +779,7 @@ Line 0
                                node.getAttribute('disabled')
                                );
                 if (tid == "itsalltext-context-popup") {
-                    cobj = that.getCacheObj(node);
+                    cobj = that.CacheObj.get(node);
                     that.rebuildMenu(cobj.uid,
                                      'itsalltext-context-popup',
                                      is_disabled);
@@ -970,7 +970,7 @@ ItsAllText.prototype.cleanEditDir = function (force) {
 ItsAllText.prototype.menuNewExtEdit = function (event) {
     var that = this,
         uid = this.private_current_uid,
-        cobj = that.getCacheObj(uid),
+        cobj = that.CacheObj.get(uid),
         params = {out: null},
         ext;
     window.openDialog("chrome://itsalltext/content/newextension.xul", "",
@@ -1019,7 +1019,7 @@ ItsAllText.prototype.rebuildMenu = function (uid, menu_id, is_disabled) {
         magic_stop_node = null,
         magic_start = null,
         magic_stop = null,
-        cobj = that.getCacheObj(uid);
+        cobj = that.CacheObj.get(uid);
     that.private_current_uid = uid;
 
     // Find the beginning and end of the magic replacement parts.

@@ -117,9 +117,9 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
     for (i = 0; i < nodes.length; i++) {
         node = nodes[i];
         if (init) {
-            cobj = ItsAllText.makeCacheObj(node, is_html);
+            cobj = ItsAllText.CacheObj.make(node, is_html);
         } else {
-            cobj = ItsAllText.getCacheObj(node);
+            cobj = ItsAllText.CacheObj.get(node);
         }
         if (cobj) {
             cobj.update();
