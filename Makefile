@@ -117,16 +117,16 @@ final/%: stage1/%
 final/chrome.manifest: stage1/chrome.manifest Makefile
 	$(Q)mkdir -p $(dir $@)
 	$(Q)perl -p -e 's!^(\s*content\s+itsalltext\s+)(chrome/)(\S+\s*)$$!$$1jar:$$2content.jar\!/$$3!;'  \
-	-e 's!^(\s*locale\s+itsalltext\s+)(\S+)(\s+)(chrome/)(\S+\s*)$$!$$1$$2$$3jar:$$4$$2.jar\!/$$5!;' $< \
+	-e 's!^(\s*locale\s+itsalltext\s+)(\S+)(\s+)(chrome/)locale/(\S+\s*)$$!$$1$$2$$3jar:$$4$$2.jar\!/$$5!;' $< \
 	> $@
 
-final/chrome/content.jar: stage1
+final/chrome/content.jar: stage1 Makefile
 	$(Q)mkdir -p $(dir $@)
 	$(Q)cd stage1/chrome && $(ZIP) -r ../../$@ content
 
-final/chrome/en-US.jar: stage1
+final/chrome/en-US.jar: stage1 Makefile
 	$(Q)mkdir -p $(dir $@)
-	$(Q)cd stage1/chrome && $(ZIP) -r ../../$@ locale/en-US
+	$(Q)cd stage1/chrome/locale && $(ZIP) -r ../../../$@ en-US
 
 .PHONY: build
 build: final
