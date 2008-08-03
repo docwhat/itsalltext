@@ -992,7 +992,7 @@ ItsAllText.prototype.menuNewExtEdit = function (event) {
  */
 ItsAllText.prototype.menuExtEdit = function (ext, clobber, event) {
     var uid = this.private_current_uid,
-        cobj;
+        cobj = this.CacheObj.get(uid);
     if (ext !== null) {
         ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
     }
