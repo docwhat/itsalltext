@@ -623,128 +623,6 @@ var ItsAllText = function () {
     };
 
     /**
-     * This function is called regularly to watch changes to web documents.
-     */
-    that.old_monitor = {
-        id: null,
-        last_now: 0,
-        documents: [],
-        /**
-         * Starts or restarts the document old_monitor.
-         */
-        restart: function () {
-            var rate = that.getRefresh(),
-                id   = that.old_monitor.id;
-            if (id) {
-                clearInterval(id);
-            }
-            that.old_monitor.id = setInterval(that.old_monitor.watcher, rate);
-        },
-        /**
-         * watches the document 'doc'.
-         * @param {Object} doc The document to watch.
-         */
-        watch: function (doc, force) {
-            // fish
-            var contentType,
-                location,
-                is_html,
-                is_usable,
-                is_my_readme,
-                documents,
-                i;
-            if (!force) {
-                /* Check that this is a document we want to play with. */
-                contentType = doc.contentType;
-                location = doc.location;
-                is_html = (contentType == 'text/html' ||
-                           contentType == 'text/xhtml' ||
-                           contentType == 'application/xhtml+xml');
-                //var is_xul=(contentType=='application/vnd.mozilla.xul+xml');
-                is_usable = (is_html) &&
-                    location &&
-                    location.protocol != 'about:' &&
-                    location.protocol != 'chrome:';
-                try {
-                    is_my_readme = location && location.href == that.README;
-                    /*
-                     * Avoiding this error.... I hope.
-                     * uncaught exception: [Exception... "Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsIDOMLocation.href]"  nsresult: "0x80004003 (NS_ERROR_INVALID_POINTER)"  location: "JS frame :: chrome://itsalltext/chrome/itsalltext.js :: anonymous :: line 634"  data: no]
-Line 0
-                    */
-                } catch (e) {
-                    is_my_readme = false;
-                    is_usable = false;
-                }
-                if (!(is_usable || is_my_readme)) {
-                    that.debug('watch(): ignoring -- ', location, contentType);
-                    return;
-                }
-            }
-
-            documents = that.old_monitor.documents;
-            for (i in documents) {
-                if (documents[i] === doc) {
-                    // Found it, don't watch it twice.
-                    that.debug('narf: double watch: ', doc.location);
-                    return;
-                }
-            }
-            that.debug('watch()ing: ', doc && doc.location);
-            that.refreshDocument(doc);
-            that.old_monitor.documents.push(doc);
-        },
-        /**
-         * Callback to be used by restart()
-         * @private
-         */
-        watcher: function (offset) {
-            var old_monitor = that.old_monitor,
-                rate = that.getRefresh(),
-                now = Date.now(),
-                documents,
-                i,
-                doc;
-            if (now - old_monitor.last_now < Math.round(rate * 0.9)) {
-                that.debug('old_monitor.watcher(', offset, ') -- skipping catchup refresh');
-                return;
-            }
-            old_monitor.last_now = now;
-
-            /* Walk the documents looking for changes */
-            documents = old_monitor.documents;
-            for (i in documents) {
-                if (documents.hasOwnProperty(i)) {
-                    doc = documents[i];
-                    if (doc.location) {
-                        that.refreshDocument(doc);
-                    }
-                }
-            }
-        },
-        /**
-         * Stops watching doc.
-         * @param {Object} doc The document to watch.
-         */
-        unwatch: function (doc) {
-            var documents = that.old_monitor.documents,
-                i;
-            for (i in documents) {
-                if (documents[i] === doc) {
-                    that.debug('unwatch()ing', doc && doc.location);
-                    delete documents[i];
-                }
-            }
-            that.cleanCacheObjs();
-            for (i = documents.length - 1; i >= 0; i--) {
-                if (typeof(documents[i]) === 'undefined') {
-                    documents.splice(i, 1);
-                }
-            }
-        }
-    };
-
-    /**
      * Open the editor for a selected node.
      * @param {Object} node The textarea to get.
      */
@@ -894,9 +772,9 @@ ItsAllText.prototype.unlisten = function (source, event, listener, opt_capture) 
     opt_capture = !!opt_capture;
     this.debug("unlisten(%o, %o, -, %o)", source, event, opt_capture);
     try {
-    Components.lookupMethod(source, "removeEventListener")(
-        event, listener, opt_capture);
-    } catch(err) {
+        Components.lookupMethod(source, "removeEventListener")(
+            event, listener, opt_capture);
+    } catch (err) {
         this.debug("didn't unlisten: %o", err);
     }
 };
