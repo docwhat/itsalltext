@@ -153,7 +153,9 @@ new_monitor.prototype.hitched_stopPage = function (event) {
     this.iat.debug('stopPage', doc && doc.location);
 
     unsafeWin = doc.defaultView.wrappedJSObject;
-    this.iat.unlisten(unsafeWin, 'pagehide', this.stopPage);
+    if (unsafeWin) {
+        this.iat.unlisten(unsafeWin, 'pagehide', this.stopPage);
+    }
 };
 
 new_monitor.prototype.isXUL = function (doc) {

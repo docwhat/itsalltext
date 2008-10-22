@@ -893,8 +893,12 @@ ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
 ItsAllText.prototype.unlisten = function (source, event, listener, opt_capture) {
     opt_capture = !!opt_capture;
     this.debug("unlisten(%o, %o, -, %o)", source, event, opt_capture);
+    try {
     Components.lookupMethod(source, "removeEventListener")(
         event, listener, opt_capture);
+    } catch(err) {
+        this.debug("didn't unlisten: %o", err);
+    }
 };
 
 /**
