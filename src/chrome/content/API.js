@@ -97,7 +97,7 @@
         i,
         nodesIter;
         /* Start watching the document, but force it. */
-        ItsAllText.new_monitor.startPage({originalTarget: document}, true);
+        ItsAllText.monitor.startPage({originalTarget: document}, true);
 
         /* Turn on all the hidden CSS */
         nodesIter = document.evaluate("//node()[@itsalltext-control]",

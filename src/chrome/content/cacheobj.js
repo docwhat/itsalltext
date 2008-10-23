@@ -111,7 +111,10 @@ function CacheObj(node) {
             style.setProperty('opacity', '0.7',   'important');
             style.setProperty('display', 'block', 'important');
         }
-        ItsAllText.refreshTextarea(that.node);
+
+        // Refresh the Textarea.
+        that.update();
+        that.addGumDrop();
     };
 
     /**

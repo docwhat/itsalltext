@@ -18,11 +18,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function new_monitor(iat) {
+function monitor(iat) {
     var hitch_re = /^hitched_/,
         method;
     this.iat = iat;
-    this.iat.debug('new_monitor');
+    this.iat.debug('monitor');
 
     for (method in this) {
         if (hitch_re.test(method)) {
@@ -34,11 +34,11 @@ function new_monitor(iat) {
 
 }
 
-new_monitor.destroy = function () {
+monitor.destroy = function () {
     delete this.iat;
 };
 
-new_monitor.prototype.hitched_restart = function () {
+monitor.prototype.hitched_restart = function () {
     var rate = this.iat.getRefresh(),
         id   = this.id;
     if (id) {
@@ -47,21 +47,14 @@ new_monitor.prototype.hitched_restart = function () {
     this.id = setInterval(this.watcher, rate);
 };
 
-new_monitor.prototype.hitched_registerPage = function (event) {
+/**
+ * Gets a page ready to be used by IAT.
+ * This is called as an event handler.
+ */
+monitor.prototype.hitched_registerPage = function (event) {
     var doc, appContent;
     if (event.originalTarget instanceof HTMLDocument) {
         doc = event.originalTarget;
-        if (doc.defaultView.frameElement) {
-            // Frame within a tab was loaded. doc should be the root document of
-            // the frameset. If you don't want do anything when frames/iframes
-            // are loaded in this web page, uncomment the following line:
-            // return;
-            // Find the root document:
-            while (doc.defaultView.frameElement) {
-                doc = doc.defaultView.frameElement.ownerDocument;
-            }
-        }
-
         this.iat.debug('registerPage: ', doc && doc.location);
 
         /* appContent is the browser chrome. */
@@ -74,20 +67,68 @@ new_monitor.prototype.hitched_registerPage = function (event) {
     }
 };
 
-new_monitor.prototype.hitched_watcher = function (offset, init) {
+/**
+ * This is called repeatedly and regularly to trigger updates for the
+ * cache objects in the page.
+ */
+monitor.prototype.hitched_watcher = function (offset, init) {
     if (typeof(offset) === 'number' &&
         offset.type === 'TabSelect') {
         init = true;
     }
     var rate = this.iat.getRefresh(),
         now = Date.now(),
+        that = this,
+        findnodes,
         doc,
         nodes = [],
         i,
         cobj,
-        node,
-        is_html,
-        is_xul;
+        node;
+
+    /* Finds all nodes under a doc; includes iframes and frames. */
+    findnodes = function (doc) {
+        if (!doc) {
+            return [];
+        }
+        var is_html = that.isHTML(doc),
+            is_xul  = that.isXUL(doc),
+            i,
+            tmp,
+            nodes = [],
+            iframes,
+            frames;
+        if (is_html) {
+            /* HTML */
+            tmp = doc.getElementsByTagName('textarea');
+            for (i = 0; i < tmp.length; i++) {
+                nodes.push(tmp[i]);
+            }
+
+            /* Now that we got the nodes in this document,
+             * look for other documents. */
+            iframes = doc.getElementsByTagName('iframe');
+            for (i = 0; i < iframes.length; i++) {
+                nodes.push.apply(nodes, (findnodes(iframes[i].contentDocument)));
+            }
+
+            frames = doc.getElementsByTagName('frame');
+            for (i = 0; i < frames.length; i++) {
+                nodes.push.apply(nodes, (findnodes(frames[i].contentDocument)));
+            }
+        } else if (is_xul) {
+            /* XUL */
+            tmp = doc.getElementsByTagName('textbox');
+            for (i = 0; i < tmp.length; i++) {
+                nodes.push(tmp[i]);
+            }
+        } else {
+            that.stopPage({originalTarget: doc});
+            return [];
+        }
+        return nodes;
+    };
+
     if (!init && now - this.last_watcher_call < Math.round(rate * 0.9)) {
         this.iat.debug('watcher(', offset, '/', (now - this.last_watcher_call), ') -- skipping catchup refresh');
         return;
@@ -102,22 +143,13 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
         doc = gBrowser.selectedBrowser.contentDocument;
     }
     this.iat.debug('watcher: ', offset, init, doc && doc.location);
-    is_html = this.isHTML(doc);
-    is_xul  = this.isXUL(doc);
-    if (is_html) {
-        /* HTML */
-        nodes = doc.getElementsByTagName('textarea');
-    } else if (is_xul) {
-        /* XUL */
-        nodes = doc.getElementsByTagName('textbox');
-    } else {
-        this.stopPage({originalTarget: doc});
-        return;
-    }
+    nodes = findnodes(doc);
+    /* Now that we have the nodes, walk through and either make or
+     * get the cache objects and update them. */
     for (i = 0; i < nodes.length; i++) {
         node = nodes[i];
         if (init) {
-            cobj = ItsAllText.CacheObj.make(node, is_html);
+            cobj = ItsAllText.CacheObj.make(node, this.isHTML(doc));
         } else {
             cobj = ItsAllText.CacheObj.get(node);
         }
@@ -127,7 +159,7 @@ new_monitor.prototype.hitched_watcher = function (offset, init) {
     }
 };
 
-new_monitor.prototype.hitched_startPage = function (event, force) {
+monitor.prototype.hitched_startPage = function (event, force) {
     var doc = event.originalTarget,
         unsafeWin;
     this.iat.debug('startPage', doc && doc.location, force);
@@ -147,7 +179,7 @@ new_monitor.prototype.hitched_startPage = function (event, force) {
     this.restart();
 };
 
-new_monitor.prototype.hitched_stopPage = function (event) {
+monitor.prototype.hitched_stopPage = function (event) {
     var doc = event.originalTarget,
         unsafeWin;
     this.iat.debug('stopPage', doc && doc.location);
@@ -158,7 +190,7 @@ new_monitor.prototype.hitched_stopPage = function (event) {
     }
 };
 
-new_monitor.prototype.isXUL = function (doc) {
+monitor.prototype.isXUL = function (doc) {
     var contentType = doc && doc.contentType,
         is_xul = (contentType == 'application/vnd.mozilla.xul+xml'),
         is_my_readme;
@@ -170,7 +202,7 @@ new_monitor.prototype.isXUL = function (doc) {
     return is_xul && !is_my_readme;
 };
 
-new_monitor.prototype.isHTML = function (doc) {
+monitor.prototype.isHTML = function (doc) {
     var contentType,
         location,
         is_html,

@@ -196,7 +196,7 @@ var ItsAllText = function () {
         loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
         loader.loadSubScript('chrome://itsalltext/content/monitor.js', that);
         loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
-        that.new_monitor = new that.new_monitor(that);
+        that.monitor = new that.monitor(that);
     };
     loadthings();
 
@@ -301,7 +301,7 @@ var ItsAllText = function () {
             if (that.preferences) {
                 that.preferences[aData] = that.preferences.private_get(aData);
                 if (aData == 'refresh') {
-                    that.new_monitor.restart();
+                    that.monitor.restart();
                 }
             }
         }
@@ -480,47 +480,10 @@ var ItsAllText = function () {
         that.debug('textarea count (tracker):', count);
     };
 
-    /**
-     * Refresh Textarea.
-     * @param {Object} node A specific textarea dom object to update.
-     */
-    that.refreshTextarea = function (node, is_chrome) {
-        var cobj = ItsAllText.CacheObj.get(node);
-        if (!cobj) {
-            return;
-        }
-
-        cobj.update();
-        if (!is_chrome) {
-            cobj.addGumDrop();
-        }
-    };
-
     // @todo [wish] Refresh textarea on editor quit.
     // @todo [9] IDEA: support for input elements as well?
     // @todo [5] Minimum size for textareas.
     // @todo [5] Mark textareas somehow as 'in editor'.
-
-    /**
-     * Refresh Document.
-     * @param {Object} doc The document to refresh.
-     */
-    that.refreshDocument = function (doc) {
-        if (!doc.location) {
-            return; // it's being cached, but not shown.
-        }
-        var is_chrome = (doc.location.protocol == 'chrome:' &&
-                         doc.location.href != that.README),
-            nodes = doc.getElementsByTagName('textarea'),
-            i;
-        for (i = 0; i < nodes.length; i++) {
-            that.refreshTextarea(nodes[i], is_chrome);
-        }
-        nodes = doc.getElementsByTagName('textbox');
-        for (i = 0; i < nodes.length; i++) {
-            that.refreshTextarea(nodes[i], is_chrome);
-        }
-    };
 
     /**
      * Returns the offset from the containing block.
@@ -683,12 +646,12 @@ var ItsAllText = function () {
     that.listen(window, 'load', function (event) {
         that.debug('!!load', event);
         if (typeof(gBrowser) === 'undefined') {
-            that.new_monitor.registerPage(event);
+            that.monitor.registerPage(event);
         } else {
             // Add a callback to be run every time a document loads.
             // note that this includes frames/iframes within the document
             that.listen(gBrowser, "load",
-                        that.new_monitor.registerPage, true);
+                        that.monitor.registerPage, true);
         }
 
         // Start watching the preferences.
@@ -704,13 +667,13 @@ var ItsAllText = function () {
     // TODONOW: move to separate function
     that.listen(window, 'unload', function (event) {
         if (typeof(gBrowser) === 'undefined') {
-            that.new_monitor.stopPage(event);
+            that.monitor.stopPage(event);
         }
         var doc = event.originalTarget;
         that.debug("pageunload(): A page has been unloaded", doc && doc.location);
         that.cleanCacheObjs();
         that.preference_observer.unregister();
-        that.new_monitor.destroy();
+        that.monitor.destroy();
     }, false);
 
 };
