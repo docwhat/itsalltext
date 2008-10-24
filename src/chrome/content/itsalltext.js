@@ -842,7 +842,6 @@ ItsAllText.prototype.menuExtEdit = function (ext, clobber, event) {
         ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
     }
     this.debug('menuExtEdit:', uid, ext, clobber);
-    //narf this.monitor.watch(cobj.node.ownerDocument);
     cobj.edit(ext, clobber);
 };
 

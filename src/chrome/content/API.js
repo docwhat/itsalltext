@@ -66,27 +66,20 @@
         extension = this.getAttribute("itsalltext-extension"),
         node,
         cache_object,
-        narf = ItsAllText.debug;
 
         node = document.getElementById(id);
-
-        narf('oec narf 1', id, extension, node);
 
         /* The only way I can adjust the background of the textbox is
          * to turn off the -moz-appearance attribute.
          */
         node.style.MozAppearance = 'none';
-        narf('oec narf 2');
 
         cache_object = node && ItsAllText.getCacheObj(node);
-        narf('oec narf 3', cache_object);
         if (!cache_object) {
             return;
         }
-        narf('oec narf 4');
         cache_object.edit(extension);
 
-        narf('oec narf 5');
         return false;
     };
 
