@@ -25,7 +25,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 1.0
+VERSION    := 0.9.9.1
 
 
 # NOTE: do not create files or directories in here that have
@@ -43,7 +43,7 @@ SOURCES_JS:=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
 SOURCES_JS_LINT:=$(patsubst %.js, lint/%.js.lint, $(SOURCES_JS))
 SOURCES_JS_WARN:=$(patsubst %.js, lint/%.js.warn, $(SOURCES_JS))
 SOURCES_JS_LINT_PRE:=$(patsubst %.lint, %.lint-pre, $(filter %.lint,$(SOURCES_JS_LINT)))
-JARS:=chrome/content.jar chrome/en-US.jar
+JARS:=chrome/content.jar $(patsubst src/chrome/locale/%, chrome/%.jar, $(wildcard src/chrome/locale/*-*))
 
 STAGE1_OUT:=$(patsubst src/%, stage1/%, $(SOURCES))
 FINAL_OUT:=$(patsubst src/%, final/%, $(SOURCES_NONCHROME)) \
@@ -116,7 +116,7 @@ final/%: stage1/%
 
 final/chrome.manifest: stage1/chrome.manifest Makefile
 	$(Q)mkdir -p $(dir $@)
-	$(Q)perl -p -e 's!^(\s*content\s+itsalltext\s+)(chrome/)(\S+\s*)$$!$$1jar:$$2content.jar\!/$$3!;'  \
+	$(Q)perl -p -e 's!^(\s*content\s+itsalltext\s+)(chrome/)(\S+\s*.*)$$!$$1jar:$$2content.jar\!/$$3!;'  \
 	-e 's!^(\s*locale\s+itsalltext\s+)(\S+)(\s+)(chrome/)locale/(\S+\s*)$$!$$1$$2$$3jar:$$4$$2.jar\!/$$5!;' $< \
 	> $@
 
@@ -124,9 +124,9 @@ final/chrome/content.jar: stage1 Makefile
 	$(Q)mkdir -p $(dir $@)
 	$(Q)cd stage1/chrome && $(ZIP) -r ../../$@ content
 
-final/chrome/en-US.jar: stage1 Makefile
+final/chrome/%.jar: stage1 Makefile
 	$(Q)mkdir -p $(dir $@)
-	$(Q)cd stage1/chrome/locale && $(ZIP) -r ../../../$@ en-US
+	$(Q)cd stage1/chrome/locale && $(ZIP) -r ../../../$@ $(patsubst final/chrome/%.jar, %, $@)
 
 .PHONY: build
 build: final
