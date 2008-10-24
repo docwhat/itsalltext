@@ -64,9 +64,7 @@
     openEditorCommand = function (event) {
         var id = this.getAttribute("itsalltext-control"),
         extension = this.getAttribute("itsalltext-extension"),
-        node,
         cache_object,
-
         node = document.getElementById(id);
 
         /* The only way I can adjust the background of the textbox is
