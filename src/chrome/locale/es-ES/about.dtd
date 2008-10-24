@@ -1,0 +1,17 @@
+<!ENTITY title "Acerda de It&apos;s All Text!">
+<!ENTITY description "It&apos;s All Text! -Fácil edición externa de formularios web.
+
+Copyright (C) 2006-2007 Christian Höltje 
+
+Este programa es software libre: usted puede redistribuirlo y/o modificarlo
+bajo los términos de la GNU General Public license tal como está publicado por
+la Free Software Foundation, versión 3 de la Licencia.
+
+Este programa es distribuido con la intención de que será útil,
+sin GARANTÍA DE NINGÚN TIPO; sin la garantía incluso de 
+MERCHANTABILITY o FITNESS PARA UN PROPÓSITO PARTICULAR.
+Ver la GNU General Public license para más detalles.
+
+Usted debería haber recibido una copia de la GNU General Public License
+junto con este programa. Si no ha sido así, vea &lt;http://www.gnu.org/licenses/&gt;.">
+<!ENTITY close "Cerrar">

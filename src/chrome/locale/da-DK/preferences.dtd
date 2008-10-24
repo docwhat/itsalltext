@@ -1,0 +1,15 @@
+<!ENTITY title "It&apos;s All Text! indstillinger">
+<!ENTITY editor.label "Editor:">
+<!ENTITY picker.label "Gennemse">
+<!ENTITY seconds.label "Sekunder mellem opdatering:">
+<!ENTITY charset.label "Tegnsæt (standard UTF-8):">
+<!ENTITY extensions.label "Filtype:">
+<!ENTITY debug.label "Debugging:">
+<!ENTITY debug.humor "Fjern alle fejl">
+<!ENTITY gumdrop_position.label "Rediger knap-position">
+<!ENTITY gumdrop_position.disable "Deaktiver">
+<!ENTITY gumdrop_position.upper_left "Øvre venstre">
+<!ENTITY gumdrop_position.upper_right "Øvre højre">
+<!ENTITY gumdrop_position.lower_left "Nedre venstre">
+<!ENTITY gumdrop_position.lower_right "Nedre højre">
+<!ENTITY fade_time.label "Varighed for udtoning af knap">

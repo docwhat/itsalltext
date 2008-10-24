@@ -1,0 +1,9 @@
+<!ENTITY title "It&apos;s All Text! kon uw tekstbewerker niet openen">
+<!ENTITY header "Openen tekstbewerker mislukt">
+<!ENTITY pref.label "Instellingen">
+<!ENTITY helptext "It&apos;s All Text! kon uw tekstbewerker niet laden.
+
+U kunt nu uw bewerking annuleren of u kunt een nieuwe tekstbewerker instellen. Zorg er a.u.b. voor dat u het volledige pad naar de tekstbewerker gebruikt en dat de tekstbewerker als uitvoeringsbestand is gemarkeerd.
+
+Dank u.">
+<!ENTITY reason "Reden:">

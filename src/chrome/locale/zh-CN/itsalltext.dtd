@@ -1,0 +1,9 @@
+<!ENTITY top.label "It&apos;s All Text!">
+<!ENTITY top.key "i">
+<!ENTITY edit.label "用默认扩展编辑">
+<!ENTITY edit.key "e">
+<!ENTITY newext.label "用新扩展编辑">
+<!ENTITY newext.key "n">
+<!ENTITY pref.label "偏好">
+<!ENTITY pref.key "p">
+<!ENTITY readme.label "浏览README..">

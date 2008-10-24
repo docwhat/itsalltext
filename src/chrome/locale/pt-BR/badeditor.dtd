@@ -1,0 +1,9 @@
+<!ENTITY title "É Tudo Texto! não conseguiu abrir seu editor">
+<!ENTITY header "Não consegui abrir seu editor">
+<!ENTITY pref.label "Preferências">
+<!ENTITY helptext "É Tudo Texto! não conseguiu executar seu editor.
+
+Você pode cancelar a edição ou mudar suas preferências para escolher outro editor. Favor se certificar de ter inserido o caminho completo para o editor e que ele esteja marcado como executável.
+
+Obrigado.">
+<!ENTITY reason "Motivo:">

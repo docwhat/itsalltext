@@ -1,0 +1,9 @@
+<!ENTITY title "It&apos;s All Text! no pudo abrir su editor">
+<!ENTITY header "No es posible abrir su editor">
+<!ENTITY pref.label "Preferencias">
+<!ENTITY helptext "It&apos;s All Text! no pudo usar su editor.
+
+Usted puede ahora cancelar su editor o usar las preferencias para escoger un nuevo editor. Por favor, asegúrese de usar la ruta completa al editor y que el editor esté marcado como ejecutable.
+
+Gracias.">
+<!ENTITY reason "Razón:">

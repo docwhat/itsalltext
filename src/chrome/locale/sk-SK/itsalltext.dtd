@@ -1,0 +1,9 @@
+<!ENTITY top.label "It&apos;s All Text!">
+<!ENTITY top.key "i">
+<!ENTITY edit.label "Upraviť s východzím rozšírením">
+<!ENTITY edit.key "U">
+<!ENTITY newext.label "Upraviť s novým rozšírením...">
+<!ENTITY newext.key "n">
+<!ENTITY pref.label "Nastavenia...">
+<!ENTITY pref.key "s">
+<!ENTITY readme.label "Čítať README...">

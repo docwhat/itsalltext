@@ -1,0 +1,9 @@
+<!ENTITY title "It&apos;s All Text! はエディタを開くことができませんでした">
+<!ENTITY header "エディタを開くことができません">
+<!ENTITY pref.label "設定">
+<!ENTITY helptext "It&apos;s All Text! はエディタを実行できませんでした。
+
+編集を中止するか新たなエディタを選択して設定することができます。エディタへの完全なパスを用いることと、エディタが実行可能になっているかどうかをご確認ください。
+
+よろしくお願いします。">
+<!ENTITY reason "原因:">

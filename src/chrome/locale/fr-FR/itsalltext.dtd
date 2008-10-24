@@ -1,0 +1,9 @@
+<!ENTITY top.label "It&apos;s All Text!">
+<!ENTITY top.key "i">
+<!ENTITY edit.label "Éditer avec l&apos;extension par défaut">
+<!ENTITY edit.key "d">
+<!ENTITY newext.label "Éditer avec une nouvelle extension">
+<!ENTITY newext.key "i">
+<!ENTITY pref.label "Préférences…">
+<!ENTITY pref.key "p">
+<!ENTITY readme.label "Voir le fichier LISEZ-MOI…">

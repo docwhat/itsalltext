@@ -1,0 +1,10 @@
+<!ENTITY title "It&apos;s All Text! 無法正確開啟你指定的編輯工具">
+<!ENTITY header "無法開啟編輯工具">
+<!ENTITY pref.label "個人設定">
+<!ENTITY helptext "It&apos;s All Text! 無法正確開啟你指定的編輯工具.
+
+你可以取消目前編輯或是在個人設定中再選擇另一個編輯工具.  請確認編輯工具所在位置的完整路徑是正確的, 並且指向主要的執行檔.
+
+謝謝.
+">
+<!ENTITY reason "原因:">

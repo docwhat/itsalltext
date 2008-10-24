@@ -1,0 +1,9 @@
+<!ENTITY top.label "It&apos;s All Text!">
+<!ENTITY top.key "x">
+<!ENTITY edit.label "Modifica con l&apos;estensione predefinita">
+<!ENTITY edit.key "e">
+<!ENTITY newext.label "Modifica con una nuova estensione...">
+<!ENTITY newext.key "n">
+<!ENTITY pref.label "Impostazioni...">
+<!ENTITY pref.key "I">
+<!ENTITY readme.label "Contenuti guida...">

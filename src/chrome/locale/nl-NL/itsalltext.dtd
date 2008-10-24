@@ -1,0 +1,9 @@
+<!ENTITY top.label "It&apos;s All Text!">
+<!ENTITY top.key "i">
+<!ENTITY edit.label "Met standaardextensie bewerken">
+<!ENTITY edit.key "b">
+<!ENTITY newext.label "Met nieuwe extensie bewerken...">
+<!ENTITY newext.key "n">
+<!ENTITY pref.label "Instellingen...">
+<!ENTITY pref.key "s">
+<!ENTITY readme.label "README lezen...">

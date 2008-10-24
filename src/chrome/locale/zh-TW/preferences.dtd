@@ -1,0 +1,15 @@
+<!ENTITY title "It&apos;s All Text! 個人設定">
+<!ENTITY editor.label "編輯工具:">
+<!ENTITY picker.label "瀏覽">
+<!ENTITY seconds.label "每次更新間隔秒數:">
+<!ENTITY charset.label "字元編碼 (預設: UTF-8):">
+<!ENTITY extensions.label "副檔名:">
+<!ENTITY debug.label "偵錯:">
+<!ENTITY debug.humor "移掉所有的問題">
+<!ENTITY gumdrop_position.label "Edit button position">
+<!ENTITY gumdrop_position.disable "Disable">
+<!ENTITY gumdrop_position.upper_left "Upper Left">
+<!ENTITY gumdrop_position.upper_right "Upper Right">
+<!ENTITY gumdrop_position.lower_left "Lower Left">
+<!ENTITY gumdrop_position.lower_right "Lower Right">
+<!ENTITY fade_time.label "Duration of button fade">

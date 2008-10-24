@@ -1,0 +1,9 @@
+<!ENTITY top.label "Edytuj">
+<!ENTITY top.key "E">
+<!ENTITY edit.label "Edytuj z domyślnym rozszerzeniem">
+<!ENTITY edit.key "M">
+<!ENTITY newext.label "Edytuj z nowym rozszerzeniem">
+<!ENTITY newext.key "N">
+<!ENTITY pref.label "Opcje">
+<!ENTITY pref.key "O">
+<!ENTITY readme.label "Informacje i pomoc">

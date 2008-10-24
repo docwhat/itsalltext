@@ -1,0 +1,6 @@
+<!ENTITY title "It&apos;s All Text! nie może otworzyć tego edytora">
+<!ENTITY header "Nie można otworzyć tego edytora">
+<!ENTITY pref.label "Opcje">
+<!ENTITY helptext "It&apos;s All Text! nie może otworzyć twojego edytora.
+Możesz anulować edytowanie lub w opcjach rozszerzenia określić nowy edytor. Proszę sprawdzić, czy jest prawidłowo określona pełna ścieżka dostępu do edytora, i czy edytor posiada plik wykonywalny">
+<!ENTITY reason "Przyczyna:">

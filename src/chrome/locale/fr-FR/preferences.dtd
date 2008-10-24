@@ -1,0 +1,15 @@
+<!ENTITY title "Préférences de It&apos;s All Text!">
+<!ENTITY editor.label "Éditeur :">
+<!ENTITY picker.label "Parcourir">
+<!ENTITY seconds.label "Secondes entre deux rafraîchissements :">
+<!ENTITY charset.label "Encodage (par défaut : UTF-8) :">
+<!ENTITY extensions.label "Extensions de fichiers :">
+<!ENTITY debug.label "Débogage :">
+<!ENTITY debug.humor "Supprimer tous les bugs">
+<!ENTITY gumdrop_position.label "Position du bouton Éditer">
+<!ENTITY gumdrop_position.disable "Désactiver">
+<!ENTITY gumdrop_position.upper_left "En haut à gauche">
+<!ENTITY gumdrop_position.upper_right "En haut à droite">
+<!ENTITY gumdrop_position.lower_left "En bas à gauche">
+<!ENTITY gumdrop_position.lower_right "En bas à droite">
+<!ENTITY fade_time.label "Durée du fondu du bouton">

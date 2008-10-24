@@ -1,0 +1,18 @@
+<!ENTITY title "It&apos;s All Text! - informacje">
+<!ENTITY description "It&apos;s All Text! - łatwe edytowanie w zewnętrznym edytorze
+
+Copyright (C) 2006-2007 Christian Höltje 
+
+Ta aplikacja jest darmowym oprogramowaniem, które można redystrybuować i/lub 
+modyfikować na zasadach licencji GNU General Public License wersja 2 lub 
+jakakolwiek późniejsza opublikowanych przez Free Software Foundation. 
+
+Ten program jest dystrybuowany z nadzieją, że będzie bardzo użyteczny, ale 
+autor nie udziela żadnej gwarancji ani nie ponosi żadnej odpowiedzialności 
+za ewentualne szkody powstałe w wyniku jego użytkowania. Więcej szczegółów 
+zawarte jest w GNU General Public License.
+ 
+W aplikacji jest umieszczona kopia licencji GNU General Public License. 
+Jeśli jej nie ma, można ją otrzymać w Free Software Foundation, Inc., 
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.">
+<!ENTITY close "Zamknij">

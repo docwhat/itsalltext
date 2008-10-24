@@ -1,0 +1,10 @@
+<!ENTITY title "It&apos;s All Text! was unable to open your editor">
+<!ENTITY header "Öffnen des Editors fehlgeschlagen">
+<!ENTITY pref.label "Einstellungen">
+<!ENTITY helptext "It&apos;s All Text! was unable to run your editor.
+
+You can now either cancel your edit or you can use the preferences to choose a new editor.  Please make sure that you use the full path to the editor and that the editor is marked executable.
+
+Thank you.
+">
+<!ENTITY reason "Grund: / Ursache:">

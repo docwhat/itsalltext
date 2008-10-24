@@ -1,0 +1,10 @@
+<!ENTITY title "Nepodarilo sa otvoriť vami nastavený editor">
+<!ENTITY header "Chyba pri otváraní editora">
+<!ENTITY pref.label "Nastavenia">
+<!ENTITY helptext "Nepodarilo sa otvoriť vami nastavený editor
+
+Môžte teraz zrušiť editáciu, alebo v nastaveniach rozšírenia It&apos;s All Text! vybrať nový editor.
+Uistite sa, že zadávate celú cestu k programu na editáciu a že je označený ako spustiteľný súbor.
+
+Ďakujem.">
+<!ENTITY reason "Dôvod:">

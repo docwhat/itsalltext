@@ -1,0 +1,5 @@
+<!ENTITY title "Impossibile aprire l&apos;editor selezionato">
+<!ENTITY header "Impossibile aprire l&apos;editor selezionato">
+<!ENTITY pref.label "Impostazioni">
+<!ENTITY helptext "Impossibile aprire l&apos;editor selezionato. È possibile annullare le modifiche effettuate oppure impostare un nuovo editor nella finestra delle impostazioni. Accertarsi di inserire l&apos;intero percorso dell&apos;editor e che esso abbia i permessi di esecuzione">
+<!ENTITY reason "Causa">

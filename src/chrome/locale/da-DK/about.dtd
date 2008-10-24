@@ -1,0 +1,17 @@
+<!ENTITY title "Om It&apos;s All Text!">
+<!ENTITY description "It&apos;s All Text! - Nem ekstern editering af web-formularer.
+
+Copyright (C) 2006-2007 Christian Höltje 
+
+Dette program er fri software; du kan redistribuere det og/eller modificere
+det under betingelserne for GNU General Public License som udgivet af
+the Free Software Foundation, version 3 af licensen.
+
+Dette program er udgivet i håb om at det kan være til nytte,
+men UDEN NOGEN FORM FOR GARANTI; endda uden den implicitte garanti om
+SALGBARHED eller BRUGBARHED TIL ET BESTEMT FORMÅL. Se
+GNU General Public License for flere detaljer.
+
+Du skulle have modtaget en kopi af GNU General Public License 
+sammen med dette program. Hvis ikke, se &lt;http://www.gnu.org/licenses/&gt;.">
+<!ENTITY close "Luk">

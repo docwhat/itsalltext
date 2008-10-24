@@ -1,0 +1,15 @@
+<!ENTITY title "Impostazioni di It&apos;s All Text!">
+<!ENTITY editor.label "Editor:">
+<!ENTITY picker.label "Sfoglia...">
+<!ENTITY seconds.label "Intervallo di aggiornamento in secondi:">
+<!ENTITY charset.label "Codifica dei caratteri (predefinita UTF-8):">
+<!ENTITY extensions.label "Estensioni dei file:">
+<!ENTITY debug.label "Debugging:">
+<!ENTITY debug.humor "Effettua il debug">
+<!ENTITY gumdrop_position.label "Posizione del pulsante:">
+<!ENTITY gumdrop_position.disable "disattiva">
+<!ENTITY gumdrop_position.upper_left "in alto a sinistra">
+<!ENTITY gumdrop_position.upper_right "in alto a destra">
+<!ENTITY gumdrop_position.lower_left "in basso a sinistra">
+<!ENTITY gumdrop_position.lower_right "in basso a destra">
+<!ENTITY fade_time.label "Durata della visibilità del pulsante:">

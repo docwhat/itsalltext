@@ -1,0 +1,15 @@
+<!ENTITY title "It&apos;s All Text! 設定">
+<!ENTITY editor.label "エディタ:">
+<!ENTITY picker.label "参照">
+<!ENTITY seconds.label "リフレッシュ間隔の秒数:">
+<!ENTITY charset.label "文字セット (既定: UTF-8):">
+<!ENTITY extensions.label "ファイル拡張子:">
+<!ENTITY debug.label "デバッグ:">
+<!ENTITY debug.humor "あらゆるバグを除去する">
+<!ENTITY gumdrop_position.label "編集ボタンの位置">
+<!ENTITY gumdrop_position.disable "無効">
+<!ENTITY gumdrop_position.upper_left "左上">
+<!ENTITY gumdrop_position.upper_right "右上">
+<!ENTITY gumdrop_position.lower_left "左下">
+<!ENTITY gumdrop_position.lower_right "右下">
+<!ENTITY fade_time.label "ボタンの消えゆく時間">

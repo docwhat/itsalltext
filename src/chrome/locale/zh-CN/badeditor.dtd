@@ -1,0 +1,7 @@
+<!ENTITY title "It&apos;s All Text!无法打开你的编辑器">
+<!ENTITY header "无法打开你的编辑器">
+<!ENTITY pref.label "偏好">
+<!ENTITY helptext "你现在可以取消你的编辑，或者可以使用偏好选择一个新的编辑器。请确认你使用完整的路径并且你的编辑器可用。
+
+谢谢">
+<!ENTITY reason "原因">

@@ -1,0 +1,9 @@
+<!ENTITY top.label "É Tudo Texto!">
+<!ENTITY top.key "t">
+<!ENTITY edit.label "Editar com extensão padrão">
+<!ENTITY edit.key "e">
+<!ENTITY newext.label "Editar com nova extensão...">
+<!ENTITY newext.key "n">
+<!ENTITY pref.label "Preferências...">
+<!ENTITY pref.key "p">
+<!ENTITY readme.label "Exibir o LEIAME...">

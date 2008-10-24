@@ -1,0 +1,9 @@
+<!ENTITY title "It&apos;s All Text! n&apos;a pas réussi à ouvrir votre éditeur">
+<!ENTITY header "Impossible d&apos;ouvrir votre éditeur">
+<!ENTITY pref.label "Préférences">
+<!ENTITY helptext "It&apos;s All Text! a été dans l&apos;incapacité de lancer votre éditeur.
+
+Vous pouvez maintenant soit annuler votre édition, soit choisir un nouvel éditeur dans les préférences. Veillez à indiquer le chemin complet vers l&apos;éditeur, et à ce que celui-ci soit marqué comme exécutable.
+
+Merci.">
+<!ENTITY reason "Cause :">

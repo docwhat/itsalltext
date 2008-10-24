@@ -1,0 +1,15 @@
+<!ENTITY title "Preferencias It&apos;s All Text!">
+<!ENTITY editor.label "Editor:">
+<!ENTITY picker.label "Búsqueda">
+<!ENTITY seconds.label "Segundos entre refresco:">
+<!ENTITY charset.label "Ajuste de caracteres (por defecto: UTF-8):">
+<!ENTITY extensions.label "Extensiones de archivo:">
+<!ENTITY debug.label "Depurador:">
+<!ENTITY debug.humor "Eliminar todos los bugs">
+<!ENTITY gumdrop_position.label "Editar posición de botón">
+<!ENTITY gumdrop_position.disable "Deshabilitar">
+<!ENTITY gumdrop_position.upper_left "Superior Izquierda">
+<!ENTITY gumdrop_position.upper_right "Superior Derecha">
+<!ENTITY gumdrop_position.lower_left "Inferior Izquierda">
+<!ENTITY gumdrop_position.lower_right "Inferior Derecha">
+<!ENTITY fade_time.label "Duración de desvanecido del botón">

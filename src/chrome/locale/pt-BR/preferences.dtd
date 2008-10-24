@@ -1,0 +1,15 @@
+<!ENTITY title "Preferências do É Tudo Texto!">
+<!ENTITY editor.label "Editor:">
+<!ENTITY picker.label "Procurar">
+<!ENTITY seconds.label "Segundos entre cada atualização:">
+<!ENTITY charset.label "Conjunto de caracteres (padrão UTF-8):">
+<!ENTITY extensions.label "Extensões de arquivo:">
+<!ENTITY debug.label "Debug:">
+<!ENTITY debug.humor "Remover todos os bugs">
+<!ENTITY gumdrop_position.label "Editar posição do botão">
+<!ENTITY gumdrop_position.disable "Inibir">
+<!ENTITY gumdrop_position.upper_left "Canto superior esquerdo">
+<!ENTITY gumdrop_position.upper_right "Canto superior direito">
+<!ENTITY gumdrop_position.lower_left "Canto inferior esquerdo">
+<!ENTITY gumdrop_position.lower_right "Canto inferior direito">
+<!ENTITY fade_time.label "Duração da transição do botão">

@@ -1,0 +1,9 @@
+<!ENTITY title "It&apos;s All Text! kunne ikke åbne din editor">
+<!ENTITY header "Kunne ikke åbne din editor">
+<!ENTITY pref.label "Indstillinger">
+<!ENTITY helptext "It&apos;s All Text! kunne ikke starte din editor.
+
+Du kan nu enten annullere din redigering eller du kan bruge indstillingerne til at vælge en ny editor. Vær venlig at sikre dig at du bruger den fulde sti til editoren og at editoren er markeret som eksekvérbar.
+
+Tak.">
+<!ENTITY reason "Årsag:">
