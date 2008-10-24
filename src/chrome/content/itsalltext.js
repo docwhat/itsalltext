@@ -142,9 +142,9 @@ var ItsAllText = function () {
      * @param {Object} message One or more objects can be passed in to display.
      */
     that.debug = function () {
-        var message = that.logString.apply(that, arguments);
-        window.dump(message + '\n');
         if (that.preferences && that.preferences.debug) {
+            var message = that.logString.apply(that, arguments);
+            window.dump(message + '\n');
             try {
                 Firebug.Console.logFormatted(arguments);
             } catch (e) {
@@ -205,7 +205,7 @@ var ItsAllText = function () {
      * @type Hash
      */
     that.preferences = {
-        debug: true,
+        debug: false,
 
         /**
          * Fetches the current value of the preference.
