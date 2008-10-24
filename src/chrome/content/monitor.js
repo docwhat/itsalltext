@@ -34,7 +34,7 @@ function monitor(iat) {
 
 }
 
-monitor.destroy = function () {
+monitor.prototype.hitched_destroy = function () {
     delete this.iat;
 };
 
