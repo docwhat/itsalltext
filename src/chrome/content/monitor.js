@@ -72,8 +72,8 @@ monitor.prototype.hitched_registerPage = function (event) {
  * cache objects in the page.
  */
 monitor.prototype.hitched_watcher = function (offset, init) {
-    if (typeof(offset) === 'number' &&
-        offset.type === 'TabSelect') {
+    // If it's a special number or it's an event, then we need to init.
+    if (offset.type && offset.type === 'TabSelect') {
         init = true;
     }
     var rate = this.iat.getRefresh(),
