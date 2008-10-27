@@ -67,6 +67,49 @@ monitor.prototype.hitched_registerPage = function (event) {
     }
 };
 
+/* Finds all nodes under a doc; includes iframes and frames. */
+monitor.prototype.hitched_findnodes = function (doc) {
+    if (!doc) {
+        return [];
+    }
+    var is_html = this.isHTML(doc),
+        is_xul  = this.isXUL(doc),
+        i,
+        tmp,
+        nodes = [],
+        iframes,
+        frames;
+    if (is_html) {
+        /* HTML */
+        tmp = doc.getElementsByTagName('textarea');
+        for (i = 0; i < tmp.length; i++) {
+            nodes.push(tmp[i]);
+        }
+
+        /* Now that we got the nodes in this document,
+             * look for other documents. */
+        iframes = doc.getElementsByTagName('iframe');
+        for (i = 0; i < iframes.length; i++) {
+            nodes.push.apply(nodes, (this.findnodes(iframes[i].contentDocument)));
+        }
+
+        frames = doc.getElementsByTagName('frame');
+        for (i = 0; i < frames.length; i++) {
+            nodes.push.apply(nodes, (this.findnodes(frames[i].contentDocument)));
+        }
+    } else if (is_xul) {
+        /* XUL */
+        tmp = doc.getElementsByTagName('textbox');
+        for (i = 0; i < tmp.length; i++) {
+            nodes.push(tmp[i]);
+        }
+    } else {
+        this.stopPage({originalTarget: doc});
+        return [];
+    }
+    return nodes;
+};
+
 /**
  * This is called repeatedly and regularly to trigger updates for the
  * cache objects in the page.
@@ -78,56 +121,11 @@ monitor.prototype.hitched_watcher = function (offset, init) {
     }
     var rate = this.iat.getRefresh(),
         now = Date.now(),
-        that = this,
-        findnodes,
         doc,
         nodes = [],
         i,
         cobj,
         node;
-
-    /* Finds all nodes under a doc; includes iframes and frames. */
-    findnodes = function (doc) {
-        if (!doc) {
-            return [];
-        }
-        var is_html = that.isHTML(doc),
-            is_xul  = that.isXUL(doc),
-            i,
-            tmp,
-            nodes = [],
-            iframes,
-            frames;
-        if (is_html) {
-            /* HTML */
-            tmp = doc.getElementsByTagName('textarea');
-            for (i = 0; i < tmp.length; i++) {
-                nodes.push(tmp[i]);
-            }
-
-            /* Now that we got the nodes in this document,
-             * look for other documents. */
-            iframes = doc.getElementsByTagName('iframe');
-            for (i = 0; i < iframes.length; i++) {
-                nodes.push.apply(nodes, (findnodes(iframes[i].contentDocument)));
-            }
-
-            frames = doc.getElementsByTagName('frame');
-            for (i = 0; i < frames.length; i++) {
-                nodes.push.apply(nodes, (findnodes(frames[i].contentDocument)));
-            }
-        } else if (is_xul) {
-            /* XUL */
-            tmp = doc.getElementsByTagName('textbox');
-            for (i = 0; i < tmp.length; i++) {
-                nodes.push(tmp[i]);
-            }
-        } else {
-            that.stopPage({originalTarget: doc});
-            return [];
-        }
-        return nodes;
-    };
 
     if (!init && now - this.last_watcher_call < Math.round(rate * 0.9)) {
         this.iat.debug('watcher(', offset, '/', (now - this.last_watcher_call), ') -- skipping catchup refresh');
@@ -143,7 +141,7 @@ monitor.prototype.hitched_watcher = function (offset, init) {
         doc = gBrowser.selectedBrowser.contentDocument;
     }
     this.iat.debug('watcher: ', offset, init, doc && doc.location);
-    nodes = findnodes(doc);
+    nodes = this.findnodes(doc);
     /* Now that we have the nodes, walk through and either make or
      * get the cache objects and update them. */
     for (i = 0; i < nodes.length; i++) {
