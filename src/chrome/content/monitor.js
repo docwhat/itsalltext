@@ -1,5 +1,5 @@
 /*extern HTMLDocument, gBrowser, ItsAllText */
-/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
+/*jslint undef: true, evil: false, browser: true, white: true */
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -157,6 +157,26 @@ monitor.prototype.hitched_watcher = function (offset, init) {
     }
 };
 
+monitor.prototype._in_DOMSubtreeModified      = false;
+
+monitor.prototype.hitched_handleSubtreeModified = function (event) {
+    var has_textareas;
+    if (this._in_DOMSubtreeModified) {
+        return;
+    }
+    has_textareas = event.originalTarget.getElementsByTagName('textarea').length > 0;
+    if (has_textareas) {
+        try {
+            // Ignore events while adding the gumdrops.
+            this._in_DOMSubtreeModified = true;
+            this.watcher(0, true);
+        } catch (e) {
+            this._in_DOMSubtreeModified = false;
+        }
+        this._in_DOMSubtreeModified = false;
+    }
+};
+
 monitor.prototype.hitched_startPage = function (event, force) {
     var doc = event.originalTarget,
         unsafeWin;
@@ -170,6 +190,7 @@ monitor.prototype.hitched_startPage = function (event, force) {
     if (unsafeWin) {
         this.iat.listen(unsafeWin, 'pagehide', this.stopPage);
     }
+    this.iat.listen(unsafeWin, 'DOMSubtreeModified', this.handleSubtreeModified);
 
     // Kick off a watcher now...
     this.watcher(0, true);
