@@ -25,7 +25,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 0.9.9.1
+VERSION    := 1.0
 
 
 # NOTE: do not create files or directories in here that have
