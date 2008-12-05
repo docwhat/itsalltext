@@ -157,23 +157,24 @@ monitor.prototype.hitched_watcher = function (offset, init) {
     }
 };
 
-monitor.prototype._in_DOMSubtreeModified      = false;
+monitor.prototype._ignore_DOMSubtreeModified      = false;
 
 monitor.prototype.hitched_handleSubtreeModified = function (event) {
     var has_textareas;
-    if (this._in_DOMSubtreeModified) {
+    if (this._ignore_DOMSubtreeModified) {
         return;
     }
     has_textareas = event.originalTarget.getElementsByTagName('textarea').length > 0;
     if (has_textareas) {
+        ItsAllText.debug('handleSubtreeModified: %o', event.target);
         try {
             // Ignore events while adding the gumdrops.
-            this._in_DOMSubtreeModified = true;
+            this._ignore_DOMSubtreeModified = true;
             this.watcher(0, true);
         } catch (e) {
-            this._in_DOMSubtreeModified = false;
+            this._ignore_DOMSubtreeModified = false;
         }
-        this._in_DOMSubtreeModified = false;
+        this._ignore_DOMSubtreeModified = false;
     }
 };
 
@@ -190,10 +191,13 @@ monitor.prototype.hitched_startPage = function (event, force) {
     if (unsafeWin) {
         this.iat.listen(unsafeWin, 'pagehide', this.stopPage);
     }
+
+    // Listen for the subtree being modified.
     this.iat.listen(unsafeWin, 'DOMSubtreeModified', this.handleSubtreeModified);
 
     // Kick off a watcher now...
     this.watcher(0, true);
+
     // Set up the future ones
     this.restart();
 };

@@ -1,5 +1,5 @@
 /*extern ItsAllText, Components */
-/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
+/*jslint undef: true, evil: false, browser: true, white: true */
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -123,6 +123,7 @@ function CacheObj(node) {
      * @param {Event} event The event object.
      */
     that.mouseout = function (event) {
+        ItsAllText.debug("mouseout: %o", event, event.target, that.is_focused);
         if (that.button_fade_timer) {
             clearTimeout(that.button_fade_timer);
         }
@@ -521,6 +522,7 @@ CacheObj.prototype.update = function () {
  * Capture keypresses to do the hotkey edit.
  */
 CacheObj.prototype.keypress = function (event) {
+    ItsAllText.debug('keypress()', event);
     var km = ItsAllText.marshalKeyEvent(event), cobj;
     if (km === ItsAllText.preferences.hotkey) {
         cobj = CacheObj.get(event.target);
@@ -535,6 +537,7 @@ CacheObj.prototype.keypress = function (event) {
  * @param {Object} event The event that triggered this.
  */
 CacheObj.prototype.onClick = function (event) {
+    ItsAllText.debug('onClick()', event);
     var cobj = CacheObj.get(event.target);
     cobj.edit();
     event.stopPropagation();
@@ -588,73 +591,87 @@ CacheObj.prototype.addGumDrop = function () {
         doc,
         gumdrop,
         parent,
-        nextSibling;
-    if (cache_object.button !== null) {
+        nextSibling,
+        previous_ignore = ItsAllText.monitor._ignore_DOMSubtreeModified;
+
+    try {
+        ItsAllText.monitor._ignore_DOMSubtreeModified = true;
+
+        if (cache_object.button !== null) {
+            cache_object.adjust();
+            ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+            return; /*already done*/
+        }
+
+        ItsAllText.debug('addGumDrop');
+
+        // Add the textarea mouseovers even if the button is disabled
+        node = cache_object.node;
+        ItsAllText.listen(node, "mouseover", ItsAllText.hitch(cache_object, "mouseover"), false);
+        ItsAllText.listen(node, "mouseout",  ItsAllText.hitch(cache_object, "mouseout"),  false);
+        ItsAllText.listen(node, "focus",     ItsAllText.hitch(cache_object, "mouseover"), false);
+        ItsAllText.listen(node, "blur",      ItsAllText.hitch(cache_object, "mouseout"),  false);
+        ItsAllText.listen(node, "keypress",  ItsAllText.hitch(cache_object, "keypress"),  false);
+        if (ItsAllText.getDisableGumdrops()) {
+            ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+            return;
+        }
+        ItsAllText.debug('addGumDrop()', cache_object);
+
+        doc = node.ownerDocument;
+        if (!node.parentNode) {
+            ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+            return;
+        }
+
+        gumdrop = doc.createElementNS(ItsAllText.XHTMLNS, "img");
+        gumdrop.setAttribute('src', this.gumdrop_url);
+
+        if (ItsAllText.getDebug()) {
+            gumdrop.setAttribute('title', cache_object.node_id);
+        } else {
+            gumdrop.setAttribute('title', ItsAllText.localeString('program_name'));
+        }
+        cache_object.button = gumdrop; // Store it for easy finding in the future.
+
+        // Image Attributes
+        gumdrop.style.setProperty('cursor',   'pointer',  'important');
+        gumdrop.style.setProperty('display',  'none',     'important');
+        gumdrop.style.setProperty('position', 'absolute', 'important');
+        gumdrop.style.setProperty('padding',  '0',        'important');
+        gumdrop.style.setProperty('margin',   '0',        'important');
+        gumdrop.style.setProperty('border',   'none',     'important');
+        gumdrop.style.setProperty('zIndex',   '32768',    'important');
+
+        gumdrop.style.setProperty('width',  this.gumdrop_width + 'px', 'important');
+        gumdrop.style.setProperty('height', this.gumdrop_height + 'px', 'important');
+
+        gumdrop.setAttribute(ItsAllText.MYSTRING + '_UID', cache_object.uid);
+
+        // Click event handlers
+        ItsAllText.listen(gumdrop, "click", ItsAllText.hitch(cache_object, 'onClick'), false);
+        ItsAllText.listen(gumdrop, "contextmenu", ItsAllText.hitch(cache_object, 'onContext'), false);
+
+        // Insert it into the document
+        parent = node.parentNode;
+        nextSibling = node.nextSibling;
+
+        if (nextSibling) {
+            parent.insertBefore(gumdrop, nextSibling);
+        } else {
+            parent.appendChild(gumdrop);
+        }
+
+        // Add mouseovers/outs
+        ItsAllText.listen(gumdrop, 'mouseover', ItsAllText.hitch(cache_object, 'mouseover'), false);
+        ItsAllText.listen(gumdrop, 'mouseout', ItsAllText.hitch(cache_object, 'mouseout'), false);
+
+        cache_object.mouseout(null);
         cache_object.adjust();
-        return; /*already done*/
+    } catch (e) {
+        ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
     }
-
-    // Add the textarea mouseovers even if the button is disabled
-    node = cache_object.node;
-    ItsAllText.listen(node, "mouseover", ItsAllText.hitch(cache_object, "mouseover"), false);
-    ItsAllText.listen(node, "mouseout",  ItsAllText.hitch(cache_object, "mouseout"),  false);
-    ItsAllText.listen(node, "focus",     ItsAllText.hitch(cache_object, "mouseover"), false);
-    ItsAllText.listen(node, "blur",      ItsAllText.hitch(cache_object, "mouseout"),  false);
-    ItsAllText.listen(node, "keypress",  ItsAllText.hitch(cache_object, "keypress"),  false);
-    if (ItsAllText.getDisableGumdrops()) {
-        return;
-    }
-    ItsAllText.debug('addGumDrop()', cache_object);
-
-    doc = node.ownerDocument;
-    if (!node.parentNode) {
-        return;
-    }
-
-    gumdrop = doc.createElementNS(ItsAllText.XHTMLNS, "img");
-    gumdrop.setAttribute('src', this.gumdrop_url);
-
-    if (ItsAllText.getDebug()) {
-        gumdrop.setAttribute('title', cache_object.node_id);
-    } else {
-        gumdrop.setAttribute('title', ItsAllText.localeString('program_name'));
-    }
-    cache_object.button = gumdrop; // Store it for easy finding in the future.
-
-    // Image Attributes
-    gumdrop.style.setProperty('cursor',   'pointer',  'important');
-    gumdrop.style.setProperty('display',  'none',     'important');
-    gumdrop.style.setProperty('position', 'absolute', 'important');
-    gumdrop.style.setProperty('padding',  '0',        'important');
-    gumdrop.style.setProperty('margin',   '0',        'important');
-    gumdrop.style.setProperty('border',   'none',     'important');
-    gumdrop.style.setProperty('zIndex',   '32768',    'important');
-
-    gumdrop.style.setProperty('width',  this.gumdrop_width + 'px', 'important');
-    gumdrop.style.setProperty('height', this.gumdrop_height + 'px', 'important');
-
-    gumdrop.setAttribute(ItsAllText.MYSTRING + '_UID', cache_object.uid);
-
-    // Click event handlers
-    ItsAllText.listen(gumdrop, "click", ItsAllText.hitch(cache_object, 'onClick'), false);
-    ItsAllText.listen(gumdrop, "contextmenu", ItsAllText.hitch(cache_object, 'onContext'), false);
-
-    // Insert it into the document
-    parent = node.parentNode;
-    nextSibling = node.nextSibling;
-
-    if (nextSibling) {
-        parent.insertBefore(gumdrop, nextSibling);
-    } else {
-        parent.appendChild(gumdrop);
-    }
-
-    // Add mouseovers/outs
-    ItsAllText.listen(gumdrop, 'mouseover', ItsAllText.hitch(cache_object, 'mouseover'), false);
-    ItsAllText.listen(gumdrop, 'mouseout', ItsAllText.hitch(cache_object, 'mouseout'), false);
-
-    cache_object.mouseout(null);
-    cache_object.adjust();
+    ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
 };
 
 /**

@@ -587,10 +587,11 @@ var ItsAllText = function () {
 
     /**
      * Open the editor for a selected node.
+     * This is used by the XUL.
      * @param {Object} node The textarea to get.
      */
     that.onEditNode = function (node) {
-        var cobj = that.CacheObj.get(node);
+        var cobj = that.CacheObj.make(node);
         if (cobj) {
             cobj.edit();
         }
