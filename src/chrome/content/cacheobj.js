@@ -66,7 +66,7 @@ function CacheObj(node) {
     host = window.escape(doc.location.hostname);
     hash = that.hashString([ doc.location.protocol,
                              doc.location.port,
-                             doc.location.search,
+                             doc.location.search ? doc.location.search : '?',
                              doc.location.pathname,
                              that.node_id].join(':'));
     that.base_filename = [host, hash.slice(0, 10)].join('.');
