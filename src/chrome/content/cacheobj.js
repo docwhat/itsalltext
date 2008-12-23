@@ -45,6 +45,7 @@ function CacheObj(node) {
     that.private_is_watching = false;
     that.button_fade_timer = null;
     that.is_focused = false;
+    that.is_listening = false;
 
     that.node_id = that.getNodeIdentifier(node);
 
@@ -591,15 +592,14 @@ CacheObj.prototype.addGumDrop = function () {
         doc,
         gumdrop,
         parent,
-        nextSibling,
-        previous_ignore = ItsAllText.monitor._ignore_DOMSubtreeModified;
+        nextSibling;
 
     try {
-        ItsAllText.monitor._ignore_DOMSubtreeModified = true;
+        ItsAllText.monitor.incrementLock();
 
         if (cache_object.button !== null) {
             cache_object.adjust();
-            ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+            ItsAllText.monitor.decrementLock();
             return; /*already done*/
         }
 
@@ -607,20 +607,23 @@ CacheObj.prototype.addGumDrop = function () {
 
         // Add the textarea mouseovers even if the button is disabled
         node = cache_object.node;
-        ItsAllText.listen(node, "mouseover", ItsAllText.hitch(cache_object, "mouseover"), false);
-        ItsAllText.listen(node, "mouseout",  ItsAllText.hitch(cache_object, "mouseout"),  false);
-        ItsAllText.listen(node, "focus",     ItsAllText.hitch(cache_object, "mouseover"), false);
-        ItsAllText.listen(node, "blur",      ItsAllText.hitch(cache_object, "mouseout"),  false);
-        ItsAllText.listen(node, "keypress",  ItsAllText.hitch(cache_object, "keypress"),  false);
+        if (!cache_object.is_listening) {
+            ItsAllText.listen(node, "mouseover", ItsAllText.hitch(cache_object, "mouseover"), false);
+            ItsAllText.listen(node, "mouseout",  ItsAllText.hitch(cache_object, "mouseout"),  false);
+            ItsAllText.listen(node, "focus",     ItsAllText.hitch(cache_object, "mouseover"), false);
+            ItsAllText.listen(node, "blur",      ItsAllText.hitch(cache_object, "mouseout"),  false);
+            ItsAllText.listen(node, "keypress",  ItsAllText.hitch(cache_object, "keypress"),  false);
+            cache_object.is_listening = true;
+        }
         if (ItsAllText.getDisableGumdrops()) {
-            ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+            ItsAllText.monitor.decrementLock();
             return;
         }
         ItsAllText.debug('addGumDrop()', cache_object);
 
         doc = node.ownerDocument;
         if (!node.parentNode) {
-            ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+            ItsAllText.monitor.decrementLock();
             return;
         }
 
@@ -669,9 +672,9 @@ CacheObj.prototype.addGumDrop = function () {
         cache_object.mouseout(null);
         cache_object.adjust();
     } catch (e) {
-        ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+        ItsAllText.monitor.decrementLock();
     }
-    ItsAllText.monitor._ignore_DOMSubtreeModified = previous_ignore;
+    ItsAllText.monitor.decrementLock();
 };
 
 /**

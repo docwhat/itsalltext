@@ -157,11 +157,21 @@ monitor.prototype.hitched_watcher = function (offset, init) {
     }
 };
 
-monitor.prototype._ignore_DOMSubtreeModified      = false;
+monitor.prototype._lock_count = 0;
+
+monitor.prototype.hitched_incrementLock = function () {
+    this._lock_count ++;
+};
+monitor.prototype.hitched_decrementLock = function () {
+    this._lock_count --;
+};
+monitor.prototype.hitched_isLocked = function () {
+    return this._lock_count > 0;
+};
 
 monitor.prototype.hitched_handleSubtreeModified = function (event) {
     var has_textareas;
-    if (this._ignore_DOMSubtreeModified) {
+    if (this.isLocked()) {
         return;
     }
     has_textareas = event.originalTarget.getElementsByTagName('textarea').length > 0;
@@ -169,12 +179,12 @@ monitor.prototype.hitched_handleSubtreeModified = function (event) {
         ItsAllText.debug('handleSubtreeModified: %o', event.target);
         try {
             // Ignore events while adding the gumdrops.
-            this._ignore_DOMSubtreeModified = true;
+            this.incrementLock();
             this.watcher(0, true);
         } catch (e) {
-            this._ignore_DOMSubtreeModified = false;
+            this.decrementLock();
         }
-        this._ignore_DOMSubtreeModified = false;
+        this.decrementLock();
     }
 };
 
@@ -196,7 +206,9 @@ monitor.prototype.hitched_startPage = function (event, force) {
     this.iat.listen(unsafeWin, 'DOMSubtreeModified', this.handleSubtreeModified);
 
     // Kick off a watcher now...
+    this.incrementLock();
     this.watcher(0, true);
+    this.decrementLock();
 
     // Set up the future ones
     this.restart();
