@@ -412,12 +412,14 @@ var ItsAllText = function () {
     that.openPreferences = function (wait) {
         wait = typeof(wait) == 'boolean' ? wait : false;
         var paneID = that.MYSTRING + '_preferences',
-            instantApply = getBoolPref("browser.preferences.instantApply", false) && !wait,
+            psvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch),
+            instantApply = psvc.getBoolPref("browser.preferences.instantApply", false) && !wait,
             features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal"),
             xpcom_wm = Components.classes["@mozilla.org/appshell/window-mediator;1"],
             wm = xpcom_wm.getService(Components.interfaces.nsIWindowMediator),
             win = wm.getMostRecentWindow("Browser:Preferences"),
             pane;
+
         if (win) {
             win.focus();
             if (paneID) {
@@ -721,8 +723,10 @@ ItsAllText.prototype.hitch = function (object, method) {
 ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
     opt_capture = !!opt_capture;
     this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
-    Components.lookupMethod(source, "addEventListener")(
-        event, listener, opt_capture);
+    if (source) {
+        Components.lookupMethod(source, "addEventListener")(
+            event, listener, opt_capture);
+    }
 };
 
 /**

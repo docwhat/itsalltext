@@ -72,7 +72,7 @@
          */
         node.style.MozAppearance = 'none';
 
-        cache_object = node && ItsAllText.getCacheObj(node);
+        cache_object = node && ItsAllText.CacheObj.get(node);
         if (!cache_object) {
             return;
         }
