@@ -903,10 +903,7 @@ ItsAllText.prototype.rebuildMenu = function (uid, menu_id, is_disabled) {
     for (i = 0; i < exts.length; i++) {
         node = document.createElementNS(that.XULNS, 'menuitem');
         node.setAttribute('label', that.localeFormat('edit_ext', [exts[i]]));
-        (function () {
-            var ext = exts[i];
-            that.listen(node, 'command', that.hitch(that, 'menuExtEdit', ext, true), false);
-        })();
+        that.listen(node, 'command', that.hitch(that, 'menuExtEdit', exts[i], true), false);
         node.setAttribute('disabled', is_disabled?'true':'false');
         menu.insertBefore(node, magic_stop_node);
     }
