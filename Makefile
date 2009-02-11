@@ -25,7 +25,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 1.1
+VERSION    := 1.2
 
 
 # NOTE: do not create files or directories in here that have
@@ -70,7 +70,7 @@ all: lintcheck narf docs final
 .PHONY: release
 release: version_check $(XPI_FILE)
 	$(Q)echo "Don't forget to bump the version number if $(VERSION) isn't right!"
-	$(Q)echo "hg tag release-$(VERSION)"
+	$(Q)echo "git tag release-$(VERSION) ; git push --tags"
 
 ## Show the version
 .PHONY: version_check
