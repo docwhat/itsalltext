@@ -11,5 +11,5 @@
 <!ENTITY gumdrop_position.upper_left "左上方">
 <!ENTITY gumdrop_position.upper_right "右上方">
 <!ENTITY gumdrop_position.lower_left "左下方">
-<!ENTITY gumdrop_position.lower_right "右上方">
+<!ENTITY gumdrop_position.lower_right "右下方">
 <!ENTITY fade_time.label "按钮阴影持续时间">
