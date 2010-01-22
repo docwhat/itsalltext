@@ -566,18 +566,12 @@ CacheObj.prototype.onContext = function (event) {
     var cobj = CacheObj.get(event.target),
         popup = ItsAllText.rebuildMenu(cobj.uid);
 
-    if (popup.openPopup) {
-        /* FF3 breath of sanity. */
-        popup.openPopup(cobj.button, 'end_before',
-                        0, cobj.gumdrop_height,
-                        true, false);
-    } else {
-        document.popupNode = popup;
-        popup.showPopup(document.documentElement,
-                        event.screenX, event.screenY,
-                        'popup', false, false);
-    }
+    popup.openPopup(cobj.button, 'end_before',
+                    0, 0,
+                    true, false);
+
     event.stopPropagation();
+    event.preventDefault();
     return false;
 };
 
