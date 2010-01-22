@@ -3,125 +3,129 @@
  
 <!DOCTYPE prefwindow SYSTEM "chrome://itsalltext/locale/preferences.dtd" >
 <prefwindow id="itsalltext-prefs"
-         title="&title;"
-         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-         buttons="accept,cancel"
-         onload="pref_onload();">
+            title="&title;"
+            xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+            buttons="accept,cancel">
 
-<script type="application/x-javascript" src="preferences.js"/>
-<script type="application/x-javascript" src="itsalltext.js"/>
+  <stringbundleset id="strbundles">
+    <stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties" /> 
+  </stringbundleset>
 
-<stringbundleset id="strbundles">
-<stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties"/>
-</stringbundleset>
- 
-<prefpane 
-    id="itsalltext-pane"
-    label="&title;"
-    flex="1">
-  <preferences>
-    <preference id="pref_charset"
-                name="extensions.itsalltext.charset" type="string"/>
-    <preference id="pref_editor"
-                name="extensions.itsalltext.editor" type="string"/>
-    <preference id="pref_seconds"
-                name="extensions.itsalltext.refresh" type="int"/>
-    <preference id="pref_extensions"
-                name="extensions.itsalltext.extensions" type="string"/>
-    <preference id="pref_gumdrop_position"
-                name="extensions.itsalltext.gumdrop_position" type="string"/>
-    <preference id="pref_fade_time"
-                name="extensions.itsalltext.fade_time" type="string"/>
-    <preference id="pref_hotkey"
-                name="extensions.itsalltext.hotkey" type="string"/>
-    <preference id="pref_debug"
-                name="extensions.itsalltext.debug" type="bool"/>
-  </preferences>
+  <prefpane 
+      id="itsalltext-pane"
+      label="&title;"
+      onpaneload="pref_onload();"
+      flex="1">
 
-  <hbox>
-    <grid>
-      <columns>
-        <column/>
-        <column/>
-      </columns>
-      <rows>
-        <row align="center">
-          <label control="editor" value="&editor.label;"/>
-          <vbox>
-            <textbox preference="pref_editor" id="editor" size="20"
-             style="-moz-appearance: none !important; background:
-             inherit;" />
-            <hbox align="right">
-              <spacer/>
-              <button oncommand="pref_editor_select();" label="&picker.label;"
-              id="browse" accesskey="b" tabindex="1"/>
-            </hbox>
-          </vbox>
-        </row>
-        <row align="center">
-          <label control="seconds" value="&seconds.label;"/>
-          <hbox>
-            <textbox preference="pref_seconds" id="seconds" size="2"
-            maxlength="2" tabindex="2"/>
-            <spacer/>
-          </hbox>
-        </row>
-        <row align="center">
-          <label control="charset"
-                 value="&charset.label;"/>
-          <hbox>
-            <textbox preference="pref_charset" id="charset" size="8" tabindex="3"/>
-            <spacer/>
-          </hbox>
-        </row>
-        <row align="center">
-          <label control="extensions"
-                 value="&extensions.label;"/>
-          <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4"/>
-        </row>
-        <row align="center">
-          <label control="gumdrop_pos" value="&gumdrop_position.label;"/>
-          <radiogroup id="gumpdrop_pos" preference="pref_gumdrop_position">
+    <preferences>
+      <preference id="pref_charset"
+                  name="extensions.itsalltext.charset" type="string" />
+      <preference id="pref_editor"
+                  name="extensions.itsalltext.editor" type="string" />
+      <preference id="pref_seconds"
+                  name="extensions.itsalltext.refresh" type="int" />
+      <preference id="pref_extensions"
+                  name="extensions.itsalltext.extensions" type="string" />
+      <preference id="pref_gumdrop_position"
+                  name="extensions.itsalltext.gumdrop_position" type="string" />
+      <preference id="pref_fade_time"
+                  name="extensions.itsalltext.fade_time" type="string" />
+      <preference id="pref_hotkey"
+                  name="extensions.itsalltext.hotkey" type="string" />
+      <preference id="pref_debug"
+                  name="extensions.itsalltext.debug" type="bool" />
+    </preferences>
+
+    <hbox>
+      <grid>
+        <columns>
+          <column />
+          <column />
+        </columns>
+        <rows>
+          <row align="center">
+            <label control="editor" value="&editor.label;" />
             <vbox>
-              <hbox>
-                <radio value="upper-left"  label="&gumdrop_position.upper_left;" tabindex="5"/>
-                <radio value="upper-right" label="&gumdrop_position.upper_right;" tabindex="6"/>
-              </hbox>
-              <hbox>
-                <radio value="lower-left"  label="&gumdrop_position.lower_left;" tabindex="7"/>
-                <radio value="lower-right" label="&gumdrop_position.lower_right;" tabindex="8"/>
+              <textbox preference="pref_editor" id="editor" size="20"
+                       style="-moz-appearance: none !important; background:
+                              inherit;" />
+              <hbox align="right">
+                <spacer />
+                <button oncommand="pref_editor_select();" label="&picker.label;"
+                        id="browse" accesskey="b" tabindex="1" />
               </hbox>
             </vbox>
-            <radio value="none"        label="&gumdrop_position.disable;" tabindex="9"/>
-          </radiogroup>
-        </row>
-        <row align="center">
-          <label control="fade_time" value="&fade_time.label;" tabindex="10"/>
-          <hbox>
-            <textbox preference="pref_fade_time" id="fade_time" size="3"
-            maxlength="3" tabindex="11"/>
-            <spacer/>
-          </hbox>
-        </row>
-        <row align="hotkey">
-          <label value="Hot Key"/>
-          <hbox>
-            <textbox id="disp-hotkey"
-                     onkeypress="pref_grab('disp-hotkey', event);"/>
-            <spacer/>
-          </hbox>
-        </row>
-        <row align="center">
-          <label control="debug"
-                 value="&debug.label;"/>
-          <checkbox preference="pref_debug" id="debug" tabindex="12"
-          label="&debug.humor;"/>
-        </row>
-      </rows>
-    </grid>
-    <vbox id="help" flex="1">
-    </vbox>
-  </hbox>
-</prefpane>
- 
+          </row>
+          <row align="center">
+            <label control="seconds" value="&seconds.label;" />
+            <hbox>
+              <textbox preference="pref_seconds" id="seconds" size="2"
+                       maxlength="2" tabindex="2" />
+              <spacer />
+            </hbox>
+          </row>
+          <row align="center">
+            <label control="charset"
+                   value="&charset.label;" />
+            <hbox>
+              <textbox preference="pref_charset" id="charset" size="8" tabindex="3" />
+              <spacer />
+            </hbox>
+          </row>
+          <row align="center">
+            <label control="extensions"
+                   value="&extensions.label;" />
+            <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4" />
+          </row>
+          <row align="center">
+            <label control="gumdrop_pos" value="&gumdrop_position.label;" />
+            <radiogroup id="gumpdrop_pos" preference="pref_gumdrop_position">
+              <vbox>
+                <hbox>
+                  <radio value="upper-left"  label="&gumdrop_position.upper_left;" tabindex="5" />
+                  <radio value="upper-right" label="&gumdrop_position.upper_right;" tabindex="6" />
+                </hbox>
+                <hbox>
+                  <radio value="lower-left"  label="&gumdrop_position.lower_left;" tabindex="7" />
+                  <radio value="lower-right" label="&gumdrop_position.lower_right;" tabindex="8" />
+                </hbox>
+              </vbox>
+              <radio value="none"        label="&gumdrop_position.disable;" tabindex="9" />
+            </radiogroup>
+          </row>
+          <row align="center">
+            <label control="fade_time" value="&fade_time.label;" tabindex="10" />
+            <hbox>
+              <textbox preference="pref_fade_time" id="fade_time" size="3"
+                       maxlength="3" tabindex="11" />
+              <spacer />
+            </hbox>
+          </row>
+          <row align="hotkey">
+            <label value="Hot Key" />
+            <hbox>
+              <textbox id="disp-hotkey"
+                       onkeypress="pref_grab('disp-hotkey', event);" />
+              <spacer />
+            </hbox>
+          </row>
+          <row align="center">
+            <label control="debug"
+                   value="&debug.label;" />
+            <checkbox preference="pref_debug" id="debug" tabindex="12"
+                      label="&debug.humor;" />
+          </row>
+        </rows>
+      </grid>
+      <vbox id="help" flex="1">
+      </vbox>
+    </hbox>
+
+  </prefpane>
+
+  <!-- These mess up the prefwindow if they come before the prefpanes
+       https://bugzilla.mozilla.org/show_bug.cgi?id=296418 -->
+  <script src="preferences.js" />
+  <script src="itsalltext.js" />
+
 </prefwindow>
