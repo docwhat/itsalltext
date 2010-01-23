@@ -190,15 +190,14 @@ var ItsAllText = function () {
     /* Clean the edit directory whenever we create a new window. */
     that.cleanEditDir();
 
-    loadthings = function () {
-        /* Load the various bits needed to make this work. */
+    /* Load the various bits needed to make this work. */
+    (function () {
         var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
         loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
         loader.loadSubScript('chrome://itsalltext/content/monitor.js', that);
         loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
         that.monitor = new that.monitor(that);
-    };
-    loadthings();
+    })();
 
     /**
      * Dictionary for storing the preferences in.
@@ -323,7 +322,7 @@ var ItsAllText = function () {
     that.getRefresh = function () {
         var refresh = that.preferences.refresh;
         if (!refresh || refresh < 1) {
-            that.debug('Invalid refresh:', refresh);
+            //disabled-debug -- that.debug('Invalid refresh:', refresh);
             refresh = 1;
         }
         return 1000 * refresh;
@@ -479,7 +478,7 @@ var ItsAllText = function () {
                 }
             }
         }
-        that.debug('textarea count (tracker):', count);
+        //disabled-debug -- that.debug('textarea count (tracker):', count);
     };
 
     // @todo [wish] Refresh textarea on editor quit.
@@ -643,7 +642,7 @@ var ItsAllText = function () {
             var browser = getBrowser();
             browser.selectedTab = browser.addTab(that.README);
         } catch (e) {
-            that.debug("failed to openReadme:", e);
+            //disabled-debug -- that.debug("failed to openReadme:", e);
         }
     };
 
@@ -651,7 +650,7 @@ var ItsAllText = function () {
     // Do the startup when things are loaded.
     // TODONOW: move to separate function
     that.listen(window, 'load', function (event) {
-        that.debug('!!load', event);
+        //disabled-debug -- that.debug('!!load', event);
         if (typeof(gBrowser) === 'undefined') {
             that.monitor.registerPage(event);
         } else {
@@ -677,7 +676,7 @@ var ItsAllText = function () {
             that.monitor.stopPage(event);
         }
         var doc = event.originalTarget;
-        that.debug("pageunload(): A page has been unloaded", doc && doc.location);
+        //disabled-debug -- that.debug("pageunload(): A page has been unloaded", doc && doc.location);
         that.cleanCacheObjs();
         that.preference_observer.unregister();
         that.monitor.destroy();
@@ -726,7 +725,8 @@ ItsAllText.prototype.hitch = function (object, method) {
  */
 ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
     opt_capture = !!opt_capture;
-    this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
+    this.unlisten(source, event, listener, opt_capture);
+    //disabled-debug -- this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
     if (source) {
         source.addEventListener(event, listener, opt_capture);
     }
@@ -741,11 +741,11 @@ ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
  */
 ItsAllText.prototype.unlisten = function (source, event, listener, opt_capture) {
     opt_capture = !!opt_capture;
-    this.debug("unlisten(%o, %o, -, %o)", source, event, opt_capture);
+    //disabled-debug -- this.debug("unlisten(%o, %o, -, %o)", source, event, opt_capture);
     try {
         source && source.removeEventListener(event, listener, opt_capture);
     } catch (err) {
-        this.debug("didn't unlisten: %o", err);
+        //disabled-debug -- this.debug("didn't unlisten: %o", err);
     }
 };
 
@@ -848,7 +848,7 @@ ItsAllText.prototype.menuExtEdit = function (ext, clobber, event) {
     if (ext !== null) {
         ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
     }
-    this.debug('menuExtEdit:', uid, ext, clobber);
+    //disabled-debug -- this.debug('menuExtEdit:', uid, ext, clobber);
     cobj.edit(ext, clobber);
 };
 

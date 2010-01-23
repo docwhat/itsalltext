@@ -25,10 +25,22 @@
  */
 function CacheObj(node) {
     var that = this,
+        hitch_re = /^hitched_/,
         doc = node.ownerDocument,
         host,
         hash,
         extension;
+
+    this.uuid = Math.floor(Math.random()*2000);
+    //disabled-debug -- ItsAllText.debug('CacheObject ', this.uuid, node);
+
+    for (method in this) {
+        if (hitch_re.test(method)) {
+
+            //disabled-debug -- ItsAllText.debug('CacheObj ', this.uuid, 'hitching ', method, ' -> ', method.replace(hitch_re, ''));
+            this[method.replace(hitch_re, '')] = ItsAllText.hitch(this, method);
+        }
+    }
 
     /* Gumdrop Image URL */
     that.gumdrop_url    = 'chrome://itsalltext/locale/gumdrop.png';
@@ -58,7 +70,7 @@ function CacheObj(node) {
                                  that.node_id ].join(':'));
     // @todo [security] Add a serial to the uid hash.
 
-    node.setAttribute(ItsAllText.MYSTRING + '_UID', that.uid);
+    node.setUserData(ItsAllText.MYSTRING + '_UID', that.uid, null);
     ItsAllText.tracker[that.uid] = that;
 
     /* Figure out where we will store the file.  While the filename can
@@ -124,7 +136,7 @@ function CacheObj(node) {
      * @param {Event} event The event object.
      */
     that.mouseout = function (event) {
-        ItsAllText.debug("mouseout: %o", event, event.target, that.is_focused);
+        //disabled-debug -- ItsAllText.debug("mouseout: %o", event, event.target, that.is_focused);
         if (that.button_fade_timer) {
             clearTimeout(that.button_fade_timer);
         }
@@ -161,13 +173,13 @@ function CacheObj(node) {
  * Destroys the object, unallocating as much as possible to prevent leaks.
  */
 CacheObj.prototype.destroy = function () {
-    ItsAllText.debug('destroying', this.node_id, this.uid);
+    //disabled-debug -- ItsAllText.debug('destroying', this.node_id, this.uid);
     var node = this.node,
         doc  = this.node.ownerDocument,
         html = doc.getElementsByTagName('html')[0];
 
-    node.removeAttribute(ItsAllText.MYSTRING + '_UID');
-    html.removeAttribute(ItsAllText.MYSTRING + '_id_serial');
+    //node.removeAttribute(ItsAllText.MYSTRING + '_UID');
+    //html.removeAttribute(ItsAllText.MYSTRING + '_id_serial');
 
     delete this.node;
     delete this.button;
@@ -221,7 +233,7 @@ CacheObj.prototype.initFromExistingFile = function () {
             try {
                 entry.remove(false);
             } catch (e) {
-                ItsAllText.debug('unable to remove', entry, 'because:', e);
+                //disabled-debug -- ItsAllText.debug('unable to remove', entry, 'because:', e);
             }
         }
     }
@@ -247,14 +259,14 @@ CacheObj.prototype.getNodeIdentifier = function (node) {
         attr = ItsAllText.MYSTRING + '_id_serial';
 
         /* Get a serial that's unique to this document */
-        serial = doc.getAttribute(attr);
+        serial = doc.getUserData(attr);
         if (serial) {
             serial = parseInt(serial, 10) + 1;
         } else {
             serial = 1;
         }
         id = [ItsAllText.MYSTRING, 'generated_id', name, serial].join('_');
-        doc.setAttribute(attr, serial);
+        doc.setUserData(attr, serial, null);
         node.setAttribute('id', id);
     }
     return id;
@@ -334,7 +346,7 @@ CacheObj.prototype.getStyle = function (node, attr) {
  * @param {boolean} clobber Should an existing file be clobbered?
  */
 CacheObj.prototype.edit = function (extension, clobber) {
-    ItsAllText.debug('edit(', extension, ', ', clobber, ')');
+    ItsAllText.debug(this.uuid, 'edit(', extension, ', ', clobber, ')', this.uid);
     extension = typeof(extension) === 'string'?extension:this.extension;
     this.setExtension(extension);
 
@@ -404,7 +416,7 @@ CacheObj.prototype.remove = function () {
         try {
             this.file.remove();
         } catch (e) {
-            ItsAllText.debug('remove(', this.file.path, '): ', e);
+            //disabled-debug -- ItsAllText.debug('remove(', this.file.path, '): ', e);
             return false;
         }
     }
@@ -522,8 +534,8 @@ CacheObj.prototype.update = function () {
 /**
  * Capture keypresses to do the hotkey edit.
  */
-CacheObj.prototype.keypress = function (event) {
-    ItsAllText.debug('keypress()', event);
+CacheObj.prototype.hitched_keypress = function (event) {
+    ItsAllText.debug(this.uuid, 'keypress()', event);
     var km = ItsAllText.marshalKeyEvent(event), cobj;
     if (km === ItsAllText.preferences.hotkey) {
         cobj = CacheObj.get(event.target);
@@ -538,7 +550,7 @@ CacheObj.prototype.keypress = function (event) {
  * @param {Object} event The event that triggered this.
  */
 CacheObj.prototype.onClick = function (event) {
-    ItsAllText.debug('onClick()', event);
+    //disabled-debug -- ItsAllText.debug('onClick()', event);
     var cobj = CacheObj.get(event.target);
     cobj.edit();
     event.stopPropagation();
@@ -597,16 +609,15 @@ CacheObj.prototype.addGumDrop = function () {
             return; /*already done*/
         }
 
-        ItsAllText.debug('addGumDrop');
-
         // Add the textarea mouseovers even if the button is disabled
         node = cache_object.node;
+        ItsAllText.debug('addGumDrop', cache_object.uuid, node);
         if (!cache_object.is_listening) {
             ItsAllText.listen(node, "mouseover", ItsAllText.hitch(cache_object, "mouseover"), false);
             ItsAllText.listen(node, "mouseout",  ItsAllText.hitch(cache_object, "mouseout"),  false);
             ItsAllText.listen(node, "focus",     ItsAllText.hitch(cache_object, "mouseover"), false);
             ItsAllText.listen(node, "blur",      ItsAllText.hitch(cache_object, "mouseout"),  false);
-            ItsAllText.listen(node, "keypress",  ItsAllText.hitch(cache_object, "keypress"),  false);
+            ItsAllText.listen(node, "keypress",  cache_object.keypress,  false);
             cache_object.is_listening = true;
         }
         if (ItsAllText.getDisableGumdrops()) {
@@ -643,7 +654,7 @@ CacheObj.prototype.addGumDrop = function () {
         gumdrop.style.setProperty('width',  this.gumdrop_width + 'px', 'important');
         gumdrop.style.setProperty('height', this.gumdrop_height + 'px', 'important');
 
-        gumdrop.setAttribute(ItsAllText.MYSTRING + '_UID', cache_object.uid);
+        gumdrop.setUserData(ItsAllText.MYSTRING + '_UID', cache_object.uid, null);
 
         // Click event handlers
         ItsAllText.listen(gumdrop, "click", ItsAllText.hitch(cache_object, 'onClick'), false);
@@ -803,8 +814,8 @@ CacheObj.get = function (node) {
         id = null;
     if (typeof(node) === 'string') {
         id = node;
-    } else if (node && node.hasAttribute(str)) {
-        id = node.getAttribute(str);
+    } else if (node && node.getUserData(str)) {
+        id = node.getUserData(str);
     }
     if (id && ItsAllText.tracker.hasOwnProperty(id)) {
         return ItsAllText.tracker[id];
@@ -822,6 +833,7 @@ CacheObj.get = function (node) {
  */
 CacheObj.make = function (node, create_gumdrop) {
     var cobj = CacheObj.get(node);
+    ItsAllText.debug('CacheObj.make(',node,', ', create_gumdrop,') = ',cobj, ' : ', cobj ? cobj.uid : 'null');
     if (!cobj) {
         cobj = new CacheObj(node);
         if (create_gumdrop) {

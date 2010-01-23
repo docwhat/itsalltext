@@ -22,12 +22,12 @@ function monitor(iat) {
     var hitch_re = /^hitched_/,
         method;
     this.iat = iat;
-    this.iat.debug('monitor');
+    //disabled-debug -- this.iat.debug('monitor');
 
     for (method in this) {
         if (hitch_re.test(method)) {
 
-            this.iat.debug('hitching ', method, ' -> ', method.replace(hitch_re, ''));
+            //disabled-debug -- this.iat.debug('hitching ', method, ' -> ', method.replace(hitch_re, ''));
             this[method.replace(hitch_re, '')] = this.iat.hitch(this, method);
         }
     }
@@ -55,7 +55,7 @@ monitor.prototype.hitched_registerPage = function (event) {
     var doc, appContent;
     if (event.originalTarget instanceof HTMLDocument) {
         doc = event.originalTarget;
-        this.iat.debug('registerPage: ', doc && doc.location);
+        //disabled-debug -- this.iat.debug('registerPage: ', doc && doc.location);
 
         /* appContent is the browser chrome. */
         appContent = document.getElementById("appcontent");
@@ -63,7 +63,7 @@ monitor.prototype.hitched_registerPage = function (event) {
         this.iat.listen(document, 'unload', this.stopPage, true);
         this.iat.listen(gBrowser.tabContainer, 'TabSelect', this.watcher, true);
         this.startPage({originalTarget: doc});
-        this.iat.debug('RegisterPage: END');
+        //disabled-debug -- this.iat.debug('RegisterPage: END');
     }
 };
 
@@ -128,7 +128,7 @@ monitor.prototype.hitched_watcher = function (offset, init) {
         node;
 
     if (!init && now - this.last_watcher_call < Math.round(rate * 0.9)) {
-        this.iat.debug('watcher(', offset, '/', (now - this.last_watcher_call), ') -- skipping catchup refresh');
+        //disabled-debug -- this.iat.debug('watcher(', offset, '/', (now - this.last_watcher_call), ') -- skipping catchup refresh');
         return;
     }
     this.last_watcher_call = now;
@@ -140,7 +140,7 @@ monitor.prototype.hitched_watcher = function (offset, init) {
         /* If we're in a tabbed browser. */
         doc = gBrowser.selectedBrowser.contentDocument;
     }
-    this.iat.debug('watcher: ', offset, init, doc && doc.location);
+    //disabled-debug -- this.iat.debug('watcher: ', offset, init, doc && doc.location);
     nodes = this.findnodes(doc);
     /* Now that we have the nodes, walk through and either make or
      * get the cache objects and update them. */
@@ -176,7 +176,7 @@ monitor.prototype.hitched_handleSubtreeModified = function (event) {
     }
     has_textareas = event.originalTarget.getElementsByTagName('textarea').length > 0;
     if (has_textareas) {
-        ItsAllText.debug('handleSubtreeModified: %o', event.target);
+        //disabled-debug -- ItsAllText.debug('handleSubtreeModified: %o', event.target);
         try {
             // Ignore events while adding the gumdrops.
             this.incrementLock();
@@ -191,7 +191,7 @@ monitor.prototype.hitched_handleSubtreeModified = function (event) {
 monitor.prototype.hitched_startPage = function (event, force) {
     var doc = event.originalTarget,
         unsafeWin;
-    this.iat.debug('startPage', doc && doc.location, force);
+    //disabled-debug -- this.iat.debug('startPage', doc && doc.location, force);
     if (!(force || this.isHTML(doc))) {
         this.stopPage(event);
         return;
@@ -217,7 +217,7 @@ monitor.prototype.hitched_startPage = function (event, force) {
 monitor.prototype.hitched_stopPage = function (event) {
     var doc = event.originalTarget,
         unsafeWin;
-    this.iat.debug('stopPage', doc && doc.location);
+    //disabled-debug -- this.iat.debug('stopPage', doc && doc.location);
 
     unsafeWin = doc.defaultView.wrappedJSObject;
     if (unsafeWin) {
