@@ -639,8 +639,12 @@ var ItsAllText = function () {
     };
 
     that.openReadme = function () {
-        var browser = getBrowser();
-        browser.selectedTab = browser.addTab(that.README, null);
+        try {
+            var browser = getBrowser();
+            browser.selectedTab = browser.addTab(that.README);
+        } catch (e) {
+            that.debug("failed to openReadme:", e);
+        }
     };
 
 
