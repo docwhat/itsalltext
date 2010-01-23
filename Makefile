@@ -25,7 +25,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 1.3.1
+VERSION    := 1.4
 
 
 # NOTE: do not create files or directories in here that have
@@ -89,7 +89,7 @@ version_check:
 .PHONY: stage1
 stage1: .stage1-stamp
 
-.stage1-stamp: Makefile narf lintcheck $(STAGE1_OUT)
+.stage1-stamp: Makefile $(STAGE1_OUT)
 	$(Q)touch $@
 
 stage1/%: src/%
