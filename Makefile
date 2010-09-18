@@ -25,7 +25,7 @@ ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 1.4.1
+VERSION    := 1.4.2
 
 
 # NOTE: do not create files or directories in here that have
@@ -155,8 +155,8 @@ $(SOURCES_JS_WARN): lint/%.js.warn: %.js
 
 .PHONY: lintcheck
 lintcheck: $(SOURCES_JS_LINT) $(SOURCES_JS_WARN)
-	$(Q)egrep -q '^lint at '    $(SOURCES_JS_LINT) ; test $$? != 0
-	$(Q)egrep -q '^\[WARNING\]' $(SOURCES_JS_WARN) ; test $$? != 0
+	$(Q)egrep -q '^lint at '    $(SOURCES_JS_LINT)
+	$(Q)egrep -q '^\[WARNING\]' $(SOURCES_JS_WARN)
 
 .PHONY: showlint
 showlint: lint

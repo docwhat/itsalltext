@@ -16,3 +16,4 @@ locale  itsalltext zh-CN chrome/locale/zh-CN/
 locale  itsalltext zh-TW chrome/locale/zh-TW/
 
 overlay chrome://browser/content/browser.xul chrome://itsalltext/content/itsalltext.xul
+overlay chrome://navigator/content/navigator.xul chrome://itsalltext/content/itsalltext.xul

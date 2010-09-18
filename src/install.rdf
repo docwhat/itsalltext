@@ -2,10 +2,20 @@
 <RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+  <!-- Firefox -->
   <RDF:Description RDF:about="rdf:#$firefox"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="3.5"
                    em:maxVersion="3.7a1pre" />
+
+  <!-- SeaMonkey -->
+  <RDF:Description RDF:about="rdf:#$seamonkey"
+      em:id="{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}"
+      em:minVersion="2.0"
+      em:maxVersion="2.0.*" />
+
+  <!-- My Extension -->
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="itsalltext@docwhat.gerf.org"
                    em:version="999.@@VERSION@@"
@@ -18,5 +28,6 @@
                    em:aboutURL="chrome://itsalltext/content/about.xul"
                    em:creator="Christian Höltje">
     <em:targetApplication RDF:resource="rdf:#$firefox"/>
+    <em:targetApplication RDF:resource="rdf:#$seamonkey"/>
   </RDF:Description>
 </RDF:RDF>
