@@ -31,7 +31,7 @@
   <!-- The merge point is main-window -->
   <window id="main-window">
     <popupset id="itsalltext-optionmenu-set">
-      <popup id="itsalltext-optionmenu">
+      <menupopup id="itsalltext-optionmenu">
         <menuitem label="&newext.label;"
                   accesskey="&newext.key;"
                   oncommand="ItsAllText.menuNewExtEdit(event);" />
@@ -43,7 +43,7 @@
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
                   oncommand="ItsAllText.openPreferences();"/>
-      </popup>
+      </menupopup>
     </popupset>
   </window>
 
