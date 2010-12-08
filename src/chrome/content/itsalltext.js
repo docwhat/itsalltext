@@ -413,7 +413,7 @@ var ItsAllText = function () {
         var paneID = that.MYSTRING + '_preferences',
             psvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch),
             instantApply = psvc.getBoolPref("browser.preferences.instantApply", false) && !wait,
-            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal"),
+            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog" : ",modal"),
             xpcom_wm = Components.classes["@mozilla.org/appshell/window-mediator;1"],
             wm = xpcom_wm.getService(Components.interfaces.nsIWindowMediator),
             win = wm.getMostRecentWindow("Browser:Preferences"),
@@ -427,7 +427,7 @@ var ItsAllText = function () {
             }
         } else {
             openDialog('chrome://itsalltext/content/preferences.xul',
-                       "", features, paneID);
+                       "preferences", features, paneID, wait);
         }
     };
 
