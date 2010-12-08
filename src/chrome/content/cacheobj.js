@@ -537,6 +537,11 @@ CacheObj.prototype.update = function () {
         if (value !== null) {
             this.fade(20, 100);
             this.node.value = value;
+
+	    var event = document.createEvent("HTMLEvents");
+	    event.initEvent('change', true, false);
+	    this.node.dispatchEvent(event);
+
             return true;
         }
     }
