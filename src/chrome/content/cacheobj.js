@@ -365,18 +365,30 @@ CacheObj.prototype.edit = function (extension, clobber) {
 
     try {
         program = ItsAllText.getEditor();
+
         // checks
         if (program === null) {
-            throw {name: "Editor is not set."};
+	    throw {name: "Editor is not set."};
         }
+
         if (!program.exists()) {
-            throw {name: "NS_ERROR_FILE_NOT_FOUND"};
+	    throw {name: "NS_ERROR_FILE_NOT_FOUND"};
         }
-        /* Mac check because of
-         * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
-        if (!(ItsAllText.isDarwin() || program.isExecutable())) {
-            throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
-        }
+
+	if (ItsAllText.isDarwin() &&
+	    program.isDirectory() &&
+	    program.leafName.match(/\.app$/i)) {
+	    // OS-X .app bundles should be run with open.
+            args = ['-a', program.path, '--args', filename];
+	    program = ItsAllText.factoryFile('/usr/bin/open');
+	} else {
+            /* Mac check because of
+             * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
+            if (!(ItsAllText.isDarwin() || program.isExecutable())) {
+		throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
+            }
+            args = [filename];
+	}
 
         // create an nsIProcess
         process = procutil.createInstance(Components.interfaces.nsIProcess);
@@ -387,9 +399,9 @@ CacheObj.prototype.edit = function (extension, clobber) {
         // called process terminates.
         // Second and third params are used to pass command-line arguments
         // to the process.
-        args = [filename];
         result = {};
         ec = process.run(false, args, args.length, result);
+
         this.private_is_watching = true;
         this.edit_count++;
     } catch (e) {
