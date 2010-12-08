@@ -109,12 +109,6 @@
               <spacer />
             </hbox>
           </row>
-          <row align="center">
-            <label control="debug"
-                   value="&debug.label;" />
-            <checkbox preference="pref_debug" id="debug" tabindex="12"
-                      label="&debug.humor;" />
-          </row>
         </rows>
       </grid>
       <vbox id="help" flex="1">
