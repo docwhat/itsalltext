@@ -730,6 +730,7 @@ CacheObj.prototype.adjust = function () {
     if ((cstyle && (cstyle.display == 'none' ||
                     cstyle.visibility == 'hidden')) ||
         el.getAttribute('readonly') ||
+        el.readOnly ||
         el.getAttribute('disabled')
         ) {
         display = 'none';

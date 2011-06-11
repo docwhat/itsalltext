@@ -18,7 +18,15 @@
 
 
     <form action="" method="get">
-      <textarea id="ro" readonly="readonly">This is a readonly textearea.</textarea>
+      <textarea id="ro" readonly="readonly">This is a well-formed readonly textearea.</textarea>
+    </form>
+
+    <form action="" method="get">
+      <textarea id="ro" readonly="">This is a badly-formed readonly textearea.</textarea>
+    </form>
+
+    <form action="" method="get">
+      <textarea id="ro" readonly>This is also badly-formed readonly textearea.</textarea>
     </form>
 
     <div class="back"><a href=".">back</a></div>
