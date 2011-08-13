@@ -34,12 +34,6 @@ var ItsAllText = function () {
         loadthings;
 
     /**
-     * Used for tracking all the all the textareas that we are watching.
-     * @type Hash
-     */
-    that.tracker = {};
-
-    /**
      * A serial for tracking ids
      * @type Integer
      */
@@ -461,25 +455,47 @@ var ItsAllText = function () {
      * Cleans out all old cache objects.
      */
     that.cleanCacheObjs = function () {
-        var count = 0,
-            cobj,
-            id,
-            cdoc;
-        for (id in that.tracker) {
-            if (that.tracker.hasOwnProperty(id)) {
-                cobj = that.tracker[id];
-                cdoc = cobj.node.ownerDocument;
-                if (!cdoc.defaultView || !cdoc.location) {
-                    cobj.destroy();
-                    cdoc = null;
-                    delete that.tracker[id];
-                } else {
-                    count += 1;
-                }
-            }
-        }
-        //disabled-debug -- that.debug('textarea count (tracker):', count);
+//        var count = 0,
+//            cobj,
+//            id,
+//            cdoc;
+//        for (id in that.tracker) {
+//            if (that.tracker.hasOwnProperty(id)) {
+//                cobj = that.tracker[id];
+//                cdoc = cobj.node.ownerDocument;
+//                if (!cdoc.defaultView || !cdoc.location) {
+//                    cobj.destroy();
+//                    cdoc = null;
+//                    delete that.tracker[id];
+//                } else {
+//                    count += 1;
+//                }
+//            }
+//        }
+//        //disabled-debug -- that.debug('textarea count (tracker):', count);
     };
+
+    that.getFromTracker = function (id) {
+	var tracker;
+	tracker = gBrowser.contentDocument.getUserData(that.MYSTRING + "_tracker");
+	if (!tracker) {
+	    tracker = {};
+	    gBrowser.contentDocument.setUserData(that.MYSTRING + "_tracker", tracker, null);
+	}
+	that.debug("getFromTracker:", id, tracker);
+	return tracker[id];
+    }
+
+    that.addToTracker = function (id, cobj) {
+	var tracker;
+	tracker = gBrowser.contentDocument.getUserData(that.MYSTRING + "_tracker");
+	if (!tracker) {
+	    tracker = {};
+	}
+	tracker[id] = cobj;
+	gBrowser.contentDocument.setUserData(that.MYSTRING + "_tracker", tracker, null);
+	that.debug("addToTracker:", id, cobj, tracker);
+    }
 
     // @todo [wish] Refresh textarea on editor quit.
     // @todo [9] IDEA: support for input elements as well?

@@ -71,7 +71,7 @@ function CacheObj(node) {
     // @todo [security] Add a serial to the uid hash.
 
     node.setUserData(ItsAllText.MYSTRING + '_UID', that.uid, null);
-    ItsAllText.tracker[that.uid] = that;
+    ItsAllText.addToTracker(that.uid, that);
 
     /* Figure out where we will store the file.  While the filename can
      * change, the directory that the file is stored in should not!
@@ -829,17 +829,13 @@ CacheObj.prototype.hashString = function (some_string) {
  */
 CacheObj.get = function (node) {
     var str = ItsAllText.MYSTRING + "_UID",
-        id = null;
+    id = null;
     if (typeof(node) === 'string') {
         id = node;
     } else if (node && node.getUserData(str)) {
         id = node.getUserData(str);
     }
-    if (id && ItsAllText.tracker.hasOwnProperty(id)) {
-        return ItsAllText.tracker[id];
-    } else {
-        return null;
-    }
+    return ItsAllText.getFromTracker(id);
 };
 
 /**
