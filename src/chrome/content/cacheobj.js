@@ -379,7 +379,7 @@ CacheObj.prototype.edit = function (extension, clobber) {
 	    program.isDirectory() &&
 	    program.leafName.match(/\.app$/i)) {
 	    // OS-X .app bundles should be run with open.
-            args = ['-a', program.path, '--args', filename];
+            args = ['-a', program.path, filename];
 	    program = ItsAllText.factoryFile('/usr/bin/open');
 	} else {
             /* Mac check because of
