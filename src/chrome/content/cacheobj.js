@@ -318,10 +318,6 @@ CacheObj.prototype.write = function (clobber) {
         this.timestamp = this.size = null; // force refresh of textarea
     }
 
-    /* Register the file to be deleted on app exit. */
-    Components.classes["@mozilla.org/uriloader/external-helper-app-service;1"].
-        getService(Components.interfaces.nsPIExternalAppLauncher).
-        deleteTemporaryFileOnExit(this.file);
     return this.file.path;
 };
 
