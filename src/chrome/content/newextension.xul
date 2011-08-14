@@ -4,11 +4,11 @@
 <!DOCTYPE newextwindow SYSTEM "chrome://itsalltext/locale/newextension.dtd" >
 <dialog
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-  id="ItsAllTextNewExtension"
+  id="itsalltextNewExtension"
   title="&title;"
   ondialogaccept="return onOK();"
   persist="screenX screenY width height"
-  windowtype="ItsAllTextWindowType">
+  windowtype="itsalltextWindowType">
 
   <script type="application/x-javascript" src="chrome://itsalltext/content/newextension.js"/>
   <grid>

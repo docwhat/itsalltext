@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE overlay SYSTEM "chrome://itsalltext/locale/itsalltext.dtd" >
 
-<overlay id="ItsAllTextOverlay"
+<overlay id="itsalltextOverlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <script type="application/x-javascript" src="chrome://itsalltext/content/itsalltext.js" />
@@ -11,19 +11,19 @@
     <menu id="itsalltext-contextmenu" label="&top.label;" accesskey="&top.key;">
       <menupopup id="itsalltext-context-popup">
         <menuitem label="&edit.label;" 
-                  oncommand="ItsAllText.onEditNode(document.popupNode)"
+                  oncommand="itsalltext.onEditNode(document.popupNode)"
                   accesskey="&edit.key;" />
         <menuitem label="&newext.label;"
                   accesskey="&newext.key;"
-                  oncommand="ItsAllText.menuNewExtEdit(event);" />
+                  oncommand="itsalltext.menuNewExtEdit(event);" />
         <menuseparator/>
-        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event, '.txt');"/>
+        <menuitem label=".txt" oncommand="itsalltext.menuExtEdit(event, '.txt');"/>
         <menuseparator/>
         <menuitem label="&readme.label;"
-                  oncommand="ItsAllText.openReadme();"/>
+                  oncommand="itsalltext.openReadme();"/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
-                  oncommand="ItsAllText.openPreferences();"/>
+                  oncommand="itsalltext.openPreferences();"/>
       </menupopup>
     </menu>
   </popup>
@@ -34,15 +34,15 @@
       <menupopup id="itsalltext-optionmenu">
         <menuitem label="&newext.label;"
                   accesskey="&newext.key;"
-                  oncommand="ItsAllText.menuNewExtEdit(event);" />
+                  oncommand="itsalltext.menuNewExtEdit(event);" />
         <menuseparator/>
-        <menuitem label=".txt" oncommand="ItsAllText.menuExtEdit(event,'.txt');"/>
+        <menuitem label=".txt" oncommand="itsalltext.menuExtEdit(event,'.txt');"/>
         <menuseparator/>
         <menuitem label="&readme.label;"
-                  oncommand="ItsAllText.openReadme();"/>
+                  oncommand="itsalltext.openReadme();"/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
-                  oncommand="ItsAllText.openPreferences();"/>
+                  oncommand="itsalltext.openPreferences();"/>
       </menupopup>
     </popupset>
   </window>
@@ -55,10 +55,10 @@
           insertbefore="sanitizeSeparator">
       <menupopup>
         <menuitem label="&readme.label;"
-                  oncommand="ItsAllText.openReadme();"/>
+                  oncommand="itsalltext.openReadme();"/>
         <menuitem label="&pref.label;"
                   accesskey="&pref.key;"
-                  oncommand="ItsAllText.openPreferences();"/>
+                  oncommand="itsalltext.openPreferences();"/>
       </menupopup>
     </menu>
   </menupopup>

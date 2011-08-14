@@ -34,119 +34,6 @@ var ItsAllText = function () {
         loadthings;
 
     /**
-     * A serial for tracking ids
-     * @type Integer
-     */
-    that.serial_id = 0;
-
-    /**
-     * A constant, a string used for things like the preferences.
-     * @type String
-     */
-    that.MYSTRING = 'itsalltext';
-
-    /**
-     * A constant, the version number.  Set by the Makefile.
-     * @type String
-     */
-    that.VERSION = '999.@@VERSION@@';
-
-    /**
-     * A constant, the url to the readme.
-     * @type String
-     */
-    that.README = 'chrome://itsalltext/locale/readme.xhtml';
-
-    /* The XHTML Namespace */
-    that.XHTMLNS = "http://www.w3.org/1999/xhtml";
-
-    /* The XUL Namespace */
-    that.XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-    that.thread_id = Math.round(new Date().getTime() * Math.random());
-
-    /**
-     * Formats a locale string, replacing $N with the arguments in arr.
-     * @param {String} name Locale property name
-     * @param {Array} arr Array of strings to replace in the string.
-     * @returns String
-     */
-    that.localeFormat = function (name, arr) {
-        return this.getLocale().formatStringFromName(name, arr, arr.length);
-    };
-    /**
-     * Returns the locale string matching name.
-     * @param {String} name Locale property name
-     * @returns String
-     */
-    that.localeString = function (name) {
-        return this.getLocale().GetStringFromName(name);
-    };
-
-    /**
-     * Create an error message from given arguments.
-     * @param {Object} message One or more objects to be made into strings...
-     */
-    that.logString = function () {
-        var args = Array.prototype.slice.apply(arguments, [0]),
-            i;
-        for (i = 0; i < args.length; i++) {
-            try {
-                args[i] = "" + args[i];
-            } catch (e) {
-                Components.utils.reportError(e);
-                args[i] = 'toStringFailed';
-            }
-        }
-        args.unshift(that.MYSTRING + ' [' + this.thread_id + ']:');
-        return args.join(' ');
-    };
-
-    /**
-     * This is a handy debug message.  I'll remove it or disable it when
-     * I release this.
-     * @param {Object} message One or more objects can be passed in to display.
-     */
-    that.log = function () {
-        const consoleService = Components.classes["@mozilla.org/consoleservice;1"];
-        var message = that.logString.apply(that, arguments),
-            obj = consoleService.getService(Components.interfaces.nsIConsoleService);
-        try {
-            // idiom: Convert arguments to an array for easy handling.
-            obj.logStringMessage(message);
-        } catch (e) {
-            Components.utils.reportError(message);
-        }
-    };
-
-    /**
-     * Uses log iff debugging is turned on.  Used for messages that need to
-     * globally logged (firebug only logs locally).
-     * @param {Object} message One or more objects can be passed in to display.
-     */
-    that.debuglog = function () {
-        if (that.preferences.debug) {
-            that.log.apply(that, arguments);
-        }
-    };
-
-    /**
-     * Displays debug information, if debugging is turned on.
-     * Requires Firebug.
-     * @param {Object} message One or more objects can be passed in to display.
-     */
-    that.debug = function () {
-        if (that.preferences && that.preferences.debug) {
-            var message = that.logString.apply(that, arguments);
-            window.dump(message + '\n');
-            try {
-                Firebug.Console.logFormatted(arguments);
-            } catch (e) {
-            }
-        }
-    };
-
-    /**
      * A factory method to make an nsILocalFile object.
      * @param {String} path A path to initialize the object with (optional).
      * @returns {nsILocalFile}
@@ -180,18 +67,6 @@ var ItsAllText = function () {
         }
         return fobj;
     };
-
-    /* Clean the edit directory whenever we create a new window. */
-    that.cleanEditDir();
-
-    /* Load the various bits needed to make this work. */
-    (function () {
-        var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
-        loader.loadSubScript('chrome://itsalltext/content/Color.js', that);
-        loader.loadSubScript('chrome://itsalltext/content/monitor.js', that);
-        loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', that);
-        that.monitor = new that.monitor(that);
-    })();
 
     /**
      * Dictionary for storing the preferences in.
@@ -667,6 +542,7 @@ var ItsAllText = function () {
     // TODONOW: move to separate function
     that.listen(window, 'load', function (event) {
         //disabled-debug -- that.debug('!!load', event);
+
         if (typeof(gBrowser) === 'undefined') {
             that.monitor.registerPage(event);
         } else {
@@ -698,6 +574,148 @@ var ItsAllText = function () {
         that.monitor.destroy();
     }, false);
 
+
+    /* Start your engines! */
+    this.init();
+};
+
+ItsAllText.prototype.init = function () {
+    /**
+     * A serial for tracking ids
+     * @type Integer
+     */
+    this.serial_id = 0;
+
+    /**
+     * A constant, a string used for things like the preferences.
+     * @type String
+     */
+    this.MYSTRING = 'itsalltext';
+
+    /**
+     * A constant, the version number.  Set by the Makefile.
+     * @type String
+     */
+    this.VERSION = '999.@@VERSION@@';
+
+    /**
+     * A constant, the url to the readme.
+     * @type String
+     */
+    this.README = 'chrome://itsalltext/locale/readme.xhtml';
+
+    /* The XHTML Namespace */
+    this.XHTMLNS = "http://www.w3.org/1999/xhtml";
+
+    /* The XUL Namespace */
+    this.XULNS   = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+
+    /* The monitor */
+    this.monitor = null;
+
+    /* For debugging */
+    this.thread_id = Math.round(new Date().getTime() * Math.random());
+
+    /* Clean the edit directory whenever we create a new window. */
+    this.cleanEditDir();
+
+    /* Load the various bits needed to make this work. */
+    this.initScripts();
+
+    /* Start the monitor */
+    var itsalltext = this;
+    setTimeout(function () {
+	itsalltext.monitor = new itsalltext.Monitor();
+    }, 1);
+}
+
+/* Load the various bits needed to make this work. */
+ItsAllText.prototype.initScripts = function() {
+    var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+    loader.loadSubScript('chrome://itsalltext/content/Color.js', this);
+    loader.loadSubScript('chrome://itsalltext/content/monitor.js', this);
+    loader.loadSubScript('chrome://itsalltext/content/cacheobj.js', this);
+}
+
+/**
+ * Formats a locale string, replacing $N with the arguments in arr.
+ * @param {String} name Locale property name
+ * @param {Array} arr Array of strings to replace in the string.
+ * @returns String
+ */
+ItsAllText.prototype.localeFormat = function (name, arr) {
+    return this.getLocale().formatStringFromName(name, arr, arr.length);
+};
+/**
+ * Returns the locale string matching name.
+ * @param {String} name Locale property name
+ * @returns String
+ */
+ItsAllText.prototype.localeString = function (name) {
+    return this.getLocale().GetStringFromName(name);
+};
+
+/**
+ * Create an error message from given arguments.
+ * @param {Object} message One or more objects to be made into strings...
+ */
+ItsAllText.prototype.logString = function () {
+    var args = Array.prototype.slice.apply(arguments, [0]),
+    i;
+    for (i = 0; i < args.length; i++) {
+        try {
+            args[i] = "" + args[i];
+        } catch (e) {
+            Components.utils.reportError(e);
+            args[i] = 'toStringFailed';
+        }
+    }
+    args.unshift(this.MYSTRING + ' [' + this.thread_id + ']:');
+    return args.join(' ');
+};
+
+/**
+ * This is a handy debug message.  I'll remove it or disable it when
+ * I release this.
+ * @param {Object} message One or more objects can be passed in to display.
+ */
+ItsAllText.prototype.log = function () {
+    const consoleService = Components.classes["@mozilla.org/consoleservice;1"];
+    var message = this.logString.apply(this, arguments),
+    obj = consoleService.getService(Components.interfaces.nsIConsoleService);
+    try {
+        // idiom: Convert arguments to an array for easy handling.
+        obj.logStringMessage(message);
+    } catch (e) {
+        Components.utils.reportError(message);
+    }
+};
+
+/**
+ * Uses log iff debugging is turned on.  Used for messages that need to
+ * globally logged (firebug only logs locally).
+ * @param {Object} message One or more objects can be passed in to display.
+ */
+ItsAllText.prototype.debuglog = function () {
+    if (this.preferences.debug) {
+        this.log.apply(this, arguments);
+    }
+};
+
+/**
+ * Displays debug information, if debugging is turned on.
+ * Requires Firebug.
+ * @param {Object} message One or more objects can be passed in to display.
+ */
+ItsAllText.prototype.debug = function () {
+    if (this.preferences && this.preferences.debug) {
+        var message = this.logString.apply(this, arguments);
+        window.dump(message + '\n');
+        try {
+            Firebug.Console.logFormatted(arguments);
+        } catch (e) {
+        }
+    }
 };
 
 /**
@@ -742,7 +760,7 @@ ItsAllText.prototype.hitch = function (object, method) {
 ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
     opt_capture = !!opt_capture;
     this.unlisten(source, event, listener, opt_capture);
-    //disabled-debug -- this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
+    this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
     if (source) {
         source.addEventListener(event, listener, opt_capture);
     }
@@ -936,10 +954,10 @@ ItsAllText.prototype.getLocale = function () {
         obj = string_bundle.getService(Components.interfaces.nsIStringBundleService);
     /**
      * A localization bundle.  Use it like so:
-     * ItsAllText.locale.getStringFromName('blah');
+     * itsalltext.locale.getStringFromName('blah');
      */
     return obj.createBundle("chrome://itsalltext/locale/itsalltext.properties");
 };
 
-ItsAllText = new ItsAllText();
+var itsalltext = new ItsAllText();
 

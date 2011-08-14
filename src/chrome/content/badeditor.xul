@@ -5,7 +5,7 @@
 
 <dialog
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-  id="ItsAllTextBadEditor"
+  id="itsalltextBadEditor"
   title="&title;"
   buttonlabelaccept="&pref.label;"
   ondialogaccept="return onOK();"

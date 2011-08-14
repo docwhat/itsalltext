@@ -1,4 +1,4 @@
-/*extern Components, ItsAllText */
+/*extern Components, itsalltext */
 /*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
 // @todo [6] [pref] Better strategy for getting the default editor: EDITOR env variable or view_source.editor.path
 // @todo [8] [pref] Option to make the textarea uneditable when using editor.
@@ -47,7 +47,7 @@ function pref_editor_select() {
 
 function update_hotkey(disp) {
     var str,
-        km = ItsAllText.preferences.hotkey;
+        km = itsalltext.preferences.hotkey;
     if (typeof(km) === 'undefined') {
         setTimeout(function () {
                 update_hotkey(disp);
@@ -57,14 +57,14 @@ function update_hotkey(disp) {
     if (km === '') {
         str = '<none>';
     } else {
-        str = ItsAllText.keyMarshalToString(km);
+        str = itsalltext.keyMarshalToString(km);
     }
     document.getElementById(disp).value = str;
 }
 
 function pref_grab(disp, e) {
     e.preventDefault();
-    var km  = ItsAllText.marshalKeyEvent(e);
+    var km  = itsalltext.marshalKeyEvent(e);
     const empty_re = /:0:0$/;
     if (empty_re.test(km)    ||   // Various Alt/Meta keys
         km === '0:0:0:0:0:8' ||   // Backspace
@@ -72,7 +72,7 @@ function pref_grab(disp, e) {
         km === '0:0:0:0:0:46') {  // Del
         km = '';
     }
-    ItsAllText.preferences.private_set('hotkey', km);
+    itsalltext.preferences.private_set('hotkey', km);
     update_hotkey(disp);
 }
 

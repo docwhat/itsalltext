@@ -1,4 +1,4 @@
-/*extern Components, ItsAllText, XPathResult */
+/*extern Components, itsalltext, XPathResult */
 /*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
 
 /*
@@ -11,7 +11,7 @@
   If "It's All Text!" isn't installed in the browser, it will fail safely.
   It only generates an info message in the error console.
 
-  You then have two choices.  You can call ItsAllTextopenEditor() directly
+  You then have two choices.  You can call itsalltextopenEditor() directly
   via JavaScript or you can add one or two attributes to a XUL element and
   it'll automatically be set up right.
 
@@ -40,8 +40,8 @@
       </hbox>
 
   Example calling openEditor() directly:
-     if(some_condition && ItsAllText) {
-         ItsAllText.openEditor('id-of-textarea', '.extension');
+     if(some_condition && itsalltext) {
+         itsalltext.openEditor('id-of-textarea', '.extension');
      }
 
  */
@@ -72,7 +72,7 @@
          */
         node.style.MozAppearance = 'none';
 
-        cache_object = node && ItsAllText.CacheObj.get(node);
+        cache_object = node && itsalltext.CacheObj.get(node);
         if (!cache_object) {
             return;
         }
@@ -88,7 +88,7 @@
         i,
         nodesIter;
         /* Start watching the document, but force it. */
-        ItsAllText.monitor.startPage({originalTarget: document}, true);
+        itsalltext.monitor.startPage({originalTarget: document}, true);
 
         /* Turn on all the hidden CSS */
         nodesIter = document.evaluate("//node()[@itsalltext-control]",
