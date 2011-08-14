@@ -326,29 +326,6 @@ var ItsAllText = function () {
 
     // @todo [wish] Profiling and optimization.
 
-    /**
-     * Cleans out all old cache objects.
-     */
-    that.cleanCacheObjs = function () {
-//        var count = 0,
-//            cobj,
-//            id,
-//            cdoc;
-//        for (id in that.tracker) {
-//            if (that.tracker.hasOwnProperty(id)) {
-//                cobj = that.tracker[id];
-//                cdoc = cobj.node.ownerDocument;
-//                if (!cdoc.defaultView || !cdoc.location) {
-//                    cobj.destroy();
-//                    cdoc = null;
-//                    delete that.tracker[id];
-//                } else {
-//                    count += 1;
-//                }
-//            }
-//        }
-//        //disabled-debug -- that.debug('textarea count (tracker):', count);
-    };
 
     that.getFromTracker = function (id) {
 	var tracker;
@@ -569,7 +546,6 @@ var ItsAllText = function () {
         }
         var doc = event.originalTarget;
         //disabled-debug -- that.debug("pageunload(): A page has been unloaded", doc && doc.location);
-        that.cleanCacheObjs();
         that.preference_observer.unregister();
         that.monitor.destroy();
     }, false);
