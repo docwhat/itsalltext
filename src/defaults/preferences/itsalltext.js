@@ -6,3 +6,4 @@ pref("extensions.itsalltext.debug",  false);
 pref("extensions.itsalltext.gumdrop_position", 'lower-right');
 pref("extensions.itsalltext.extensions",  '.txt,.html,.css,.xml,.xsl,.js');
 pref("extensions.itsalltext.hotkey",  '');
+pref("extensions.itsalltext.tracker_id",  '');

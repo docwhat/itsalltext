@@ -65,9 +65,9 @@ function CacheObj(node) {
      * web page from knowing what it's connected to.
      * @type String
      */
-    that.uid = that.hashString([ doc.location.toString(),
-                                 Math.random(),
-                                 that.node_id ].join(':'));
+    that.uid = itsalltext.hashString([ doc.location.toString(),
+                                       Math.random(),
+                                       that.node_id ].join(':'));
     // @todo [security] Add a serial to the uid hash.
 
     node.setUserData(itsalltext.MYSTRING + '_UID', that.uid, null);
@@ -77,11 +77,11 @@ function CacheObj(node) {
      * change, the directory that the file is stored in should not!
      */
     host = window.escape(doc.location.hostname);
-    hash = that.hashString([ doc.location.protocol,
-                             doc.location.port,
-                             doc.location.search ? doc.location.search : '?',
-                             doc.location.pathname,
-                             that.node_id].join(':'));
+    hash = itsalltext.hashString([ doc.location.protocol,
+				   doc.location.port,
+				   doc.location.search ? doc.location.search : '?',
+				   doc.location.pathname,
+				   that.node_id].join(':'));
     that.base_filename = [host, hash.slice(0, 10)].join('.');
     /* The current extension.
      * @type String
@@ -771,53 +771,6 @@ CacheObj.prototype.adjust = function () {
 };
 
 /**
- * Creates a mostly unique hash of a string
- * Most of this code is from:
- *    http://developer.mozilla.org/en/docs/nsICryptoHash
- * @param {String} some_string The string to hash.
- * @returns {String} a hashed string.
- */
-CacheObj.prototype.hashString = function (some_string) {
-    var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter),
-        result = {},
-        data,
-        ch,
-        hash,
-        toHexString,
-        retval = [],
-        i;
-    converter.charset = "UTF-8";
-
-    /* result is the result of the hashing.  It's not yet a string,
-     * that'll be in retval.
-     * result.value will contain the array length
-     */
-    result = {};
-
-    /* data is an array of bytes */
-    data = converter.convertToByteArray(some_string, result);
-    ch   = Components.classes["@mozilla.org/security/hash;1"].createInstance(Components.interfaces.nsICryptoHash);
-
-    ch.init(ch.MD5);
-    ch.update(data, data.length);
-    hash = ch.finish(true);
-
-    // return the two-digit hexadecimal code for a byte
-    toHexString = function (charCode) {
-        return ("0" + charCode.toString(36)).slice(-2);
-    };
-
-    // convert the binary hash data to a hex string.
-    for (i in hash) {
-        if (hash.hasOwnProperty(i)) {
-            retval[i] = toHexString(hash.charCodeAt(i));
-        }
-    }
-
-    return (retval.join(""));
-};
-
-/**
  * Returns a cache object
  * Note: These UIDs are only unique for Its All Text.
  * @param {Object} node A dom object node or ID to one.
@@ -843,7 +796,7 @@ CacheObj.get = function (node) {
  */
 CacheObj.make = function (node, create_gumdrop) {
     var cobj = CacheObj.get(node);
-    itsalltext.debug('CacheObj.make(',node,', ', create_gumdrop,') = ',cobj, ' : ', cobj ? cobj.uid : 'null');
+    // Too noisy itsalltext.debug('CacheObj.make(',node,', ', create_gumdrop,') = ',cobj, ' : ', cobj ? cobj.uid : 'null');
     if (!cobj) {
         cobj = new CacheObj(node);
         if (create_gumdrop) {

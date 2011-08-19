@@ -123,7 +123,8 @@ var ItsAllText = function () {
             gumdrop_position:   'Char',
             fade_time:          'Float',
             extensions:         'Char',
-            hotkey:             'Char'
+            hotkey:             'Char',
+            tracker_id:         'Char',
         },
 
         /**
@@ -197,6 +198,20 @@ var ItsAllText = function () {
         return 1000 * refresh;
 
     };
+
+    that.getTrackerId = function () {
+	var id = that.preferences.tracker_id;
+	if (!id) {
+	    id = [that.MYSTRING,
+		  Math.floor(Math.random()*999999).toString(),
+		  Math.round(new Date().getTime()),
+		 ].join(':')
+	    id = that.hashString(id);
+            that.preferences.private_set('tracker_id', id);
+	}
+	return id;
+    }
+
 
     /**
      * Returns true if the system is running Mac OS X.
@@ -326,7 +341,6 @@ var ItsAllText = function () {
 
     // @todo [wish] Profiling and optimization.
 
-
     that.getFromTracker = function (id) {
 	var tracker, doc;
 	if (typeof gBrowser !== 'undefined') {
@@ -335,12 +349,11 @@ var ItsAllText = function () {
 	    // We must be in a XUL window, fall back to simpler method.
 	    doc = window.document;
 	}
-	tracker = doc.getUserData(that.MYSTRING + "_tracker");
+	tracker = doc.getUserData(that.getTrackerId());
 	if (!tracker) {
 	    tracker = {};
-	    doc.setUserData(that.MYSTRING + "_tracker", tracker, null);
+	    doc.setUserData(that.getTrackerId(), tracker, null);
 	}
-	that.debug("getFromTracker:", id, tracker);
 	return tracker[id];
     }
 
@@ -352,12 +365,12 @@ var ItsAllText = function () {
 	    // We must be in a XUL window, fall back to simpler method.
 	    doc = window.document;
 	}
-	tracker = doc.getUserData(that.MYSTRING + "_tracker");
+	tracker = doc.getUserData(that.getTrackerId());
 	if (!tracker) {
 	    tracker = {};
 	}
 	tracker[id] = cobj;
-	doc.setUserData(that.MYSTRING + "_tracker", tracker, null);
+	doc.setUserData(that.getTrackerId(), tracker, null);
 	that.debug("addToTracker:", id, cobj, tracker);
     }
 
@@ -748,10 +761,57 @@ ItsAllText.prototype.hitch = function (object, method) {
 ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
     opt_capture = !!opt_capture;
     this.unlisten(source, event, listener, opt_capture);
-    this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
+    // this.debug("listen(%o, %o, -, %o)", source, event, opt_capture);
     if (source) {
         source.addEventListener(event, listener, opt_capture);
     }
+};
+
+/**
+ * Creates a mostly unique hash of a string
+ * Most of this code is from:
+ *    http://developer.mozilla.org/en/docs/nsICryptoHash
+ * @param {String} some_string The string to hash.
+ * @returns {String} a hashed string.
+ */
+ItsAllText.prototype.hashString = function (some_string) {
+    var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter),
+        result = {},
+        data,
+        ch,
+        hash,
+        toHexString,
+        retval = [],
+        i;
+    converter.charset = "UTF-8";
+
+    /* result is the result of the hashing.  It's not yet a string,
+     * that'll be in retval.
+     * result.value will contain the array length
+     */
+    result = {};
+
+    /* data is an array of bytes */
+    data = converter.convertToByteArray(some_string, result);
+    ch   = Components.classes["@mozilla.org/security/hash;1"].createInstance(Components.interfaces.nsICryptoHash);
+
+    ch.init(ch.MD5);
+    ch.update(data, data.length);
+    hash = ch.finish(true);
+
+    // return the two-digit hexadecimal code for a byte
+    toHexString = function (charCode) {
+        return ("0" + charCode.toString(36)).slice(-2);
+    };
+
+    // convert the binary hash data to a hex string.
+    for (i in hash) {
+        if (hash.hasOwnProperty(i)) {
+            retval[i] = toHexString(hash.charCodeAt(i));
+        }
+    }
+
+    return (retval.join(""));
 };
 
 /**
