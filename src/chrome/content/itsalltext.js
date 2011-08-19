@@ -328,24 +328,36 @@ var ItsAllText = function () {
 
 
     that.getFromTracker = function (id) {
-	var tracker;
-	tracker = gBrowser.contentDocument.getUserData(that.MYSTRING + "_tracker");
+	var tracker, doc;
+	if (typeof gBrowser !== 'undefined') {
+	    doc = gBrowser.contentDocument;
+	} else {
+	    // We must be in a XUL window, fall back to simpler method.
+	    doc = window.document;
+	}
+	tracker = doc.getUserData(that.MYSTRING + "_tracker");
 	if (!tracker) {
 	    tracker = {};
-	    gBrowser.contentDocument.setUserData(that.MYSTRING + "_tracker", tracker, null);
+	    doc.setUserData(that.MYSTRING + "_tracker", tracker, null);
 	}
 	that.debug("getFromTracker:", id, tracker);
 	return tracker[id];
     }
 
     that.addToTracker = function (id, cobj) {
-	var tracker;
-	tracker = gBrowser.contentDocument.getUserData(that.MYSTRING + "_tracker");
+	var tracker, doc;
+	if (typeof gBrowser !== 'undefined') {
+	    doc = gBrowser.contentDocument;
+	} else {
+	    // We must be in a XUL window, fall back to simpler method.
+	    doc = window.document;
+	}
+	tracker = doc.getUserData(that.MYSTRING + "_tracker");
 	if (!tracker) {
 	    tracker = {};
 	}
 	tracker[id] = cobj;
-	gBrowser.contentDocument.setUserData(that.MYSTRING + "_tracker", tracker, null);
+	doc.setUserData(that.MYSTRING + "_tracker", tracker, null);
 	that.debug("addToTracker:", id, cobj, tracker);
     }
 
