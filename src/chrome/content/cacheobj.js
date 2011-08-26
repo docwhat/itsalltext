@@ -348,6 +348,7 @@ CacheObj.prototype.edit = function (extension, clobber) {
 
     var filename = this.write(clobber),
         program = null,
+        command,
         process,
         args,
         result,
@@ -377,26 +378,44 @@ CacheObj.prototype.edit = function (extension, clobber) {
 	    // OS-X .app bundles should be run with open.
             args = ['-a', program.path, filename];
 	    program = itsalltext.factoryFile('/usr/bin/open');
+	    command = ['/usr/bin/open', '-a', program.path, filename];
 	} else {
             /* Mac check because of
              * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
             if (!(itsalltext.isDarwin() || program.isExecutable())) {
 		throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
             }
-            args = [filename];
+            args = [program.path, filename];
+	    command = [program.path, filename];
 	}
+
+	// Create an observer.
+	var observer = {
+	    observe: function (subject, topic, data) {
+                // Topic moved as last argument to callbacks since we don't need it (we already know what it is)
+                if (topic==='process-finished') {
+		    if (subject.exitValue != 0) {
+			var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+			    .getService(Components.interfaces.nsIPromptService);
+			prompts.alert(null, "Editor exited with status of " + subject.exitValue,
+				      "I ran this command: " + (command.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
+		    }
+		    itsalltext.debug("Process exited successfully: ", subject, data);
+                }
+                else if (topic === 'process-failed') {
+		    itsalltext.debug("Process exited unsuccessfully: ", subject, data);
+                } else {
+		    itsalltext.debug("Observer had a hard time: ", subject, topic, data);
+		}
+            }
+        };
 
         // create an nsIProcess
         process = procutil.createInstance(Components.interfaces.nsIProcess);
         process.init(program);
 
         // Run the process.
-        // If first param is true, calling thread will be blocked until
-        // called process terminates.
-        // Second and third params are used to pass command-line arguments
-        // to the process.
-        result = {};
-        ec = process.run(false, args, args.length, result);
+        process.runwAsync(args, args.length, observer, false);
 
         this.private_is_watching = true;
         this.edit_count++;
