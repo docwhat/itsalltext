@@ -378,15 +378,13 @@ CacheObj.prototype.edit = function (extension, clobber) {
 	    // OS-X .app bundles should be run with open.
             args = ['-a', program.path, filename];
 	    program = itsalltext.factoryFile('/usr/bin/open');
-	    command = ['/usr/bin/open', '-a', program.path, filename];
 	} else {
             /* Mac check because of
              * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
             if (!(itsalltext.isDarwin() || program.isExecutable())) {
 		throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
             }
-            args = [program.path, filename];
-	    command = [program.path, filename];
+            args = [filename];
 	}
 
 	// Create an observer.
@@ -398,7 +396,7 @@ CacheObj.prototype.edit = function (extension, clobber) {
 			var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 			    .getService(Components.interfaces.nsIPromptService);
 			prompts.alert(null, "Editor exited with status of " + subject.exitValue,
-				      "I ran this command: " + (command.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
+				      "I ran this command: " + program + " " (args.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
 		    }
 		    itsalltext.debug("Process exited successfully: ", subject, data);
                 }
