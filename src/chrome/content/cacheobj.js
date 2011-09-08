@@ -392,7 +392,7 @@ CacheObj.prototype.edit = function (extension, clobber) {
 	    observe: function (subject, topic, data) {
                 // Topic moved as last argument to callbacks since we don't need it (we already know what it is)
                 if (topic==='process-finished') {
-		    if (subject.exitValue != 0) {
+		    if (typeof(subject.exitValue) === 'undefined' && subject.exitValue != 0) {
 			var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 			    .getService(Components.interfaces.nsIPromptService);
 			prompts.alert(null, "Editor exited with status of " + subject.exitValue,
