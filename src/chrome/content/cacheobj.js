@@ -365,46 +365,46 @@ CacheObj.prototype.edit = function (extension, clobber) {
 
         // checks
         if (program === null) {
-	    throw {name: "Editor is not set."};
+	        throw {name: "Editor is not set."};
         }
 
         if (!program.exists()) {
-	    throw {name: "NS_ERROR_FILE_NOT_FOUND"};
+	        throw {name: "NS_ERROR_FILE_NOT_FOUND"};
         }
 
-	if (itsalltext.isDarwin() &&
-	    program.isDirectory() &&
-	    program.leafName.match(/\.app$/i)) {
-	    // OS-X .app bundles should be run with open.
+	    if (itsalltext.isDarwin() &&
+	        program.isDirectory() &&
+	        program.leafName.match(/\.app$/i)) {
+	        // OS-X .app bundles should be run with open.
             args = ['-a', program.path, filename];
-	    program = itsalltext.factoryFile('/usr/bin/open');
-	} else {
+	        program = itsalltext.factoryFile('/usr/bin/open');
+	    } else {
             /* Mac check because of
              * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
             if (!(itsalltext.isDarwin() || program.isExecutable())) {
-		throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
+		        throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
             }
             args = [filename];
-	}
+	    }
 
-	// Create an observer.
-	var observer = {
-	    observe: function (subject, topic, data) {
+	    // Create an observer.
+	    var observer = {
+	        observe: function (subject, topic, data) {
                 // Topic moved as last argument to callbacks since we don't need it (we already know what it is)
                 if (topic==='process-finished') {
-		    if (typeof(subject.exitValue) === 'undefined' && subject.exitValue != 0) {
-			var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-			    .getService(Components.interfaces.nsIPromptService);
-			prompts.alert(null, "Editor exited with status of " + subject.exitValue,
-				      "I ran this command: " + program + " " (args.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
-		    }
-		    itsalltext.debug("Process exited successfully: ", subject, data);
+		            if (typeof(subject.exitValue) === 'undefined' || subject.exitValue != 0) {
+			            var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+			            .getService(Components.interfaces.nsIPromptService);
+			            prompts.alert(null, "Editor exited with status of " + subject.exitValue,
+				                      "I ran this command: " + program.path + " " + (args.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
+		            }
+		            itsalltext.debug("Process exited successfully: ", subject, data);
                 }
                 else if (topic === 'process-failed') {
-		    itsalltext.debug("Process exited unsuccessfully: ", subject, data);
+		            itsalltext.debug("Process exited unsuccessfully: ", subject, data);
                 } else {
-		    itsalltext.debug("Observer had a hard time: ", subject, topic, data);
-		}
+		            itsalltext.debug("Observer had a hard time: ", subject, topic, data);
+		        }
             }
         };
 
