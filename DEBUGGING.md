@@ -3,7 +3,7 @@
 
 Thank you for considering helping me debug a problem with [It's All Text!](http://github.com/docwhat/itsalltext).
 
-This document should help you set up debugging and then remove it once you're done.  You'll probably want to remove some of these debugging methods because it slows down Firefox.  Unless you debug regularly (you're a web or extension developer) you probably don't need these tools day-to-day.
+This document will help you set up debugging and then remove it once you're done.  You'll probably want to remove some of these debugging methods when you finish because it slows down Firefox.  Unless you debug regularly (you're a web or extension developer) you probably don't need these tools day-to-day.
 
 ## Preparation
 
@@ -26,9 +26,15 @@ If this sounds good to you, then go read the [managing profiles article](http://
 
 Once you've set up a new debugging profile and are running it by restarting Firefox, then you'll want to go install the version of It's All Text! you'll be debugging.  You should have either gotten an `.xpi` file directly from Christian Höltje or you can get any previously released version from [Addons.Mozzilla.Org](https://addons.mozilla.org/en-US/firefox/addon/its-all-text/versions/).
 
+The TL;DR version is to run the following command (for Windows and Linux only, alas):
+
+```bash
+firefox -ProfileManager
+```
+
 ## Level 1 Debugging - Error Console
 
-This is the easiest method of debugging.  It involves turning on debugging in It's All Text! and opening the Error Console.
+This is the easiest method of debugging.  It involves turning on debugging in It's All Text! and opening the Error Console.  Unfortunately, it returns the least amount of info unless IAT itself is crashing someplace.
 
 ### Turning on debugging in IAT
 
@@ -38,15 +44,13 @@ This is the easiest method of debugging.  It involves turning on debugging in It
 
 ### Open the Error Console
 
-You open it via the menu item "Tools" -> "Web Developer" -> "Error Console"
+You open the Error Console via <kbd>CTRL</kbd>+<kbd>SHIFT</kdb>+<kbd>J</kbd>.
 
 1. Verify that it is set to show "all" errors, messages, etc.  Click the "all" tab/button.
 2. Check the Error Console for any errors from It's All Text! during startup.  If there are any, then you should copy and paste them into your notes and mark them as start-up errors.
 3. Clear the console. This is to make finding problems easier.
 
 ### Debug
-
-What you do now depends on what you're debugging.
 
 If you're debugging "normal usage" of IAT, then you can go to [http://docwhat.org/files/iat] and walk through those tests one by one.
 
@@ -72,17 +76,11 @@ Go to the [firebug webpage](http://getfirebug.com/) and install the latest versi
 
 ### Turning on debugging in IAT
 
-1. Go to the URL `about:config`
-2. In the "filter" box, type `itsalltext.debug`
-3. Double-click on "false" in the "value" column so that it says "true"
+See the section for level 1
 
 ### Open the Error Console
 
-You open it via the menu item "Tools" -> "Web Developer" -> "Error Console"
-
-1. Verify that it is set to show "all" errors, messages, etc.  Click the "all" tab/button.
-2. Check the Error Console for any errors from It's All Text! during startup.  If there are any, then you should copy and paste them into your notes and mark them as start-up errors.
-3. Clear the console. This is to make finding problems easier.
+See the section for level 1
 
 ### Open the Firebug console
 
@@ -92,8 +90,6 @@ You open it via the menu item "Tools" -> "Web Developer" -> "Error Console"
 ### Debugging
 
 Make sure you have the Firebug console open.  
-
-What you do now depends on what you're debugging.
 
 If you're debugging "normal usage" of IAT, then you can go to [http://docwhat.org/files/iat] and walk through those tests one by one.
 
@@ -127,7 +123,7 @@ Follow the instructions for [setting up extension development environment](https
 
 ### Run Firefox
 
-You need to run Firefox from a terminal so that you can see the output.  You may also want to redirect this output to a file.  You can use `tee` for this if your operating system supports it.
+You need to run Firefox from a terminal so that you can see the output.  You may also want to redirect this output to a file.  For example, on a Unix system you can use `tee` for this if your operating system supports it.
 
 ### Debugging
 
@@ -136,8 +132,6 @@ You'll now have three sources of information:
 * The Error Console
 * The Firebug Console
 * The output from running Firefox
-
-What you do now depends on what you're debugging.
 
 If you're debugging "normal usage" of IAT, then you can go to [http://docwhat.org/files/iat] and walk through those tests one by one.
 
