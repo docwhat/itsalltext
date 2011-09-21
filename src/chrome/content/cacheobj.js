@@ -418,6 +418,7 @@ CacheObj.prototype.edit = function (extension, clobber) {
         this.private_is_watching = true;
         this.edit_count++;
     } catch (e) {
+        itsalltext.debug("Caught error launching editor: ", e);
         params = { out: null,
                    exists: program ? program.exists() : false,
                    path: itsalltext.preferences.editor,
