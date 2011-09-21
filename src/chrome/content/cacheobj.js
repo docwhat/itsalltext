@@ -413,7 +413,13 @@ CacheObj.prototype.edit = function (extension, clobber) {
         process.init(program);
 
         // Run the process.
-        process.runwAsync(args, args.length, observer, false);
+        if (typeof process.runwAsync == 'undefined') {
+          // FF < 4.0
+          process.runAsync(args, args.length, observer, false);
+        } else {
+          // FF >= 4.0 - Wide character support.
+          process.runwAsync(args, args.length, observer, false);
+        }
 
         this.private_is_watching = true;
         this.edit_count++;
