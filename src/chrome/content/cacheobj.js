@@ -341,104 +341,104 @@ CacheObj.prototype.getStyle = function (node, attr) {
  * @param {String} extension The extension of the file to edit.
  * @param {boolean} clobber Should an existing file be clobbered?
  */
-CacheObj.prototype.edit = function (extension, clobber) {
-    itsalltext.debug(this.uuid, 'edit(', extension, ', ', clobber, ')', this.uid);
-    extension = typeof(extension) === 'string'?extension:this.extension;
-    this.setExtension(extension);
+ CacheObj.prototype.edit = function (extension, clobber) {
+   itsalltext.debug(this.uuid, 'edit(', extension, ', ', clobber, ')', this.uid);
+   extension = typeof(extension) === 'string'?extension:this.extension;
+   this.setExtension(extension);
 
-    var filename = this.write(clobber),
-        program = null,
-        command,
-        process,
-        args,
-        result,
-        ec,
-        params,
-        procutil;
-    procutil = Components.classes["@mozilla.org/process/util;1"];
-    this.initial_background = this.node.style.backgroundColor;
-    this.initial_color      = this.node.style.color;
+   var filename = this.write(clobber),
+   program = null,
+   command,
+   process,
+   args,
+   result,
+   ec,
+   params,
+   procutil;
+   procutil = Components.classes["@mozilla.org/process/util;1"];
+   this.initial_background = this.node.style.backgroundColor;
+   this.initial_color      = this.node.style.color;
 
 
-    try {
-        program = itsalltext.getEditor();
+   try {
+     program = itsalltext.getEditor();
 
-        // checks
-        if (program === null) {
-	        throw {name: "Editor is not set."};
-        }
+     // checks
+     if (program === null) {
+       throw {name: "Editor is not set."};
+     }
 
-        if (!program.exists()) {
-	        throw {name: "NS_ERROR_FILE_NOT_FOUND"};
-        }
+     if (!program.exists()) {
+       throw {name: "NS_ERROR_FILE_NOT_FOUND"};
+     }
 
-	    if (itsalltext.isDarwin() &&
-	        program.isDirectory() &&
-	        program.leafName.match(/\.app$/i)) {
-	        // OS-X .app bundles should be run with open.
-            args = ['-a', program.path, filename];
-	        program = itsalltext.factoryFile('/usr/bin/open');
-	    } else {
-            /* Mac check because of
-             * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
-            if (!(itsalltext.isDarwin() || program.isExecutable())) {
-		        throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
-            }
-            args = [filename];
-	    }
+     if (itsalltext.isDarwin() &&
+     program.isDirectory() &&
+     program.leafName.match(/\.app$/i)) {
+       // OS-X .app bundles should be run with open.
+       args = ['-a', program.path, filename];
+       program = itsalltext.factoryFile('/usr/bin/open');
+     } else {
+       /* Mac check because of
+       * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
+       if (!(itsalltext.isDarwin() || program.isExecutable())) {
+         throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
+       }
+       args = [filename];
+     }
 
-	    // Create an observer.
-	    var observer = {
-	        observe: function (subject, topic, data) {
-                // Topic moved as last argument to callbacks since we don't need it (we already know what it is)
-                if (topic==='process-finished') {
-		            if (typeof(subject.exitValue) === 'undefined' || subject.exitValue != 0) {
-			            var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-			            .getService(Components.interfaces.nsIPromptService);
-			            prompts.alert(null, "Editor exited with status of " + subject.exitValue,
-				                      "I ran this command: " + program.path + " " + (args.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
-		            }
-		            itsalltext.debug("Process exited successfully: ", subject, data);
-                }
-                else if (topic === 'process-failed') {
-		            itsalltext.debug("Process exited unsuccessfully: ", subject, data);
-                } else {
-		            itsalltext.debug("Observer had a hard time: ", subject, topic, data);
-		        }
-            }
-        };
+     // Create an observer.
+     var observer          = {
+       observe: function (subject, topic, data) {
+         // Topic moved as last argument to callbacks since we don't need it (we already know what it is)
+         if (topic==='process-finished') {
+           if (typeof(subject.exitValue) != 'undefined' && subject.exitValue != 0) {
+             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+             .getService(Components.interfaces.nsIPromptService);
+             prompts.alert(null, "Editor exited with status of " + subject.exitValue,
+             "I ran this command: " + program.path + " " + (args.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
+           }
+           itsalltext.debug("Process exited successfully: ", subject, data);
+         }
+         else if (topic === 'process-failed') {
+           itsalltext.debug("Process exited unsuccessfully: ", subject, data);
+         } else {
+           itsalltext.debug("Observer had a hard time: ", subject, topic, data);
+         }
+       }
+     };
 
-        // create an nsIProcess
-        process = procutil.createInstance(Components.interfaces.nsIProcess);
-        process.init(program);
+     // create an nsIProcess
+     process = procutil.createInstance(Components.interfaces.nsIProcess);
+     process.init(program);
 
-        // Run the process.
-        if (typeof process.runwAsync == 'undefined') {
-          // FF < 4.0
-          process.runAsync(args, args.length, observer, false);
-        } else {
-          // FF >= 4.0 - Wide character support.
-          process.runwAsync(args, args.length, observer, false);
-        }
+     // Run the process.
+     if (typeof process.runwAsync == 'undefined') {
+       // FF < 4.0
+       process.runAsync(args, args.length, observer, false);
+     } else {
+       // FF >= 4.0 - Wide character support.
+       process.runwAsync(args, args.length, observer, false);
+     }
 
-        this.private_is_watching = true;
-        this.edit_count++;
-    } catch (e) {
-        itsalltext.debug("Caught error launching editor: ", e);
-        params = { out: null,
-                   exists: program ? program.exists() : false,
-                   path: itsalltext.preferences.editor,
-                   exception: e.name };
-        window.openDialog('chrome://itsalltext/content/badeditor.xul',
-                          null,
-                          "chrome, titlebar, toolbar, centerscreen, modal",
-                          params);
-        if (params.out !== null && params.out.do_preferences) {
-            itsalltext.openPreferences(true);
-            this.edit(extension);
-        }
-    }
-};
+     this.private_is_watching = true;
+     this.edit_count++;
+   } catch (e) {
+     itsalltext.debug("Caught error launching editor: ", e);
+     params = { out: null,
+       exists: program ? program.exists() : false,
+       path: itsalltext.preferences.editor,
+       exception: e.name };
+       window.openDialog('chrome://itsalltext/content/badeditor.xul',
+       null,
+       "chrome, titlebar, toolbar, centerscreen, modal",
+       params);
+       if (params.out !== null && params.out.do_preferences) {
+         itsalltext.openPreferences(true);
+         this.edit(extension);
+       }
+     }
+   };
 
 /**
  * Delete the file from disk.
