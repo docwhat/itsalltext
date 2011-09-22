@@ -3,13 +3,13 @@
 
 Thank you for considering helping me debug a problem with [It's All Text!](http://github.com/docwhat/itsalltext).
 
-This document will help you set up debugging and then remove it once you're done.  You'll probably want to remove some of these debugging methods when you finish because it slows down Firefox.  Unless you debug regularly (you're a web or extension developer) you probably don't need these tools day-to-day.
+This document will help you set up debugging and then remove it once you're done.  You'll probably want to undo some of the debugging when you finish because it slows down Firefox.  Unless you debug regularly (you're a web or extension developer) you probably don't need these tools day-to-day.
 
 ## Preparation
 
 You may want to save a copy of this document to disk or open it in a different browser so you can read it while you're restarting and debugging Firefox.
 
-You'll also want at text editor or an open email to collect any interesting information.
+You'll also want a text editor or a new open email to collect any interesting information.
 
 ### Setting up a new profile (optional)
 
@@ -19,12 +19,12 @@ There are several advantages to setting up a new profile for debugging IAT:
 
 1. You won't change your normal settings.
 2. Cleanup is easy, just switch profiles back to your normal profile.
-3. It makes debugging problems caused by extensions interacting with IAT.
+3. It makes debugging problems caused by extensions interacting with IAT possible without destroying your day-to-day profile.
 4. You start with default settings for your platform.
 
 If this sounds good to you, then go read the [managing profiles article](http://support.mozilla.com/en-US/kb/Managing-profiles) in the Mozilla knowledge-base.
 
-Once you've set up a new debugging profile and are running it by restarting Firefox, then you'll want to go install the version of It's All Text! you'll be debugging.  You should have either gotten an `.xpi` file directly from Christian Höltje or you can get any previously released version from [Addons.Mozzilla.Org](https://addons.mozilla.org/en-US/firefox/addon/its-all-text/versions/).
+Once you've set up a new debugging profile and are running it by restarting Firefox and activating that profile you'll want to go install the version of It's All Text! you'll be debugging.  You should have either gotten an `.xpi` file directly from Christian Höltje or you can get any previously released version from [Addons.Mozilla.Org](https://addons.mozilla.org/en-US/firefox/addon/its-all-text/versions/).
 
 The TL;DR version is to run the following command (for Windows and Linux only, alas):
 
@@ -48,13 +48,13 @@ You open the Error Console via <kbd>CTRL</kbd>+<kbd>SHIFT</kdb>+<kbd>J</kbd>.
 
 1. Verify that it is set to show "all" errors, messages, etc.  Click the "all" tab/button.
 2. Check the Error Console for any errors from It's All Text! during startup.  If there are any, then you should copy and paste them into your notes and mark them as start-up errors.
-3. Clear the console. This is to make finding problems easier.
+3. Clear the console. This is to make finding subsequent problems easier.
 
 ### Debug
 
 If you're debugging "normal usage" of IAT, then you can go to [http://docwhat.org/files/iat] and walk through those tests one by one.
 
-After each step check your Error Console and see if any errors from IAT have appeared.  Make note of any that do appear.  It's okay to record too much, we can clean up the info later.
+After each step check your Error Console and see if any errors from IAT have appeared and make a note of them.  It's okay to record too much, we can clean up the info later.
 
 You may want to clear the Error Console regularly to make finding new messages easier.
 
@@ -154,6 +154,10 @@ If you didn't use a new profile, then you'll want to uninstall Firebug and turn 
 If you're proficient enough to do this, I won't need to explain too much to you.  I'd recommend following the setup steps for Level 3 debugging.
 
 You'll also want to install [Venkman](https://developer.mozilla.org/en/Venkman), even if you use Firebug to do JS debugging.
+
+Since you are knowledgable enough to be using a debugger, I assume you'll figure out how to continue from here.
+
+The latest source (and tagged releases) are all on [github](http://github.com/docwhat/itsalltext).
 
 ## Getting Help
 
