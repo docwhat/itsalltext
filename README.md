@@ -106,3 +106,11 @@ Check out the source from [github](http://github.com/).  When you have a suggest
 Version 2.0 will work on a completely different mechanism which will allow it work across Chrome, Firefox, and any other browser that has plugins that do ajax requests.
 
 I'm currently working on that over in my [iated](http://github.com/docwhat/iated/) project.
+
+# "Thank You"s
+
+Last and certainly not least, the list of people who've helped out:
+
+* [Bill von Hagen](http://vonhagen.org/) -- Documentation checker, extraordinaire.
+* Mammad Mammadov - Debugging a [problem](https://github.com/docwhat/itsalltext/issues/18) above and beyond the call of duty.
+* All the people who have donated money and the occasional wishlist item.
