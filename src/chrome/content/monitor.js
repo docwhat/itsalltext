@@ -115,7 +115,7 @@ Monitor.prototype.hitched_findnodes = function (doc) {
  */
 Monitor.prototype.hitched_watcher = function (offset, init) {
     // If it's a special number or it's an event, then we need to init.
-    if (offset.type && offset.type === 'TabSelect') {
+    if (typeof offset != 'undefined' && offset.type && offset.type === 'TabSelect') {
         init = true;
     }
     var rate = itsalltext.getRefresh(),
