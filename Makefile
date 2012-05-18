@@ -18,14 +18,13 @@
 ## Options
 # If you don't have jslint or jsmin, you can replace these with cat...
 # but I strongly suggest you get jslint and jsmin working.
-JSLINT     := jslint
 YC         := yuicompressor
 YC_JSFLAGS := --type js --charset UTF-8
 ZIP        := zip
 PROJNICK   := itsalltext
 PROJNAME   := "It's All Text!"
 ICONFILE   := src/chrome/content/icon.png
-VERSION    := 1.6.3
+VERSION    := 1.6.4
 
 
 # NOTE: do not create files or directories in here that have
@@ -40,9 +39,6 @@ SOURCES_CHROME:=$(shell find src/chrome -type f\
 SOURCES_NONCHROME:=src/chrome.manifest src/gpl.txt src/install.rdf src/defaults/preferences/itsalltext.js
 SOURCES:=$(SOURCES_CHROME) $(SOURCES_NONCHROME)
 SOURCES_JS:=$(shell echo "$(SOURCES)" | xargs -n 1 echo | grep -E '\.js$$')
-SOURCES_JS_LINT:=$(patsubst %.js, lint/%.js.lint, $(SOURCES_JS))
-SOURCES_JS_WARN:=$(patsubst %.js, lint/%.js.warn, $(SOURCES_JS))
-SOURCES_JS_LINT_PRE:=$(patsubst %.lint, %.lint-pre, $(filter %.lint,$(SOURCES_JS_LINT)))
 JARS:=chrome/content.jar $(patsubst src/chrome/locale/%, chrome/%.jar, $(wildcard src/chrome/locale/*-*))
 
 STAGE1_OUT:=$(patsubst src/%, stage1/%, $(SOURCES))
@@ -61,10 +57,10 @@ else
 endif
 
 .PHONY: default
-default: lintcheck narf final
+default: narf final
 
 .PHONY: all
-all: lintcheck narf docs final
+all: narf docs final
 
 ## Release a new xpi
 .PHONY: release
@@ -130,37 +126,6 @@ final/chrome/%.jar: stage1 Makefile
 
 .PHONY: build
 build: final
-
-##
-## Lint checks for possible problems.
-.PHONY: lint
-lint: $(SOURCES_JS_LINT) $(SOURCES_JS_WARN)
-
-.INTERMEDIATE: $(SOURCES_JS_LINT_PRE)
-
-$(SOURCES_JS_LINT_PRE): lint/%.js.lint-pre: %.js
-	$(Q)mkdir -p $(dir $@)
-	$(Q)perl -p -e 's!^(\s*)(const)(\s+)!$$1var$$3!' $< > $@
-
-$(SOURCES_JS_LINT): %.js.lint: %.js.lint-pre
-	$(info linting $(patsubst %.lint-pre,%,$(notdir $<)) ...)
-	$(Q)rm -f $@
-	$(Q)$(JSLINT) -p $< |\
-		perl -p -e 's!^(jslint: linting )lint/(.*)\.lint-pre!********* $$1$$2!' >> $@
-$(SOURCES_JS_WARN): lint/%.js.warn: %.js
-	$(info warning $(patsubst %.lint-pre,%,$(notdir $<)) ...)
-	$(Q)echo '********* checking $< *********' > $@
-	$(Q)$(YC) $(YC_JSFLAGS) --verbose -o /dev/null $< 2>&1 |\
-		grep -vE '^\[INFO\] It is recommended to use Sun' >> $@
-
-.PHONY: lintcheck
-lintcheck: $(SOURCES_JS_LINT) $(SOURCES_JS_WARN)
-	$(Q)egrep -q '^lint at '    $(SOURCES_JS_LINT)
-	$(Q)egrep -q '^\[WARNING\]' $(SOURCES_JS_WARN)
-
-.PHONY: showlint
-showlint: lint
-	$(Q)find ./lint -type f \( -name '*.lint' -o -name '*.warn' \) -print0 | xargs -0 cat
 
 ##
 ## Narf is a magick keyword that should stop builds from working
