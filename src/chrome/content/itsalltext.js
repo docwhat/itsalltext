@@ -245,7 +245,7 @@ var ItsAllText = function () {
             retval = null;
 
         if (editor === '' && that.isDarwin()) {
-            editor = '/Application/TextEdit.app';
+            editor = '/Applications/TextEdit.app';
             that.preferences.private_set('editor', editor);
         }
 
