@@ -88,22 +88,10 @@ function CacheObj(node) {
      */
     that.extension = null;
 
-    /* Stores an nsILocalFile pointing to the current filename.
-     * @type nsILocalFile
-     */
-    that.file = null;
-
     /* The number of edits done on this object.
      * @type number
      */
     that.edit_count = 0;
-
-    /* Set the default extension and create the nsIFile object. */
-    extension = node.getAttribute('itsalltext-extension');
-    if (typeof(extension) != 'string' || !extension.match(/^[.a-z0-9]+$/i)) {
-        extension = itsalltext.getExtensions()[0];
-    }
-    that.setExtension(extension);
 
     that.initFromExistingFile();
 
@@ -183,8 +171,7 @@ CacheObj.prototype.destroy = function () {
 
     delete this.node;
     delete this.button;
-    delete this.file;
-    this.file = this.node = this.button = null;
+    this.node = this.button = null;
 };
 
 /**
@@ -192,22 +179,46 @@ CacheObj.prototype.destroy = function () {
  * @param {String} ext The extension.  Must include the dot.  Example: .txt
  */
 CacheObj.prototype.setExtension = function (ext) {
-    if (ext == this.extension && this.file) {
+    if (ext == this.extension) {
         return; /* It's already set.  No problem. */
     }
 
     /* Create the nsIFile object */
-    var file = itsalltext.factoryFile();
-    file.initWithFile(itsalltext.getEditDir());
-    file.append([this.base_filename, ext].join(''));
+    var file = this.getFile();
 
     this.extension = ext;
-    this.file = file;
     if (file.exists()) {
         this.timestamp = file.lastModifiedTime;
         this.size      = file.fileSize;
     }
 };
+
+/**
+ * Returns the current extension.
+ * @returns {String} The current extension.
+ */
+CacheObj.prototype.getExtension = function () {
+    var extension;
+    if (!this.extension) {
+        extension = this.node.getAttribute('itsalltext-extension');
+        if (typeof(extension) != 'string' || !extension.match(/^[.a-z0-9]+$/i)) {
+            extension = itsalltext.getExtensions()[0];
+        }
+        this.extension = extension;
+    }
+    return this.extension;
+}
+
+
+/**
+ * Returns an nsIFile object for the current file.
+ * @returns {nsIFile} A file object for the directory.
+ */
+CacheObj.prototype.getFile = function () {
+    var file = itsalltext.factoryFile(itsalltext.getWorkingDir());
+    file.append([this.base_filename, this.getExtension()].join(''));
+    return file;
+}
 
 /**
  * This function looks for an existing file and starts to monitor
@@ -216,7 +227,7 @@ CacheObj.prototype.setExtension = function (ext) {
  */
 CacheObj.prototype.initFromExistingFile = function () {
     var base = this.base_filename,
-        fobj = itsalltext.getEditDir(),
+        fobj = itsalltext.factoryFile(itsalltext.getWorkingDir()),
         entries = fobj.directoryEntries,
         ext = null,
         tmpfiles = /(\.bak|.tmp|~)$/,
@@ -290,7 +301,7 @@ CacheObj.prototype.toString = function () {
  */
 CacheObj.prototype.write = function (clobber) {
     clobber = typeof(clobber) === 'boolean'?clobber:true;
-    var foStream, conv, text;
+    var foStream, conv, text, file = this.getFile();
 
     if (clobber) {
         foStream = Components.
@@ -298,7 +309,7 @@ CacheObj.prototype.write = function (clobber) {
             createInstance(Components.interfaces.nsIFileOutputStream);
 
         /* write, create, truncate */
-        foStream.init(this.file, 0x02 | 0x08 | 0x20,
+        foStream.init(file, 0x02 | 0x08 | 0x20,
                       parseInt('0600', 8), 0);
 
         /* We convert to charset */
@@ -312,13 +323,13 @@ CacheObj.prototype.write = function (clobber) {
         foStream.close();
 
         /* Reset Timestamp and filesize, to prevent a spurious refresh */
-        this.timestamp = this.file.lastModifiedTime;
-        this.size      = this.file.fileSize;
+        this.timestamp = file.lastModifiedTime;
+        this.size      = file.fileSize;
     } else {
         this.timestamp = this.size = null; // force refresh of textarea
     }
 
-    return this.file.path;
+    return file.path;
 };
 
 /**
@@ -343,7 +354,7 @@ CacheObj.prototype.getStyle = function (node, attr) {
  */
  CacheObj.prototype.edit = function (extension, clobber) {
    itsalltext.debug(this.uuid, 'edit(', extension, ', ', clobber, ')', this.uid);
-   extension = typeof(extension) === 'string'?extension:this.extension;
+   extension = typeof(extension) === 'string'?extension:this.getExtension();
    this.setExtension(extension);
 
    var filename = this.write(clobber),
@@ -444,11 +455,12 @@ CacheObj.prototype.getStyle = function (node, attr) {
  * Delete the file from disk.
  */
 CacheObj.prototype.remove = function () {
-    if (this.file.exists()) {
+    var file = this.getFile();
+    if (file.exists()) {
         try {
-            this.file.remove();
+            file.remove();
         } catch (e) {
-            //disabled-debug -- itsalltext.debug('remove(', this.file.path, '): ', e);
+            //disabled-debug -- itsalltext.debug('remove(', file.path, '): ', e);
             return false;
         }
     }
@@ -461,6 +473,7 @@ CacheObj.prototype.remove = function () {
 CacheObj.prototype.read = function () {
     /* read file, reset ts & size */
     var DEFAULT_REPLACEMENT_CHARACTER = 65533,
+        file = this.getFile(),
         buffer = [],
         fis,
         istream,
@@ -469,7 +482,7 @@ CacheObj.prototype.read = function () {
     try {
         fis = Components.classes["@mozilla.org/network/file-input-stream;1"].
             createInstance(Components.interfaces.nsIFileInputStream);
-        fis.init(this.file, 0x01, parseInt('00400', 8), 0);
+        fis.init(file, 0x01, parseInt('00400', 8), 0);
         // MODE_RDONLY | PERM_IRUSR
 
         istream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].
@@ -484,8 +497,8 @@ CacheObj.prototype.read = function () {
         istream.close();
         fis.close();
 
-        this.timestamp = this.file.lastModifiedTime;
-        this.size      = this.file.fileSize;
+        this.timestamp = file.lastModifiedTime;
+        this.size      = file.fileSize;
 
         return buffer.join('');
     } catch (e) {
@@ -498,13 +511,13 @@ CacheObj.prototype.read = function () {
  * @returns {boolean} returns true if the file has changed on disk.
  */
 CacheObj.prototype.hasChanged = function () {
+    var file = this.getFile();
     /* Check exists.  Check ts and size. */
     return this.private_is_watching &&
-           this.file &&
-           this.file.exists() &&
-           this.file.isReadable() &&
-           (this.file.lastModifiedTime != this.timestamp ||
-            this.file.fileSize         != this.size);
+           file.exists() &&
+           file.isReadable() &&
+           (file.lastModifiedTime != this.timestamp ||
+            file.fileSize         != this.size);
 };
 
 /**

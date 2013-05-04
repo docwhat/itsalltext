@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
- 
+
 <!DOCTYPE prefwindow SYSTEM "chrome://itsalltext/locale/preferences.dtd" >
 <prefwindow id="itsalltext-prefs"
             title="&title;"
@@ -8,10 +8,10 @@
             buttons="accept,cancel">
 
   <stringbundleset id="strbundles">
-    <stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties" /> 
+    <stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties" />
   </stringbundleset>
 
-  <prefpane 
+  <prefpane
       id="itsalltext-pane"
       label="&title;"
       onpaneload="pref_onload();"
@@ -22,6 +22,8 @@
                   name="extensions.itsalltext.charset" type="string" />
       <preference id="pref_editor"
                   name="extensions.itsalltext.editor" type="string" />
+      <preference id="pref_workingdir"
+                  name="extensions.itsalltext.workingdir" type="string" />
       <preference id="pref_seconds"
                   name="extensions.itsalltext.refresh" type="int" />
       <preference id="pref_extensions"
@@ -52,6 +54,19 @@
               <hbox align="right">
                 <spacer />
                 <button oncommand="pref_editor_select();" label="&picker.label;"
+                        id="browse" accesskey="b" tabindex="1" />
+              </hbox>
+            </vbox>
+          </row>
+          <row align="center">
+            <label control="workingdir" value="&workingdir.label;" />
+            <vbox>
+              <textbox preference="pref_workingdir" id="workingdir" size="20"
+                       style="-moz-appearance: none !important; background:
+                              inherit;" />
+              <hbox align="right">
+                <spacer />
+                <button oncommand="pref_workingdir_select();" label="&picker.label;"
                         id="browse" accesskey="b" tabindex="1" />
               </hbox>
             </vbox>

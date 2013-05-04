@@ -1,5 +1,6 @@
 /*extern Components, Firebug, getBoolPref, openDialog, getBrowser, gBrowser */
 /*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
+// vim: ts=4 sw=4
 
 /*
  *  It's All Text! - Easy external editing of web forms.
@@ -34,14 +35,15 @@ var ItsAllText = function () {
         loadthings;
 
     /**
-     * A factory method to make an nsILocalFile object.
+     * A factory method to make an nsIFile object.
      * @param {String} path A path to initialize the object with (optional).
-     * @returns {nsILocalFile}
+     * @returns {nsIFile}
      */
     that.factoryFile = function (path) {
         var file = Components.
             classes["@mozilla.org/file/local;1"].
-            createInstance(Components.interfaces.nsILocalFile);
+            createInstance(Components.interfaces.nsIFile);
+        file.followLinks = false;
         if (typeof(path) == 'string' && path !== '') {
             file.initWithPath(path);
         }
@@ -50,9 +52,9 @@ var ItsAllText = function () {
 
     /**
      * Returns the directory where we put files to edit.
-     * @returns nsILocalFile The location where we should write editable files.
+     * @returns {String} The location where we should write editable files.
      */
-    that.getEditDir = function () {
+    that.getDefaultWorkingDir = function () {
         /* Where is the directory that we use. */
         var fobj = Components.classes["@mozilla.org/file/directory_service;1"].
             getService(Components.interfaces.nsIProperties).
@@ -65,7 +67,7 @@ var ItsAllText = function () {
         if (!fobj.isDirectory()) {
             that.error(that.localeFormat('problem_making_directory', [fobj.path]));
         }
-        return fobj;
+        return fobj.path;
     };
 
     /**
@@ -118,6 +120,7 @@ var ItsAllText = function () {
         types: {
             charset:            'Char',
             editor:             'Char',
+            workingdir:         'Char',
             refresh:            'Int',
             debug:              'Bool',
             gumdrop_position:   'Char',
@@ -200,16 +203,16 @@ var ItsAllText = function () {
     };
 
     that.getTrackerId = function () {
-	var id = that.preferences.tracker_id;
-	if (!id) {
-	    id = [that.MYSTRING,
-		  Math.floor(Math.random()*999999).toString(),
-		  Math.round(new Date().getTime()),
-		 ].join(':')
-	    id = that.hashString(id);
-            that.preferences.private_set('tracker_id', id);
-	}
-	return id;
+        var id = that.preferences.tracker_id;
+        if (!id) {
+            id = [that.MYSTRING,
+            Math.floor(Math.random()*999999).toString(),
+            Math.round(new Date().getTime()),
+           ].join(':')
+            id = that.hashString(id);
+                  that.preferences.private_set('tracker_id', id);
+        }
+        return id;
     }
 
 
@@ -238,7 +241,7 @@ var ItsAllText = function () {
      *
      * For a complete list of exceptions, see:
      * http://lxr.mozilla.org/seamonkey/source/xpcom/base/nsError.h#262
-     * @returns {nsILocalFile} A file object of the editor.
+     * @returns {nsIFile} A file object of the editor.
      */
     that.getEditor = function () {
         var editor = that.preferences.editor,
@@ -253,6 +256,23 @@ var ItsAllText = function () {
             retval = that.factoryFile(editor);
         }
         return retval;
+    };
+
+    /**
+     * A Preference Option: Where should we store the working files?
+     * @returns {String} The directory path as a string.
+     */
+    that.getWorkingDir = function () {
+        var workingdir = that.preferences.workingdir,
+            default_workingdir;
+
+        if (!workingdir) {
+            default_workingdir = that.getDefaultWorkingDir();
+            that.preferences.private_set('workingdir', default_workingdir);
+            return default_workingdir;
+        } else {
+            return workingdir;
+        }
     };
 
     /**
@@ -342,36 +362,36 @@ var ItsAllText = function () {
     // @todo [wish] Profiling and optimization.
 
     that.getFromTracker = function (id) {
-	var tracker, doc;
-	if (typeof gBrowser !== 'undefined') {
-	    doc = gBrowser.contentDocument;
-	} else {
-	    // We must be in a XUL window, fall back to simpler method.
-	    doc = window.document;
-	}
-	tracker = doc.getUserData(that.getTrackerId());
-	if (!tracker) {
-	    tracker = {};
-	    doc.setUserData(that.getTrackerId(), tracker, null);
-	}
-	return tracker[id];
-    }
+        var tracker, doc;
+        if (typeof gBrowser !== 'undefined') {
+            doc = gBrowser.contentDocument;
+        } else {
+            // We must be in a XUL window, fall back to simpler method.
+            doc = window.document;
+        }
+        tracker = doc.getUserData(that.getTrackerId());
+        if (!tracker) {
+            tracker = {};
+            doc.setUserData(that.getTrackerId(), tracker, null);
+        }
+        return tracker[id];
+        }
 
-    that.addToTracker = function (id, cobj) {
-	var tracker, doc;
-	if (typeof gBrowser !== 'undefined') {
-	    doc = gBrowser.contentDocument;
-	} else {
-	    // We must be in a XUL window, fall back to simpler method.
-	    doc = window.document;
-	}
-	tracker = doc.getUserData(that.getTrackerId());
-	if (!tracker) {
-	    tracker = {};
-	}
-	tracker[id] = cobj;
-	doc.setUserData(that.getTrackerId(), tracker, null);
-	that.debug("addToTracker:", id, cobj, tracker);
+        that.addToTracker = function (id, cobj) {
+        var tracker, doc;
+        if (typeof gBrowser !== 'undefined') {
+            doc = gBrowser.contentDocument;
+        } else {
+            // We must be in a XUL window, fall back to simpler method.
+            doc = window.document;
+        }
+        tracker = doc.getUserData(that.getTrackerId());
+        if (!tracker) {
+            tracker = {};
+        }
+        tracker[id] = cobj;
+        doc.setUserData(that.getTrackerId(), tracker, null);
+        that.debug("addToTracker:", id, cobj, tracker);
     }
 
     // @todo [wish] Refresh textarea on editor quit.
@@ -554,9 +574,6 @@ var ItsAllText = function () {
                         that.monitor.registerPage, true);
         }
 
-        // Start watching the preferences.
-        that.preference_observer.register();
-
         // Setup the context menu whenever it is shown.
         var contentAreaContextMenu = document.getElementById("contentAreaContextMenu");
         if (contentAreaContextMenu) {
@@ -617,8 +634,11 @@ ItsAllText.prototype.init = function () {
     /* For debugging */
     this.thread_id = Math.round(new Date().getTime() * Math.random());
 
+    // Start watching the preferences.
+    this.preference_observer.register();
+
     /* Clean the edit directory whenever we create a new window. */
-    this.cleanEditDir();
+    this.cleanWorkingDir();
 
     /* Load the various bits needed to make this work. */
     this.initScripts();
@@ -626,7 +646,7 @@ ItsAllText.prototype.init = function () {
     /* Start the monitor */
     var itsalltext = this;
     setTimeout(function () {
-	itsalltext.monitor = new itsalltext.Monitor();
+        itsalltext.monitor = new itsalltext.Monitor();
     }, 1);
 }
 
@@ -877,12 +897,13 @@ ItsAllText.prototype.keyprintToString = function (keyprint) {
 /**
  * Cleans out the edit directory, deleting all old files.
  */
-ItsAllText.prototype.cleanEditDir = function (force) {
+ItsAllText.prototype.cleanWorkingDir = function (force) {
     force = typeof(force) === 'boolean'?force:false;
-    var last_week = Date.now() - (1000 * 60 * 60 * 24 * 7),
-        fobj = this.getEditDir(),
-        entries = fobj.directoryEntries,
-        entry;
+    var last_week, fobj, entries, entry;
+    last_week = Date.now() - (1000 * 60 * 60 * 24 * 7);
+    fobj = this.factoryFile(this.getWorkingDir());
+    entries = fobj.directoryEntries;
+
     while (entries.hasMoreElements()) {
         entry = entries.getNext();
         entry.QueryInterface(Components.interfaces.nsIFile);
@@ -975,7 +996,7 @@ ItsAllText.prototype.rebuildMenu = function (uid, menu_id, is_disabled) {
         menu.removeChild(items[i]);
     }
 
-    if (cobj.edit_count <= 0 && cobj.file && cobj.file.exists()) {
+    if (cobj.edit_count <= 0 && cobj.getFile() && cobj.getFile().exists()) {
         node = document.createElementNS(that.XULNS, 'menuitem');
         node.setAttribute('label', that.localeFormat('edit_existing', [cobj.extension]));
         that.listen(node, 'command', that.hitch(that, 'menuExtEdit', null, false), false);
