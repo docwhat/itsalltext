@@ -29,5 +29,6 @@
                    em:creator="Christian Höltje">
     <em:targetApplication RDF:resource="rdf:#$firefox"/>
     <em:targetApplication RDF:resource="rdf:#$seamonkey"/>
+    <em:unpack>true</em:unpack>
   </RDF:Description>
 </RDF:RDF>
