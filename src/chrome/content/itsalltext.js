@@ -59,13 +59,6 @@ var ItsAllText = function () {
             getService(Components.interfaces.nsIProperties).
             get("ProfD", Components.interfaces.nsIFile);
         fobj.append(that.MYSTRING);
-        if (!fobj.exists()) {
-            fobj.create(Components.interfaces.nsIFile.DIRECTORY_TYPE,
-                        parseInt('0700', 8));
-        }
-        if (!fobj.isDirectory()) {
-            that.error(that.localeFormat('problem_making_directory', [fobj.path]));
-        }
         return fobj.path;
     };
 
@@ -263,15 +256,26 @@ var ItsAllText = function () {
      */
     that.getWorkingDir = function () {
         var workingdir = that.preferences.workingdir,
-            default_workingdir;
+            default_workingdir,
+            fobj;
 
         if (!workingdir) {
             default_workingdir = that.getDefaultWorkingDir();
             that.preferences.private_set('workingdir', default_workingdir);
-            return default_workingdir;
-        } else {
-            return workingdir;
+            workingdir = default_workingdir;
         }
+
+        // Verify the directory exists.
+        fobj = that.factoryFile(workingdir);
+        if (!fobj.exists()) {
+            fobj.create(Components.interfaces.nsIFile.DIRECTORY_TYPE,
+                        parseInt('0700', 8));
+        }
+        if (!fobj.isDirectory()) {
+            that.error(that.localeFormat('problem_making_directory', [workingdir]));
+        }
+
+        return workingdir;
     };
 
     /**
@@ -901,16 +905,18 @@ ItsAllText.prototype.cleanWorkingDir = function (force) {
     var last_week, fobj, entries, entry;
     last_week = Date.now() - (1000 * 60 * 60 * 24 * 7);
     fobj = this.factoryFile(this.getWorkingDir());
-    entries = fobj.directoryEntries;
+    if (fobj.exists() && fobj.isDirectory()) {
+        entries = fobj.directoryEntries;
 
-    while (entries.hasMoreElements()) {
-        entry = entries.getNext();
-        entry.QueryInterface(Components.interfaces.nsIFile);
-        if (force || !entry.exists() || entry.lastModifiedTime < last_week) {
-            try {
-                entry.remove(false);
-            } catch (e) {
-                this.log('unable to remove', entry, 'because:', e);
+        while (entries.hasMoreElements()) {
+            entry = entries.getNext();
+            entry.QueryInterface(Components.interfaces.nsIFile);
+            if (force || !entry.exists() || entry.lastModifiedTime < last_week) {
+                try {
+                    entry.remove(false);
+                } catch (e) {
+                    this.log('unable to remove', entry, 'because:', e);
+                }
             }
         }
     }

@@ -33,7 +33,7 @@ function Monitor() {
 }
 
 Monitor.prototype.hitched_destroy = function () {
-    delete itsalltext;
+    delete this.itsalltext;
 };
 
 Monitor.prototype.hitched_restart = function () {

@@ -228,23 +228,26 @@ CacheObj.prototype.getFile = function () {
 CacheObj.prototype.initFromExistingFile = function () {
     var base = this.base_filename,
         fobj = itsalltext.factoryFile(itsalltext.getWorkingDir()),
-        entries = fobj.directoryEntries,
+        entries,
         ext = null,
         tmpfiles = /(\.bak|.tmp|~)$/,
         entry;
-    while (entries.hasMoreElements()) {
-        entry = entries.getNext();
-        entry.QueryInterface(Components.interfaces.nsIFile);
-        if (entry.leafName.indexOf(base) === 0) {
-            // startswith
-            if (ext === null && !entry.leafName.match(tmpfiles)) {
-                ext = entry.leafName.slice(base.length);
-                continue;
-            }
-            try {
-                entry.remove(false);
-            } catch (e) {
-                //disabled-debug -- itsalltext.debug('unable to remove', entry, 'because:', e);
+    if (fobj.exists() && fobj.isDirectory()) {
+        entries = fobj.directoryEntries;
+        while (entries.hasMoreElements()) {
+            entry = entries.getNext();
+            entry.QueryInterface(Components.interfaces.nsIFile);
+            if (entry.leafName.indexOf(base) === 0) {
+                // startswith
+                if (ext === null && !entry.leafName.match(tmpfiles)) {
+                    ext = entry.leafName.slice(base.length);
+                    continue;
+                }
+                try {
+                    entry.remove(false);
+                } catch (e) {
+                    //disabled-debug -- itsalltext.debug('unable to remove', entry, 'because:', e);
+                }
             }
         }
     }
