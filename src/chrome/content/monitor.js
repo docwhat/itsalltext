@@ -1,4 +1,5 @@
 "use strict";
+// vim: ts=4 sw=4 sts=4
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -19,7 +20,7 @@
 
 function Monitor() {
     var hitch_re = /^hitched_/,
-        method;
+    method;
     itsalltext.debug('Monitor', itsalltext);
 
     for (method in this) {
@@ -38,7 +39,7 @@ Monitor.prototype.hitched_destroy = function () {
 
 Monitor.prototype.hitched_restart = function () {
     var rate = itsalltext.getRefresh(),
-        id   = this.id;
+    id   = this.id;
     if (id) {
         clearInterval(id);
     }
@@ -71,12 +72,12 @@ Monitor.prototype.hitched_findnodes = function (doc) {
         return [];
     }
     var is_html = this.isHTML(doc),
-        is_xul  = this.isXUL(doc),
-        i,
-        tmp,
-        nodes = [],
-        iframes,
-        frames;
+    is_xul  = this.isXUL(doc),
+    i,
+    tmp,
+    nodes = [],
+    iframes,
+    frames;
     if (is_html) {
         /* HTML */
         tmp = doc.getElementsByTagName('textarea');
@@ -85,7 +86,7 @@ Monitor.prototype.hitched_findnodes = function (doc) {
         }
 
         /* Now that we got the nodes in this document,
-             * look for other documents. */
+         * look for other documents. */
         iframes = doc.getElementsByTagName('iframe');
         for (i = 0; i < iframes.length; i++) {
             nodes.push.apply(nodes, (this.findnodes(iframes[i].contentDocument)));
@@ -118,12 +119,12 @@ Monitor.prototype.hitched_watcher = function (offset, init) {
         init = true;
     }
     var rate = itsalltext.getRefresh(),
-        now = Date.now(),
-        doc,
-        nodes = [],
-        i,
-        cobj,
-        node;
+    now = Date.now(),
+    doc,
+    nodes = [],
+    i,
+    cobj,
+    node;
 
     if (!init && now - this.last_watcher_call < Math.round(rate * 0.9)) {
         //disabled-debug -- itsalltext.debug('watcher(', offset, '/', (now - this.last_watcher_call), ') -- skipping catchup refresh');
@@ -188,7 +189,7 @@ Monitor.prototype.hitched_handleSubtreeModified = function (event) {
 
 Monitor.prototype.hitched_startPage = function (event, force) {
     var doc = event.originalTarget,
-        unsafeWin;
+    unsafeWin;
     //disabled-debug -- itsalltext.debug('startPage', doc && doc.location, force);
     if (!(force || this.isHTML(doc))) {
         this.stopPage(event);
@@ -214,7 +215,7 @@ Monitor.prototype.hitched_startPage = function (event, force) {
 
 Monitor.prototype.hitched_stopPage = function (event) {
     var doc = event.originalTarget,
-        unsafeWin;
+    unsafeWin;
     //disabled-debug -- itsalltext.debug('stopPage', doc && doc.location);
 
     unsafeWin = doc.defaultView.wrappedJSObject;
@@ -225,8 +226,8 @@ Monitor.prototype.hitched_stopPage = function (event) {
 
 Monitor.prototype.isXUL = function (doc) {
     var contentType = doc && doc.contentType,
-        is_xul = (contentType == 'application/vnd.mozilla.xul+xml'),
-        is_my_readme;
+    is_xul = (contentType == 'application/vnd.mozilla.xul+xml'),
+    is_my_readme;
     try {
         is_my_readme = location && location.href == itsalltext.README;
     } catch (e) {
@@ -237,10 +238,10 @@ Monitor.prototype.isXUL = function (doc) {
 
 Monitor.prototype.isHTML = function (doc) {
     var contentType,
-        location,
-        is_html,
-        is_usable,
-        is_my_readme;
+    location,
+    is_html,
+    is_usable,
+    is_my_readme;
     /* Check that this is a document we want to play with. */
     contentType = doc.contentType;
     location = doc.location;
@@ -248,9 +249,9 @@ Monitor.prototype.isHTML = function (doc) {
                contentType == 'text/xhtml' ||
                contentType == 'application/xhtml+xml');
     is_usable = is_html &&
-                location &&
-                location.protocol !== 'about:' &&
-                location.protocol !== 'chrome:';
+        location &&
+        location.protocol !== 'about:' &&
+        location.protocol !== 'chrome:';
     try {
         is_my_readme = location && location.href == itsalltext.README;
         /*

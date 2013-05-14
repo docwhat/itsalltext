@@ -1,6 +1,5 @@
 "use strict";
-// vim: ts=4 sw=4
-
+// vim: ts=4 sw=4 sts=4
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -31,7 +30,7 @@ var ItsAllText = function () {
      * @type Object
      */
     var that = this,
-        loadthings;
+    loadthings;
 
     /**
      * A factory method to make an nsIFile object.
@@ -77,9 +76,9 @@ var ItsAllText = function () {
          */
         private_get: function (aData) {
             var po = that.preference_observer,
-                real_type = po.types[aData],
-                type = real_type === 'Float' ? 'Char' : real_type,
-                retval = '';
+            real_type = po.types[aData],
+            type = real_type === 'Float' ? 'Char' : real_type,
+            retval = '';
             retval = po.private_branch['get' + type + 'Pref'](aData);
             return real_type === 'Float' ? parseFloat(retval) : retval;
         },
@@ -91,8 +90,8 @@ var ItsAllText = function () {
          */
         private_set: function (aData, value) {
             var po = that.preference_observer,
-                real_type = po.types[aData],
-                type = real_type === 'Float' ? 'Char' : real_type;
+            real_type = po.types[aData],
+            type = real_type === 'Float' ? 'Char' : real_type;
             if (real_type === 'Float') {
                 value = '' + parseFloat(value);
             }
@@ -129,7 +128,7 @@ var ItsAllText = function () {
             var prefService = Components.
                 classes["@mozilla.org/preferences-service;1"].
                 getService(Components.interfaces.nsIPrefService),
-                type;
+            type;
             this.private_branch = prefService.getBranch("extensions." + that.MYSTRING + ".");
             this.private_branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
             this.private_branch.addObserver("", this, false);
@@ -198,11 +197,11 @@ var ItsAllText = function () {
         var id = that.preferences.tracker_id;
         if (!id) {
             id = [that.MYSTRING,
-            Math.floor(Math.random()*999999).toString(),
-            Math.round(new Date().getTime()),
-           ].join(':')
+                Math.floor(Math.random()*999999).toString(),
+                Math.round(new Date().getTime()),
+            ].join(':')
             id = that.hashString(id);
-                  that.preferences.private_set('tracker_id', id);
+            that.preferences.private_set('tracker_id', id);
         }
         return id;
     }
@@ -214,8 +213,8 @@ var ItsAllText = function () {
      */
     that.isDarwin = function () {
         /* more help:
-         http://developer.mozilla.org/en/docs/Code_snippets:Miscellaneous#Operating_system_detection
-        */
+http://developer.mozilla.org/en/docs/Code_snippets:Miscellaneous#Operating_system_detection
+*/
 
         var is_darwin = that.private_is_darwin;
         if (typeof(is_darwin) == 'undefined') {
@@ -237,7 +236,7 @@ var ItsAllText = function () {
      */
     that.getEditor = function () {
         var editor = that.preferences.editor,
-            retval = null;
+        retval = null;
 
         if (editor === '' && that.isDarwin()) {
             editor = '/Applications/TextEdit.app';
@@ -256,8 +255,8 @@ var ItsAllText = function () {
      */
     that.getWorkingDir = function () {
         var workingdir = that.preferences.workingdir,
-            default_workingdir,
-            fobj;
+        default_workingdir,
+        fobj;
 
         if (!workingdir) {
             default_workingdir = that.getDefaultWorkingDir();
@@ -300,7 +299,7 @@ var ItsAllText = function () {
      */
     that.getExtensions = function () {
         var string = that.preferences.extensions.replace(/[\n\t ]+/g, ''),
-            extensions = string.split(',');
+        extensions = string.split(',');
         if (extensions.length === 0) {
             return ['.txt'];
         } else {
@@ -318,13 +317,13 @@ var ItsAllText = function () {
     that.openPreferences = function (wait) {
         wait = typeof(wait) == 'boolean' ? wait : false;
         var paneID = that.MYSTRING + '_preferences',
-            psvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch),
-            instantApply = psvc.getBoolPref("browser.preferences.instantApply", false) && !wait,
-            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog" : ",modal"),
-            xpcom_wm = Components.classes["@mozilla.org/appshell/window-mediator;1"],
-            wm = xpcom_wm.getService(Components.interfaces.nsIWindowMediator),
-            win = wm.getMostRecentWindow("Browser:Preferences"),
-            pane;
+        psvc = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch),
+        instantApply = psvc.getBoolPref("browser.preferences.instantApply", false) && !wait,
+        features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog" : ",modal"),
+        xpcom_wm = Components.classes["@mozilla.org/appshell/window-mediator;1"],
+        wm = xpcom_wm.getService(Components.interfaces.nsIWindowMediator),
+        win = wm.getMostRecentWindow("Browser:Preferences"),
+        pane;
 
         if (win) {
             win.focus();
@@ -344,8 +343,8 @@ var ItsAllText = function () {
      */
     that.appendExtensions = function (ext) {
         var current = that.getExtensions(),
-            value,
-            i;
+        value,
+        i;
         ext = ext.replace(/[\n\t ]+/g, '');
         for (i = 0; i < current.length; i++) {
             if (ext == current[i]) {
@@ -378,9 +377,9 @@ var ItsAllText = function () {
             doc.setUserData(that.getTrackerId(), tracker, null);
         }
         return tracker[id];
-        }
+    }
 
-        that.addToTracker = function (id, cobj) {
+    that.addToTracker = function (id, cobj) {
         var tracker, doc;
         if (typeof gBrowser !== 'undefined') {
             doc = gBrowser.contentDocument;
@@ -413,7 +412,7 @@ var ItsAllText = function () {
             container = node.offsetParent;
         }
         var pos = [node.offsetLeft, node.offsetTop],
-            pnode = node.offsetParent;
+        pnode = node.offsetParent;
         while (pnode && (container === null || pnode != container)) {
             pos[0] += pnode.offsetLeft || 0;
             pos[1] += pnode.offsetTop  || 0;
@@ -430,13 +429,13 @@ var ItsAllText = function () {
      */
     that.marshalKeyEvent = function (event) {
         var marshal = [event.altKey  ? 1 : 0,
-                       event.ctrlKey ? 1 : 0,
-                       event.metaKey ? 1 : 0,
-                       event.shiftKey ? 1 : 0,
-                       event.charCode,
-                       event.keyCode];
-        marshal = marshal.join(':');
-        return marshal;
+            event.ctrlKey ? 1 : 0,
+            event.metaKey ? 1 : 0,
+            event.shiftKey ? 1 : 0,
+            event.charCode,
+            event.keyCode];
+            marshal = marshal.join(':');
+            return marshal;
     };
 
     that.keyMap = {
@@ -476,8 +475,8 @@ var ItsAllText = function () {
      */
     that.keyMarshalToString = function (km) {
         var e = km.split(':'),
-            out = [],
-            c = parseInt(e[5], 10);
+        out = [],
+        c = parseInt(e[5], 10);
         if (e[0] === '1') {
             out.push('alt');
         }
@@ -526,27 +525,28 @@ var ItsAllText = function () {
             if (tid == "itsalltext-context-popup" ||
                 tid == "contentAreaContextMenu") {
                 node = document.popupNode;
-                tag = node.nodeName.toLowerCase();
-                doc = node.ownerDocument;
-                cstyle = doc.defaultView.getComputedStyle(node, '');
-                is_disabled = (!(tag == 'textarea' ||
-                                 tag == 'textbox') ||
-                               node.style.display == 'none' ||
-                               (cstyle && (cstyle.display == 'none' ||
-                                           cstyle.visibility == 'hidden')) ||
-                               node.getAttribute('readonly') ||
-                               node.getAttribute('disabled')
-                               );
-                if (tid == "itsalltext-context-popup") {
-                    cobj = that.CacheObj.get(node);
-                    that.rebuildMenu(cobj.uid,
-                                     'itsalltext-context-popup',
-                                     is_disabled);
-                } else {
-                    // tid == "contentAreaContextMenu"
-                    menu = document.getElementById("itsalltext-contextmenu");
-                    menu.setAttribute('hidden', is_disabled);
-                }
+            tag = node.nodeName.toLowerCase();
+            doc = node.ownerDocument;
+            cstyle = doc.defaultView.getComputedStyle(node, '');
+            is_disabled = (
+                !(tag == 'textarea' ||
+                  tag == 'textbox') ||
+                  node.style.display == 'none' ||
+                  (cstyle && (cstyle.display == 'none' ||
+                              cstyle.visibility == 'hidden')) ||
+                              node.getAttribute('readonly') ||
+                              node.getAttribute('disabled')
+            );
+            if (tid == "itsalltext-context-popup") {
+                cobj = that.CacheObj.get(node);
+                that.rebuildMenu(cobj.uid,
+                                 'itsalltext-context-popup',
+                                 is_disabled);
+            } else {
+                // tid == "contentAreaContextMenu"
+                menu = document.getElementById("itsalltext-contextmenu");
+                menu.setAttribute('hidden', is_disabled);
+            }
 
             }
         }
@@ -761,7 +761,7 @@ ItsAllText.prototype.hitch = function (object, method) {
         // make a copy of staticArgs (don't modify it because it gets reused for
         // every invocation).
         var args = staticArgs.concat(),
-            i;
+        i;
 
         // add all the new arguments
         for (i = 0; i < arguments.length; i++) {
@@ -799,13 +799,13 @@ ItsAllText.prototype.listen = function (source, event, listener, opt_capture) {
  */
 ItsAllText.prototype.hashString = function (some_string) {
     var converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].createInstance(Components.interfaces.nsIScriptableUnicodeConverter),
-        result = {},
-        data,
-        ch,
-        hash,
-        toHexString,
-        retval = [],
-        i;
+    result = {},
+    data,
+    ch,
+    hash,
+    toHexString,
+    retval = [],
+    i;
     converter.charset = "UTF-8";
 
     /* result is the result of the hashing.  It's not yet a string,
@@ -861,11 +861,11 @@ ItsAllText.prototype.unlisten = function (source, event, listener, opt_capture) 
  */
 ItsAllText.prototype.eventToKeyprint = function (event) {
     return [ event.ctrlKey,
-             event.altKey,
-             event.metaKey,
-             event.shiftKey,
-             event.keyCode,
-             event.charCode ].join(':');
+        event.altKey,
+        event.metaKey,
+        event.shiftKey,
+        event.keyCode,
+        event.charCode ].join(':');
 };
 
 /**
@@ -875,7 +875,7 @@ ItsAllText.prototype.eventToKeyprint = function (event) {
  */
 ItsAllText.prototype.keyprintToString = function (keyprint) {
     var split = keyprint.split(':'),
-        string = [];
+    string = [];
     if (split[0] === 'true') {
         string.push('Ctrl');
     }
@@ -929,12 +929,14 @@ ItsAllText.prototype.cleanWorkingDir = function (force) {
  */
 ItsAllText.prototype.menuNewExtEdit = function (event) {
     var that = this,
-        uid = this.private_current_uid,
-        cobj = that.CacheObj.get(uid),
-        params = {out: null},
-        ext;
-    window.openDialog("chrome://itsalltext/content/newextension.xul", "",
-    "chrome, dialog, modal, resizable=yes", params).focus();
+    uid = this.private_current_uid,
+    cobj = that.CacheObj.get(uid),
+    params = {out: null},
+    ext;
+    window.openDialog(
+        "chrome://itsalltext/content/newextension.xul", "",
+        "chrome, dialog, modal, resizable=yes", params
+    ).focus();
     if (params.out) {
         ext = params.out.extension.replace(/[\n\t ]+/g, '');
         if (params.out.do_save) {
@@ -952,7 +954,7 @@ ItsAllText.prototype.menuNewExtEdit = function (event) {
  */
 ItsAllText.prototype.menuExtEdit = function (ext, clobber, event) {
     var uid = this.private_current_uid,
-        cobj = this.CacheObj.get(uid);
+    cobj = this.CacheObj.get(uid);
     if (ext !== null) {
         ext = typeof(ext) === 'string'?ext:event.target.getAttribute('label');
     }
@@ -969,16 +971,16 @@ ItsAllText.prototype.rebuildMenu = function (uid, menu_id, is_disabled) {
     menu_id = typeof(menu_id) == 'string'?menu_id:'itsalltext-optionmenu';
     is_disabled = (typeof(is_disabled) === 'undefined' || !is_disabled) ? false : (is_disabled && true);
     var i,
-        that = this,
-        exts = that.getExtensions(),
-        menu = document.getElementById(menu_id),
-        items = menu.childNodes,
-        items_length = items.length - 1, /* We ignore the preferences item */
-        node,
-        magic_stop_node = null,
-        magic_start = null,
-        magic_stop = null,
-        cobj = that.CacheObj.get(uid);
+    that = this,
+    exts = that.getExtensions(),
+    menu = document.getElementById(menu_id),
+    items = menu.childNodes,
+    items_length = items.length - 1, /* We ignore the preferences item */
+    node,
+    magic_stop_node = null,
+    magic_start = null,
+    magic_stop = null,
+    cobj = that.CacheObj.get(uid);
     that.private_current_uid = uid;
 
     // Find the beginning and end of the magic replacement parts.
@@ -1025,7 +1027,7 @@ ItsAllText.prototype.rebuildMenu = function (uid, menu_id, is_disabled) {
  */
 ItsAllText.prototype.getLocale = function () {
     var string_bundle = Components.classes["@mozilla.org/intl/stringbundle;1"],
-        obj = string_bundle.getService(Components.interfaces.nsIStringBundleService);
+    obj = string_bundle.getService(Components.interfaces.nsIStringBundleService);
     /**
      * A localization bundle.  Use it like so:
      * itsalltext.locale.getStringFromName('blah');

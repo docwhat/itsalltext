@@ -1,4 +1,5 @@
 "use strict";
+// vim: ts=4 sw=4 sts=4
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -24,12 +25,12 @@
  */
 function CacheObj(node) {
     var that = this,
-        hitch_re = /^hitched_/,
-        doc = node.ownerDocument,
-        host,
-        hash,
-        method,
-        extension;
+    hitch_re = /^hitched_/,
+    doc = node.ownerDocument,
+    host,
+    hash,
+    method,
+    extension;
 
     this.uuid = Math.floor(Math.random()*2000);
     //disabled-debug -- itsalltext.debug('CacheObject ', this.uuid, node);
@@ -65,9 +66,11 @@ function CacheObj(node) {
      * web page from knowing what it's connected to.
      * @type String
      */
-    that.uid = itsalltext.hashString([ doc.location.toString(),
-                                       Math.random(),
-                                       that.node_id ].join(':'));
+    that.uid = itsalltext.hashString(
+        [ doc.location.toString(),
+            Math.random(),
+            that.node_id ].join(':')
+    );
     // @todo [security] Add a serial to the uid hash.
 
     node.setUserData(itsalltext.MYSTRING + '_UID', that.uid, null);
@@ -77,11 +80,13 @@ function CacheObj(node) {
      * change, the directory that the file is stored in should not!
      */
     host = window.escape(doc.location.hostname);
-    hash = itsalltext.hashString([ doc.location.protocol,
-				   doc.location.port,
-				   doc.location.search ? doc.location.search : '?',
-				   doc.location.pathname,
-				   that.node_id].join(':'));
+    hash = itsalltext.hashString(
+        [ doc.location.protocol,
+            doc.location.port,
+            doc.location.search ? doc.location.search : '?',
+            doc.location.pathname,
+            that.node_id].join(':')
+    );
     that.base_filename = [host, hash.slice(0, 10)].join('.');
     /* The current extension.
      * @type String
@@ -135,13 +140,13 @@ function CacheObj(node) {
         that.is_focused = false;
 
         var style = that.button?that.button.style:null,
-            f,
-            cur  = 0.7,
-            dest = 0,
-            fps  = 12,
-            num_frames = (itsalltext.preferences.fade_time * fps),
-            increment = (cur - dest) / num_frames,
-            wait = (1 / fps) / 1000;
+        f,
+        cur  = 0.7,
+        dest = 0,
+        fps  = 12,
+        num_frames = (itsalltext.preferences.fade_time * fps),
+        increment = (cur - dest) / num_frames,
+        wait = (1 / fps) / 1000;
         if (style) {
             f = function () {
                 cur -= increment;
@@ -163,8 +168,8 @@ function CacheObj(node) {
 CacheObj.prototype.destroy = function () {
     //disabled-debug -- itsalltext.debug('destroying', this.node_id, this.uid);
     var node = this.node,
-        doc  = this.node.ownerDocument,
-        html = doc.getElementsByTagName('html')[0];
+    doc  = this.node.ownerDocument,
+    html = doc.getElementsByTagName('html')[0];
 
     //node.removeAttribute(itsalltext.MYSTRING + '_UID');
     //html.removeAttribute(itsalltext.MYSTRING + '_id_serial');
@@ -227,11 +232,11 @@ CacheObj.prototype.getFile = function () {
  */
 CacheObj.prototype.initFromExistingFile = function () {
     var base = this.base_filename,
-        fobj = itsalltext.factoryFile(itsalltext.getWorkingDir()),
-        entries,
-        ext = null,
-        tmpfiles = /(\.bak|.tmp|~)$/,
-        entry;
+    fobj = itsalltext.factoryFile(itsalltext.getWorkingDir()),
+    entries,
+    ext = null,
+    tmpfiles = /(\.bak|.tmp|~)$/,
+    entry;
     if (fobj.exists() && fobj.isDirectory()) {
         entries = fobj.directoryEntries;
         while (entries.hasMoreElements()) {
@@ -263,10 +268,10 @@ CacheObj.prototype.initFromExistingFile = function () {
  */
 CacheObj.prototype.getNodeIdentifier = function (node) {
     var id   = node.getAttribute('id'),
-        name,
-        doc,
-        attr,
-        serial;
+    name,
+    doc,
+    attr,
+    serial;
     if (!id) {
         name = node.getAttribute('name');
         doc = node.ownerDocument.getElementsByTagName('html')[0];
@@ -292,9 +297,9 @@ CacheObj.prototype.getNodeIdentifier = function (node) {
  */
 CacheObj.prototype.toString = function () {
     return [ "CacheObj",
-             " uid=", this.uid,
-             " timestamp=", this.timestamp,
-             " size=", this.size].join('');
+        " uid=", this.uid,
+        " timestamp=", this.timestamp,
+        " size=", this.size].join('');
 };
 
 /**
@@ -315,19 +320,19 @@ CacheObj.prototype.write = function (clobber) {
         foStream.init(file, 0x02 | 0x08 | 0x20,
                       parseInt('0600', 8), 0);
 
-        /* We convert to charset */
-        conv = Components.
-            classes["@mozilla.org/intl/scriptableunicodeconverter"].
-            createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-        conv.charset = itsalltext.getCharset();
+                      /* We convert to charset */
+                      conv = Components.
+                          classes["@mozilla.org/intl/scriptableunicodeconverter"].
+                          createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+                      conv.charset = itsalltext.getCharset();
 
-        text = conv.ConvertFromUnicode(this.node.value);
-        foStream.write(text, text.length);
-        foStream.close();
+                      text = conv.ConvertFromUnicode(this.node.value);
+                      foStream.write(text, text.length);
+                      foStream.close();
 
-        /* Reset Timestamp and filesize, to prevent a spurious refresh */
-        this.timestamp = file.lastModifiedTime;
-        this.size      = file.fileSize;
+                      /* Reset Timestamp and filesize, to prevent a spurious refresh */
+                      this.timestamp = file.lastModifiedTime;
+                      this.size      = file.fileSize;
     } else {
         this.timestamp = this.size = null; // force refresh of textarea
     }
@@ -343,7 +348,7 @@ CacheObj.prototype.write = function (clobber) {
  */
 CacheObj.prototype.getStyle = function (node, attr) {
     var view  = node ? node.ownerDocument.defaultView : null,
-        style = view.getComputedStyle(node, '');
+    style = view.getComputedStyle(node, '');
     return  style.getPropertyCSSValue(attr).cssText;
 };
 
@@ -355,104 +360,104 @@ CacheObj.prototype.getStyle = function (node, attr) {
  * @param {String} extension The extension of the file to edit.
  * @param {boolean} clobber Should an existing file be clobbered?
  */
- CacheObj.prototype.edit = function (extension, clobber) {
-   itsalltext.debug(this.uuid, 'edit(', extension, ', ', clobber, ')', this.uid);
-   extension = typeof(extension) === 'string'?extension:this.getExtension();
-   this.setExtension(extension);
+CacheObj.prototype.edit = function (extension, clobber) {
+    itsalltext.debug(this.uuid, 'edit(', extension, ', ', clobber, ')', this.uid);
+    extension = typeof(extension) === 'string'?extension:this.getExtension();
+    this.setExtension(extension);
 
-   var filename = this.write(clobber),
-   program = null,
-   command,
-   process,
-   args,
-   result,
-   ec,
-   params,
-   procutil;
-   procutil = Components.classes["@mozilla.org/process/util;1"];
-   this.initial_background = this.node.style.backgroundColor;
-   this.initial_color      = this.node.style.color;
+    var filename = this.write(clobber),
+    program = null,
+    command,
+    process,
+    args,
+    result,
+    ec,
+    params,
+    procutil;
+    procutil = Components.classes["@mozilla.org/process/util;1"];
+    this.initial_background = this.node.style.backgroundColor;
+    this.initial_color      = this.node.style.color;
 
 
-   try {
-     program = itsalltext.getEditor();
+    try {
+        program = itsalltext.getEditor();
 
-     // checks
-     if (program === null) {
-       throw {name: "Editor is not set."};
-     }
+        // checks
+        if (program === null) {
+            throw {name: "Editor is not set."};
+        }
 
-     if (!program.exists()) {
-       throw {name: "NS_ERROR_FILE_NOT_FOUND"};
-     }
+        if (!program.exists()) {
+            throw {name: "NS_ERROR_FILE_NOT_FOUND"};
+        }
 
-     if (itsalltext.isDarwin() &&
-     program.isDirectory() &&
-     program.leafName.match(/\.app$/i)) {
-       // OS-X .app bundles should be run with open.
-       args = ['-a', program.path, filename];
-       program = itsalltext.factoryFile('/usr/bin/open');
-     } else {
-       /* Mac check because of
-       * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
-       if (!(itsalltext.isDarwin() || program.isExecutable())) {
-         throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
-       }
-       args = [filename];
-     }
+        if (itsalltext.isDarwin() &&
+            program.isDirectory() &&
+                program.leafName.match(/\.app$/i)) {
+            // OS-X .app bundles should be run with open.
+            args = ['-a', program.path, filename];
+            program = itsalltext.factoryFile('/usr/bin/open');
+        } else {
+            /* Mac check because of
+             * https://bugzilla.mozilla.org/show_bug.cgi?id=322865 */
+            if (!(itsalltext.isDarwin() || program.isExecutable())) {
+                throw {name: "NS_ERROR_FILE_ACCESS_DENIED"};
+            }
+            args = [filename];
+        }
 
-     // Create an observer.
-     var observer          = {
-       observe: function (subject, topic, data) {
-         // Topic moved as last argument to callbacks since we don't need it (we already know what it is)
-         if (topic==='process-finished') {
-           if (typeof(subject.exitValue) != 'undefined' && subject.exitValue != 0) {
-             var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-             .getService(Components.interfaces.nsIPromptService);
-             prompts.alert(null, "Editor exited with status of " + subject.exitValue,
-             "I ran this command: " + program.path + " " + (args.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
-           }
-           itsalltext.debug("Process exited successfully: ", subject, data);
-         }
-         else if (topic === 'process-failed') {
-           itsalltext.debug("Process exited unsuccessfully: ", subject, data);
-         } else {
-           itsalltext.debug("Observer had a hard time: ", subject, topic, data);
-         }
-       }
-     };
+        // Create an observer.
+        var observer          = {
+            observe: function (subject, topic, data) {
+                // Topic moved as last argument to callbacks since we don't need it (we already know what it is)
+                if (topic==='process-finished') {
+                    if (typeof(subject.exitValue) != 'undefined' && subject.exitValue != 0) {
+                        var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+                        .getService(Components.interfaces.nsIPromptService);
+                        prompts.alert(null, "Editor exited with status of " + subject.exitValue,
+                                      "I ran this command: " + program.path + " " + (args.join(' ')) + "\n\n...and it exited with a status of " + subject.exitValue + ".");
+                    }
+                    itsalltext.debug("Process exited successfully: ", subject, data);
+                }
+                else if (topic === 'process-failed') {
+                    itsalltext.debug("Process exited unsuccessfully: ", subject, data);
+                } else {
+                    itsalltext.debug("Observer had a hard time: ", subject, topic, data);
+                }
+            }
+        };
 
-     // create an nsIProcess
-     process = procutil.createInstance(Components.interfaces.nsIProcess);
-     process.init(program);
+        // create an nsIProcess
+        process = procutil.createInstance(Components.interfaces.nsIProcess);
+        process.init(program);
 
-     // Run the process.
-     if (typeof process.runwAsync == 'undefined') {
-       // FF < 4.0
-       process.runAsync(args, args.length, observer, false);
-     } else {
-       // FF >= 4.0 - Wide character support.
-       process.runwAsync(args, args.length, observer, false);
-     }
+        // Run the process.
+        if (typeof process.runwAsync == 'undefined') {
+            // FF < 4.0
+            process.runAsync(args, args.length, observer, false);
+        } else {
+            // FF >= 4.0 - Wide character support.
+            process.runwAsync(args, args.length, observer, false);
+        }
 
-     this.private_is_watching = true;
-     this.edit_count++;
-   } catch (e) {
-     itsalltext.debug("Caught error launching editor: ", e);
-     params = { out: null,
-       exists: program ? program.exists() : false,
-       path: itsalltext.preferences.editor,
-       exception: e.name };
-       window.openDialog('chrome://itsalltext/content/badeditor.xul',
-       null,
-       "chrome, titlebar, toolbar, centerscreen, modal",
-       params);
-       if (params.out !== null && params.out.do_preferences) {
-         itsalltext.openPreferences(true);
-         this.edit(extension);
-       }
-     }
-   };
+        this.private_is_watching = true;
+        this.edit_count++;
+    } catch (e) {
+        itsalltext.debug("Caught error launching editor: ", e);
+        params = { out: null,
+            exists: program ? program.exists() : false,
+            path: itsalltext.preferences.editor,
+            exception: e.name };
+            window.openDialog('chrome://itsalltext/content/badeditor.xul',
+                              null,
+                              "chrome, titlebar, toolbar, centerscreen, modal",
+                              params);
+                              if (params.out !== null && params.out.do_preferences) {
+                                  itsalltext.openPreferences(true);
+                                  this.edit(extension);
+                              }
+    }
+};
 
 /**
  * Delete the file from disk.
@@ -476,11 +481,11 @@ CacheObj.prototype.remove = function () {
 CacheObj.prototype.read = function () {
     /* read file, reset ts & size */
     var DEFAULT_REPLACEMENT_CHARACTER = 65533,
-        file = this.getFile(),
-        buffer = [],
-        fis,
-        istream,
-        str;
+    file = this.getFile(),
+    buffer = [],
+    fis,
+    istream,
+    str;
 
     try {
         fis = Components.classes["@mozilla.org/network/file-input-stream;1"].
@@ -517,10 +522,10 @@ CacheObj.prototype.hasChanged = function () {
     var file = this.getFile();
     /* Check exists.  Check ts and size. */
     return this.private_is_watching &&
-           file.exists() &&
-           file.isReadable() &&
-           (file.lastModifiedTime != this.timestamp ||
-            file.fileSize         != this.size);
+        file.exists() &&
+        file.isReadable() &&
+        (file.lastModifiedTime != this.timestamp ||
+         file.fileSize         != this.size);
 };
 
 /**
@@ -551,14 +556,14 @@ CacheObj.prototype.fadeStep = function (background_pallet, color_pallet, step, d
  */
 CacheObj.prototype.fade = function (steps, delay) {
     var color             = this.getStyle(this.node, 'color'),
-        color_stop        = new itsalltext.Color(color),
-        color_start       = new itsalltext.Color('black'),
-        color_pallet      = color_start.blend(color_stop, steps),
+    color_stop        = new itsalltext.Color(color),
+    color_start       = new itsalltext.Color('black'),
+    color_pallet      = color_start.blend(color_stop, steps),
 
-        background        = this.getStyle(this.node, 'background-color'),
-        background_stop   = new itsalltext.Color(background),
-        background_start  = new itsalltext.Color('yellow'),
-        background_pallet = background_start.blend(background_stop, steps);
+    background        = this.getStyle(this.node, 'background-color'),
+    background_stop   = new itsalltext.Color(background),
+    background_start  = new itsalltext.Color('yellow'),
+    background_pallet = background_start.blend(background_stop, steps);
     setTimeout(this.fadeStep(background_pallet, color_pallet, 0, delay), delay);
 };
 
@@ -574,9 +579,9 @@ CacheObj.prototype.update = function () {
             this.fade(20, 100);
             this.node.value = value;
 
-	    var event = document.createEvent("HTMLEvents");
-	    event.initEvent('change', true, false);
-	    this.node.dispatchEvent(event);
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent('change', true, false);
+            this.node.dispatchEvent(event);
 
             return true;
         }
@@ -629,15 +634,15 @@ CacheObj.prototype.onContext = function (event) {
      * sane....openPopup()
      */
     var cobj = CacheObj.get(event.target),
-        popup = itsalltext.rebuildMenu(cobj.uid);
+    popup = itsalltext.rebuildMenu(cobj.uid);
 
     popup.openPopup(cobj.button, 'end_before',
                     0, 0,
                     true, false);
 
-    event.stopPropagation();
-    event.preventDefault();
-    return false;
+                    event.stopPropagation();
+                    event.preventDefault();
+                    return false;
 };
 
 
@@ -647,11 +652,11 @@ CacheObj.prototype.onContext = function (event) {
  */
 CacheObj.prototype.addGumDrop = function () {
     var cache_object = this,
-        node,
-        doc,
-        gumdrop,
-        parent,
-        nextSibling;
+    node,
+    doc,
+    gumdrop,
+    parent,
+    nextSibling;
 
     try {
         itsalltext.monitor.incrementLock();
@@ -740,15 +745,15 @@ CacheObj.prototype.addGumDrop = function () {
  */
 CacheObj.prototype.adjust = function () {
     var gumdrop  = this.button,
-        el       = this.node,
-        doc      = el.ownerDocument,
-        style,
-        display,
-        cstyle,
-        left,
-        top,
-        coord,
-        pos;
+    el       = this.node,
+    doc      = el.ownerDocument,
+    style,
+    display,
+    cstyle,
+    left,
+    top,
+    coord,
+    pos;
 
     if (itsalltext.getDisableGumdrops()) {
         if (gumdrop && gumdrop.style.display != 'none') {
@@ -765,49 +770,49 @@ CacheObj.prototype.adjust = function () {
     cstyle = doc.defaultView && doc.defaultView.getComputedStyle(el, '');
     if ((cstyle && (cstyle.display == 'none' ||
                     cstyle.visibility == 'hidden')) ||
-        el.getAttribute('readonly') ||
-        el.readOnly ||
-        el.getAttribute('disabled')
-        ) {
-        display = 'none';
-    }
-    if (display === 'none' && style.display != display) {
-        style.setProperty('display', display, 'important');
-    }
+                        el.getAttribute('readonly') ||
+                            el.readOnly ||
+                                el.getAttribute('disabled')
+       ) {
+           display = 'none';
+       }
+       if (display === 'none' && style.display != display) {
+           style.setProperty('display', display, 'important');
+       }
 
-    /**
-     * Position the gumdrop.
-     * Updates in case the DOM changes.
-     */
-    pos = itsalltext.preferences.gumdrop_position;
-    if (pos === 'upper-right' || pos === 'lower-right') {
-        left = Math.max(1, el.offsetWidth - this.gumdrop_width);
-    } else {
-        left = 0;
-    }
-    if (pos === 'lower-left' || pos === 'lower-right') {
-        top  = el.offsetHeight;
-    } else {
-        top  = 0 - this.gumdrop_height;
-    }
-    if (el.offsetParent === gumdrop.offsetParent) {
-        left += el.offsetLeft;
-        top  += el.offsetTop;
-    } else {
-        coord = itsalltext.getContainingBlockOffset(el, gumdrop.offsetParent);
-        left += coord[0];
-        top  += coord[1];
-    }
-    if (left && top) {
-        left = [left, 'px'].join('');
-        top  = [top, 'px'].join('');
-        if (style.left != left) {
-            style.setProperty('left', left, 'important');
-        }
-        if (style.top != top) {
-            style.setProperty('top',  top, 'important');
-        }
-    }
+       /**
+        * Position the gumdrop.
+        * Updates in case the DOM changes.
+        */
+       pos = itsalltext.preferences.gumdrop_position;
+       if (pos === 'upper-right' || pos === 'lower-right') {
+           left = Math.max(1, el.offsetWidth - this.gumdrop_width);
+       } else {
+           left = 0;
+       }
+       if (pos === 'lower-left' || pos === 'lower-right') {
+           top  = el.offsetHeight;
+       } else {
+           top  = 0 - this.gumdrop_height;
+       }
+       if (el.offsetParent === gumdrop.offsetParent) {
+           left += el.offsetLeft;
+           top  += el.offsetTop;
+       } else {
+           coord = itsalltext.getContainingBlockOffset(el, gumdrop.offsetParent);
+           left += coord[0];
+           top  += coord[1];
+       }
+       if (left && top) {
+           left = [left, 'px'].join('');
+           top  = [top, 'px'].join('');
+           if (style.left != left) {
+               style.setProperty('left', left, 'important');
+           }
+           if (style.top != top) {
+               style.setProperty('top',  top, 'important');
+           }
+       }
 };
 
 /**

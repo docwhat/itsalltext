@@ -1,4 +1,5 @@
 "use strict";
+// vim: ts=4 sw=4 sts=4
 /**
  * Author: Lachlan Hunt
  * Date: 2005-11-24
@@ -19,19 +20,19 @@
  */
 var Color = function () {
     var keyword,
-        func,
-        clamp,
-        alphaBlend,
-        value,
-        components,
-        pattern,
-        key,
-        base,
-        m,
-        r,
-        g,
-        b,
-        a;
+    func,
+    clamp,
+    alphaBlend,
+    value,
+    components,
+    pattern,
+    key,
+    base,
+    m,
+    r,
+    g,
+    b,
+    a;
 
     // CSS 2.1 Colour Keywords
     keyword = {
@@ -92,11 +93,11 @@ var Color = function () {
      */
     this.hex = function (bg) {
         var r,
-            g,
-            b,
-            strHexR,
-            strHexG,
-            strHexB;
+        g,
+        b,
+        strHexR,
+        strHexG,
+        strHexB;
         if (bg) {
             r = alphaBlend(this.red, bg.red, this.alpha);
             g = alphaBlend(this.green, bg.green, this.alpha);
@@ -131,8 +132,8 @@ var Color = function () {
      */
     this.rgb = function (bg) {
         var r,
-            g,
-            b;
+        g,
+        b;
         if (bg) {
             r = alphaBlend(this.red, bg.red, this.alpha);
             g = alphaBlend(this.green, bg.green, this.alpha);
@@ -172,11 +173,11 @@ var Color = function () {
      */
     this.blend = function (color, steps) {
         var pallet = [],
-            r,
-            g,
-            b,
-            i,
-            step = {
+        r,
+        g,
+        b,
+        i,
+        step = {
             red   : (alphaBlend(color.red, this.red, color.alpha) - this.red) / steps,
             green : (alphaBlend(color.green, this.green, color.alpha) - this.green) / steps,
             blue  : (alphaBlend(color.blue,  this.blue,  color.alpha) - this.blue) / steps
@@ -221,26 +222,26 @@ var Color = function () {
         m = 1; // Multiplier for percentage values
 
         switch (pattern) {
-        case "rgb%":
-        case "rgba%":
-            m = 2.55;
+            case "rgb%":
+                case "rgba%":
+                m = 2.55;
             base = 10;
             break;
-        case "rgb":
-        case "rgba":
-            base = 10;
+            case "rgb":
+                case "rgba":
+                base = 10;
             break;
-        case "hex3":
-            components[1] = components[1] + "" + components[1];
+            case "hex3":
+                components[1] = components[1] + "" + components[1];
             components[2] = components[2] + "" + components[2];
             components[3] = components[3] + "" + components[3];
             base = 16;
             break;
-        case "hex6":
-            base = 16;
+            case "hex6":
+                base = 16;
             break;
-        default:
-            components = [0, "255", "255", "255", "1.0"];
+            default:
+                components = [0, "255", "255", "255", "1.0"];
         }
 
         this.red   = clamp(Math.round(parseInt(components[1], base) * m), 0, 255);
