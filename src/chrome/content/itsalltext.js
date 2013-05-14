@@ -619,7 +619,7 @@ ItsAllText.prototype.init = function () {
      * A constant, the url to the readme.
      * @type String
      */
-    this.README = 'chrome://itsalltext/locale/readme.xhtml';
+    this.README = 'https://github.com/docwhat/itsalltext/tree/release-' + this.VERSION + '#readme';
 
     /* The XHTML Namespace */
     this.XHTMLNS = "http://www.w3.org/1999/xhtml";
