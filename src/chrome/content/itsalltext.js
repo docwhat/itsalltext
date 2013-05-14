@@ -130,7 +130,7 @@ var ItsAllText = function () {
                 getService(Components.interfaces.nsIPrefService),
             type;
             this.private_branch = prefService.getBranch("extensions." + that.MYSTRING + ".");
-            this.private_branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+            this.private_branch.QueryInterface(Components.interfaces.nsIPrefBranch);
             this.private_branch.addObserver("", this, false);
             /* setup the preferences */
             for (type in this.types) {
