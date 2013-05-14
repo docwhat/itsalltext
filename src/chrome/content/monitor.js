@@ -168,28 +168,31 @@ Monitor.prototype.hitched_isLocked = function () {
     return this._lock_count > 0;
 };
 
-Monitor.prototype.hitched_handleSubtreeModified = function (event) {
-    var has_textareas;
-    if (this.isLocked()) {
-        return;
-    }
-    has_textareas = event.originalTarget.getElementsByTagName('textarea').length > 0;
-    if (has_textareas) {
-        //disabled-debug -- itsalltext.debug('handleSubtreeModified: %o', event.target);
-        try {
-            // Ignore events while adding the gumdrops.
-            this.incrementLock();
-            this.watcher(0, true);
-        } catch (e) {
-            this.decrementLock();
+Monitor.prototype.hitched_handleMutation = function (mutations, observer) {
+    var that = this;
+
+    mutations.forEach(function (mutation) {
+        if (that.isLocked()) {
+            return;
         }
-        this.decrementLock();
-    }
+
+        var has_textareas = mutation.target.getElementsByTagName('textarea').length > 0;
+        if (has_textareas) {
+            //disabled-debug -- itsalltext.debug('handleMutation: %o', event.target);
+            try {
+                // Ignore events while adding the gumdrops.
+                that.incrementLock();
+                that.watcher(0, true);
+            } catch (e) {
+                that.decrementLock();
+            }
+            that.decrementLock();
+        }
+    });
 };
 
 Monitor.prototype.hitched_startPage = function (event, force) {
-    var doc = event.originalTarget,
-    unsafeWin;
+    var doc = event.originalTarget, unsafeWin, observer;
     //disabled-debug -- itsalltext.debug('startPage', doc && doc.location, force);
     if (!(force || this.isHTML(doc))) {
         this.stopPage(event);
@@ -202,7 +205,8 @@ Monitor.prototype.hitched_startPage = function (event, force) {
     }
 
     // Listen for the subtree being modified.
-    itsalltext.listen(unsafeWin, 'DOMSubtreeModified', this.handleSubtreeModified);
+    observer  = new MutationObserver(this.handleMutation);
+    observer.observe(unsafeWin.document, { childList: true, subtree: true });
 
     // Kick off a watcher now...
     this.incrementLock();
