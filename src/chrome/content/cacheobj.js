@@ -1,5 +1,4 @@
-/*extern itsalltext, Components */
-/*jslint undef: true, evil: false, browser: true, white: true */
+"use strict";
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
@@ -29,6 +28,7 @@ function CacheObj(node) {
         doc = node.ownerDocument,
         host,
         hash,
+        method,
         extension;
 
     this.uuid = Math.floor(Math.random()*2000);

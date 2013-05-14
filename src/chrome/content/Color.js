@@ -1,4 +1,4 @@
-/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
+"use strict";
 /**
  * Author: Lachlan Hunt
  * Date: 2005-11-24

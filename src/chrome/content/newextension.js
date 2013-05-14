@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Pass back the values that that the user selected.
  */

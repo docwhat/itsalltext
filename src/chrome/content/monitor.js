@@ -1,5 +1,4 @@
-/*extern HTMLDocument, gBrowser, itsalltext */
-/*jslint undef: true, evil: false, browser: true, white: true */
+"use strict";
 /*
  *  It's All Text! - Easy external editing of web forms.
  *

@@ -1,5 +1,4 @@
-/*extern Components, Firebug, getBoolPref, openDialog, getBrowser, gBrowser */
-/*jslint undef: true, nomen: true, evil: false, browser: true, white: true */
+"use strict";
 // vim: ts=4 sw=4
 
 /*
