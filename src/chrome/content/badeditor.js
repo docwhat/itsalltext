@@ -11,7 +11,7 @@ function onOK() {
     return true;
 }
 function doOnload() {
-    var locale = document.getElementById("strings"),
+    var locale = document.getElementById("itsalltext-strings"),
     params = window['arguments'][0],
     reason = document.getElementById('reason'),
     textnode = '**error**';

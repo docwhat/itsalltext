@@ -8,7 +8,7 @@
             buttons="accept,cancel">
 
   <stringbundleset id="strbundles">
-    <stringbundle id="strings" src="chrome://itsalltext/locale/preferences.properties" />
+    <stringbundle id="itsalltext-strings" src="chrome://itsalltext/locale/preferences.properties" />
   </stringbundleset>
 
   <prefpane

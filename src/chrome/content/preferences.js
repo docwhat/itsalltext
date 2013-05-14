@@ -7,7 +7,7 @@
  * Open a filepicker to select the value of the editor.
  */
 function pref_editor_select() {
-    var locale = document.getElementById("strings"),
+    var locale = document.getElementById("itsalltext-strings"),
     pref_editor = document.getElementById('pref_editor'),
     nsIFilePicker = Components.interfaces.nsIFilePicker,
     fp,
@@ -48,7 +48,7 @@ function pref_editor_select() {
 }
 
 function pref_workingdir_select() {
-    var locale = document.getElementById("strings"),
+    var locale = document.getElementById("itsalltext-strings"),
     pref_workingdir = document.getElementById('pref_workingdir'),
     nsIFilePicker = Components.interfaces.nsIFilePicker,
     fp,
@@ -127,7 +127,7 @@ function setHelp(text) {
 }
 
 function pref_onload() {
-    var locale = document.getElementById("strings"),
+    var locale = document.getElementById("itsalltext-strings"),
     editor,
     workingdir,
     box,

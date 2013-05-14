@@ -14,7 +14,7 @@
 
   <script type="application/x-javascript" src="chrome://itsalltext/content/badeditor.js"/>
   <stringbundleset id="strbundles">
-    <stringbundle id="strings" src="chrome://itsalltext/locale/badeditor.properties"/>
+    <stringbundle id="itsalltext-strings" src="chrome://itsalltext/locale/badeditor.properties"/>
   </stringbundleset>
 
   <dialogheader title="&header;"/>
@@ -27,7 +27,7 @@
       </description>
     </groupbox>
   </vbox>
-    
+
 </dialog>
 <!-- Local Variables: -->
 <!-- mode: xml -->
