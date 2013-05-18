@@ -1,5 +1,6 @@
 <!ENTITY title "Preferencias It&apos;s All Text!">
 <!ENTITY editor.label "Editor:">
+<!ENTITY workingdir.label "Working Directory:">
 <!ENTITY picker.label "Búsqueda">
 <!ENTITY seconds.label "Segundos entre refresco:">
 <!ENTITY charset.label "Ajuste de caracteres (por defecto: UTF-8):">
