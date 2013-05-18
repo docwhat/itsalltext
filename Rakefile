@@ -1,7 +1,7 @@
+require_relative 'version'
 require 'paint'
 require 'set'
 
-VERSION="1.8.0"
 XPI_FILENAME = "itsalltext-#{VERSION}.xpi"
 
 FIREFOX_SOURCE_EXTENSIONS = [
@@ -22,13 +22,10 @@ LANGUAGES = Dir["#{LOCALE_DIR}/*"].select { |p| File.directory?(p) }.map { |p| F
 task :default => :build
 
 desc "Build add-on #{VERSION}"
-task :build => [XPI_FILENAME]
-
-# Alias, because I forget.
-task :release => [:build]
+task :build => [:verify, XPI_FILENAME]
 
 desc "Install It's All Text! into firefox"
-task :install => :build do
+task :install => [:verify, :build] do
   sh 'open', '-a', 'Firefox', XPI_FILENAME
 end
 
@@ -44,7 +41,7 @@ task :verify do
   errors = errors.flatten.select { |e| !e.nil? }
   if errors.size > 0
     errors.each { |error| puts "ERROR: #{error}" }
-    raise "There were problems with the translations."
+    fail "There were problems with the translations."
   end
 end
 
@@ -111,9 +108,10 @@ def diff_locale language
   errors.flatten.select { |e| !e.nil? }
 end
 
-file "final" => FIREFOX_SOURCES do |t|
+file "final" => FIREFOX_SOURCES + ['version.rb'] do |t|
   rm_rf 'final'
   t.prerequisites.each do |src|
+    next unless src =~ %r{\Asrc}
     dst = src.sub(%r{\Asrc/}, 'final/')
     dst_parent = File.dirname(dst)
     mkdir_p dst_parent unless File.directory?(dst_parent)
@@ -128,7 +126,7 @@ file "final" => FIREFOX_SOURCES do |t|
   end
 end
 
-file XPI_FILENAME => [:verify, "final"] do |t|
+file XPI_FILENAME => "final" do |t|
   rm_f t.name
   xpi_path = File.expand_path(t.name)
   Dir.chdir "final" do
