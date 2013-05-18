@@ -640,9 +640,6 @@ ItsAllText.prototype.init = function () {
     // Start watching the preferences.
     this.preference_observer.register();
 
-    /* Clean the edit directory whenever we create a new window. */
-    this.cleanWorkingDir();
-
     /* Load the various bits needed to make this work. */
     this.initScripts();
 
@@ -650,6 +647,7 @@ ItsAllText.prototype.init = function () {
     var itsalltext = this;
     setTimeout(function () {
         itsalltext.monitor = new itsalltext.Monitor();
+        itsalltext.cleanWorkingDir();
     }, 1);
 }
 
@@ -902,9 +900,11 @@ ItsAllText.prototype.keyprintToString = function (keyprint) {
  */
 ItsAllText.prototype.cleanWorkingDir = function (force) {
     force = typeof(force) === 'boolean'?force:false;
-    var last_week, fobj, entries, entry;
+    var last_week, fobj, entries, entry, working_dir;
     last_week = Date.now() - (1000 * 60 * 60 * 24 * 7);
-    fobj = this.factoryFile(this.getWorkingDir());
+    working_dir = this.getWorkingDir();
+    itsalltext.debug("Cleaning up ", working_dir);
+    fobj = this.factoryFile(working_dir);
     if (fobj.exists() && fobj.isDirectory()) {
         entries = fobj.directoryEntries;
 
