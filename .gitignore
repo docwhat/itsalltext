@@ -6,3 +6,4 @@ final/*
 .*-stamp
 .todo
 /.bundle
+/.vagrant
