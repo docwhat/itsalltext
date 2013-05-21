@@ -7,6 +7,7 @@
     <em:id>itsalltext@docwhat.gerf.org</em:id>
     <em:version>999.@@VERSION@@</em:version>
     <em:type>2</em:type>
+    <em:unpack>true</em:unpack>
 
     <!-- Firefox -->
     <em:targetApplication>
