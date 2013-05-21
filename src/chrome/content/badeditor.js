@@ -17,7 +17,7 @@ function doOnload() {
     textnode = '**error**';
     /* Errors are from
      * http://lxr.mozilla.org/seamonkey/source/xpcom/base/nsError.h#262 */
-    noent_errors = [
+    var noent_errors = [
         'NS_ERROR_FILE_INVALID_PATH',
         'NS_ERROR_FILE_UNRECOGNIZED_PATH',
         'NS_ERROR_FILE_TARGET_DOES_NOT_EXIST',
@@ -25,7 +25,7 @@ function doOnload() {
         'NS_ERROR_FILE_NOT_FOUND',
         'NS_ERROR_FILE_NAME_TOO_LONG'
     ];
-    noexec_errors = [
+    var noexec_errors = [
         'NS_ERROR_FILE_ACCESS_DENIED',
         'NS_ERROR_FILE_IS_DIRECTORY',
         'NS_ERROR_FILE_IS_LOCKED'
