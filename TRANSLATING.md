@@ -34,6 +34,40 @@ translations!
 If you're comfortable with `git`, then you should know how this goes.  If you're new to `git` but still want to use it, then I suggest reading
 github's guides at [help.github.com](https://help.github.com/).
 
+## Testing a translation
+
+There are several ways to do this.
+
+### Use rake
+
+If you have `ruby` installed and you're comfortable with it you can just do:
+
+1. `bundle install`
+2. `rake build`
+
+If you have a Mac, you can just use `rake install` to install the `.xpi`.
+
+If you are not on a Mac, you can just install the `.xpi` by hand.
+
+### Tell firefox to use your checked out version.
+
+Find your Firefox profile directory (e.g. `~/.mozilla/firefox/Profiles/`) and inside the profile you're currently using there should be an extensions folder.
+
+In the extensions folder, create a file named `itsalltext@docwhat.gerf.org`.  The contents should be the path to `src` directory.
+
+For example, on my system the contens of this file is:
+
+    /Users/docwhat/Projects/itsalltext/src
+
+You have to restart firefox to have the changes take effect.
+
+### Replace the unpacked copy of itsalltext@docwhat.gerf.org with your translations.
+
+As above, find your profile directory.  If you have *It's All Text!* already installed there should be a directory
+called `itsalltext@docwhat.gerf.org`.  The contents of this folder are laid out just like the `src` directory.
+
+Just copy your translations in there and restart Firefox.
+
 ## A Completely new translation
 
 If you're a `git` user, just copy the `en-US` locale and use it for your starting point.  Remind me it is a new locale so I remember to add
@@ -45,4 +79,4 @@ To contact me, just use [my mail form](https://docwhat.org/email/).
 
 ## Additional Notes
 
-Don't worry about the GPL license.  For legal reasons it cannot be translated.  See [GNU's page on translations](http://www.gnu.org/licenses/translations.html).
+Don't worry about translating the GPL license.  For legal reasons it cannot be translated.  See [GNU's page on translations](http://www.gnu.org/licenses/translations.html).
