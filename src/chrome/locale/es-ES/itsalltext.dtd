@@ -1,8 +1,8 @@
 <!ENTITY top.label "It&apos;s All Text!">
 <!ENTITY top.key "i">
-<!ENTITY edit.label "Edite con extensión por defecto">
+<!ENTITY edit.label "Edite con la extensión por defecto">
 <!ENTITY edit.key "e">
-<!ENTITY newext.label "Edite con nueva extensión...">
+<!ENTITY newext.label "Edite con una nueva extensión...">
 <!ENTITY newext.key "n">
 <!ENTITY pref.label "Preferencias...">
 <!ENTITY pref.key "p">
