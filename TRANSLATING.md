@@ -63,20 +63,59 @@ You have to restart firefox to have the changes take effect.
 
 ### Replace the unpacked copy of itsalltext@docwhat.gerf.org with your translations.
 
-As above, find your profile directory.  If you have *It's All Text!* already installed there should be a directory
-called `itsalltext@docwhat.gerf.org`.  The contents of this folder are laid out just like the `src` directory.
+As above, find your profile directory.  If you have *It's All Text!* already
+installed there should be a directory called `itsalltext@docwhat.gerf.org`.
+The contents of this folder are laid out just like the `src` directory.
 
 Just copy your translations in there and restart Firefox.
 
 ## A Completely new translation
 
-If you're a `git` user, just copy the `en-US` locale and use it for your starting point.  Remind me it is a new locale so I remember to add
-it to the `install.rdf` (or you can add it yourself and save me from making a mistake).
+If you're a `git` user, just copy the `en-US` locale and use it for your
+starting point.  Remind me it is a new locale so I remember to add it to the
+`install.rdf` (or you can add it yourself and save me from making a mistake).
 
-If you aren't comfortable with `git` then I can mail you a copy of the `en-US` locale and you can email me the resulting translation!
+If you aren't comfortable with `git` then I can mail you a copy of the `en-US`
+locale and you can email me the resulting translation!
 
 To contact me, just use [my mail form](https://docwhat.org/email/).
 
+## File format information
+
+### DTD files
+
+The `.dtd` files are [Document Type Definition](https://developer.mozilla.org/en-US/docs/XUL/Tutorial/Localization#DTD_Files) files.
+
+They should be UTF-8 files.  Each line looks like so:
+
+    <!ENTITY magic.key.word "The translated text">
+
+The way it works in that in the parts of display that are
+[XUL](https://developer.mozilla.org/en-US/docs/XUL) (the preferences, dialogs,
+etc.) I can use the `magic.key.word` to pull in the translated text.
+
+For the string in the double quotes use UTF-8 unescaped characters.
+
+The only HTML/XML escaping that can be used are:
+
+    &quote; &amp; &apos; &lt; &gt;
+
+### Properties files
+
+The `.properties` files are [XUL Properties](https://developer.mozilla.org/en-US/docs/XUL/Tutorial/Property_Files) files.
+
+These translations are used from JavaScript and contain placeholders (e.g.
+`%1$S`) that will be replaced with strings later.
+
+The format is pretty simple:
+
+    keyword=The translation string that will be used.
+
+The translation string should be straight UTF-8.  There are some old
+translations that still contain XML-style escapes (such as `&oacute;`) -- They
+were translations done for pre-2.0 Firefox and should be replaced with UTF-8.
+
 ## Additional Notes
 
-Don't worry about translating the GPL license.  For legal reasons it cannot be translated.  See [GNU's page on translations](http://www.gnu.org/licenses/translations.html).
+Don't worry about translating the GPL license.  For legal reasons it cannot be
+translated.  See [GNU's page on translations](http://www.gnu.org/licenses/translations.html).
