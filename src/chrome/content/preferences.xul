@@ -45,7 +45,7 @@
           <column />
         </columns>
         <rows>
-          <row align="center">
+          <row align="baseline">
             <label control="editor" value="&editor.label;" />
             <vbox>
               <textbox preference="pref_editor" id="editor" size="20"
@@ -58,7 +58,7 @@
               </hbox>
             </vbox>
           </row>
-          <row align="center">
+          <row align="baseline">
             <label control="workingdir" value="&workingdir.label;" />
             <vbox>
               <textbox preference="pref_workingdir" id="workingdir" size="20"
@@ -71,7 +71,7 @@
               </hbox>
             </vbox>
           </row>
-          <row align="center">
+          <row align="baseline">
             <label control="seconds" value="&seconds.label;" />
             <hbox>
               <textbox preference="pref_seconds" id="seconds" size="2"
@@ -79,7 +79,7 @@
               <spacer />
             </hbox>
           </row>
-          <row align="center">
+          <row align="baseline">
             <label control="charset"
                    value="&charset.label;" />
             <hbox>
@@ -87,12 +87,12 @@
               <spacer />
             </hbox>
           </row>
-          <row align="center">
+          <row align="baseline">
             <label control="extensions"
                    value="&extensions.label;" />
             <textbox preference="pref_extensions" id="extensions" size="30" tabindex="4" />
           </row>
-          <row align="center">
+          <row align="baseline">
             <label control="gumdrop_pos" value="&gumdrop_position.label;" />
             <radiogroup id="gumpdrop_pos" preference="pref_gumdrop_position">
               <vbox>
@@ -108,7 +108,7 @@
               <radio value="none"        label="&gumdrop_position.disable;" tabindex="9" />
             </radiogroup>
           </row>
-          <row align="center">
+          <row align="baseline">
             <label control="fade_time" value="&fade_time.label;" tabindex="10" />
             <hbox>
               <textbox preference="pref_fade_time" id="fade_time" size="3"
@@ -116,7 +116,7 @@
               <spacer />
             </hbox>
           </row>
-          <row align="hotkey">
+          <row align="baseline">
             <label value="Hot Key" />
             <hbox>
               <textbox id="disp-hotkey"
