@@ -1,9 +1,9 @@
 <!ENTITY top.label "It&apos;s All Text!">
 <!ENTITY top.key "i">
-<!ENTITY edit.label "Edit with default extension">
+<!ENTITY edit.label "Mit Standarderweiterung bearbeiten">
 <!ENTITY edit.key "e">
-<!ENTITY newext.label "Edit with new extension...">
+<!ENTITY newext.label "Mit neuer Erweiterung bearbeiten...">
 <!ENTITY newext.key "n">
 <!ENTITY pref.label "Einstellungen...">
 <!ENTITY pref.key "p">
-<!ENTITY readme.label "README /LIESMICH lesen...">
+<!ENTITY readme.label "README lesen...">
