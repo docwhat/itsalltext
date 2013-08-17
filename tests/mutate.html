@@ -1,62 +1,41 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Mutating HTML</title>
-    <link rel="stylesheet" href="style.css" type="text/css">
-    <style type="text/css">
-    #test {
-      text-align: center;
-    }
-    </style>
-  </head>
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Mutating HTML</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  #test {
+    text-align: center;
+  }
+</style>
+<script src="mutate.js"></script>
 
-  <body>
-    <h1>Mutating HTML</h1>
+<body>
+  <h1>Mutating HTML</h1>
 
-    <div class="back"><a href=".">back</a></div>
+  <div class="back"><a href=".">back</a></div>
 
-    <p>
-      Purpose: to verify IAT! works even with dynamically created HTML.
-    </p>
+  <p>
+    Purpose: to verify IAT! works even with dynamically created HTML.
+  </p>
 
-    <div id="test" style="height: 8em">
-      The textareas should appear here.
-    </div>
-    
-    <ol>
-      <li>
-        Click here: <a href="#" onclick="iat.make()">create textarea</a>.
-        A Textarea should appear above.
-      </li>
-      <li>
-        Verify that the edit button appears when you hover over the textarea.
-      </li>
-      <li>
-        Click edit, make a change, save; the textarea should update.
-      </li>
-    </ol>
+  <div id="test" style="height: 8em">
+    The textareas should appear here.
+  </div>
 
-    <div class="back"><a href=".">back</a></div>
-    <script type="text/javascript">
-    var iat = (function () {
-    return {
-        parent_id: 'test',
-        counter: 0,
-        make: function () {
-            var parent = document.getElementById(this.parent_id);
-            while (parent.hasChildNodes()) {
-                parent.removeChild(parent.firstChild);
-            }
-            var ta = document.createElement('textarea');
-            ta.id = 'textarea-' + this.counter;
-            ta.value = 'Textarea ' + this.counter;
-            this.counter++;
-            parent.appendChild(ta);
-        }
-    };
-    })();
-    </script>
-  </body>
+  <ol>
+    <li>
+      Click here: <a href="#" onclick="iat.make()">create textarea</a>.
+      A Textarea should appear above. (<a href="#" onclick="iat.make(100000)">don't press</a>)
+    </li>
+    <li>
+      Verify that the edit button appears when you hover over the textarea.
+    </li>
+    <li>
+      Click edit, make a change, save; the textarea should update.
+    </li>
+  </ol>
+
+  <div class="back"><a href=".">back</a></div>
+</body>
 </html>
 

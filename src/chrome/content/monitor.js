@@ -114,6 +114,9 @@ Monitor.prototype.hitched_findnodes = function (doc) {
  * cache objects in the page.
  */
 Monitor.prototype.hitched_watcher = function (offset, init) {
+    itsalltext.debug('isLocked:', this.isLocked());
+    this.setLock();
+    itsalltext.debug('watcher(', JSON.stringify(offset), JSON.stringify(init), ')');
     // If it's a special number or it's an event, then we need to init.
     if (typeof offset != 'undefined' && offset.type && offset.type === 'TabSelect') {
         init = true;
@@ -128,6 +131,7 @@ Monitor.prototype.hitched_watcher = function (offset, init) {
 
     if (!init && now - this.last_watcher_call < Math.round(rate * 0.9)) {
         //disabled-debug -- itsalltext.debug('watcher(', offset, '/', (now - this.last_watcher_call), ') -- skipping catchup refresh');
+        this.clearLock();
         return;
     }
     this.last_watcher_call = now;
@@ -154,41 +158,53 @@ Monitor.prototype.hitched_watcher = function (offset, init) {
             cobj.update();
         }
     }
+    this.clearLock();
 };
 
-Monitor.prototype._lock_count = 0;
+//Monitor.prototype._lock_count = 0;
 
-Monitor.prototype.hitched_incrementLock = function () {
-    this._lock_count ++;
+//Monitor.prototype.hitched_incrementLock = function () {
+//this._lock_count ++;
+//};
+//Monitor.prototype.hitched_decrementLock = function () {
+//this._lock_count --;
+//};
+//Monitor.prototype.hitched_isLocked = function () {
+//return this._lock_count > 0;
+//};
+
+Monitor.prototype._is_locked = false;
+
+Monitor.prototype.hitched_setLock = function () {
+    this._is_locked = true;
 };
-Monitor.prototype.hitched_decrementLock = function () {
-    this._lock_count --;
+Monitor.prototype.hitched_clearLock = function () {
+    this._is_locked = false;
 };
 Monitor.prototype.hitched_isLocked = function () {
-    return this._lock_count > 0;
+    return this._is_locked;
 };
 
 Monitor.prototype.hitched_handleMutation = function (mutations, observer) {
     var that = this;
+    if (mutations.length != 2)
+        itsalltext.debug('mutations: ', mutations.length);
+    if (that.isLocked()) { return; }
+    that.setLock();
 
-    mutations.forEach(function (mutation) {
-        if (that.isLocked()) {
-            return;
-        }
+    //mutations.forEach(function (mutation) {
+    //if (that.isLocked()) { return; }
 
-        var has_textareas = mutation.target.getElementsByTagName('textarea').length > 0;
-        if (has_textareas) {
-            //disabled-debug -- itsalltext.debug('handleMutation: %o', event.target);
-            try {
-                // Ignore events while adding the gumdrops.
-                that.incrementLock();
-                that.watcher(0, true);
-            } catch (e) {
-                that.decrementLock();
-            }
-            that.decrementLock();
-        }
-    });
+    //setTimeout(function () {
+    //try {
+    //// Ignore events while adding the gumdrops.
+    //that.watcher(0, true);
+    //} catch (e) {
+    //that.decrementLock();
+    //}
+    //that.decrementLock();
+    //}, 800);
+    //})
 };
 
 Monitor.prototype.hitched_startPage = function (event, force) {
@@ -209,9 +225,7 @@ Monitor.prototype.hitched_startPage = function (event, force) {
     observer.observe(unsafeWin.document, { childList: true, subtree: true });
 
     // Kick off a watcher now...
-    this.incrementLock();
     this.watcher(0, true);
-    this.decrementLock();
 
     // Set up the future ones
     this.restart();
