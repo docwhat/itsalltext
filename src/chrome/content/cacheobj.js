@@ -27,7 +27,7 @@ function CacheObj(node) {
     var that = this,
     hitch_re = /^hitched_/,
     doc = node.ownerDocument,
-    host,
+    basename,
     hash,
     method,
     extension;
@@ -79,7 +79,6 @@ function CacheObj(node) {
     /* Figure out where we will store the file.  While the filename can
      * change, the directory that the file is stored in should not!
      */
-    host = window.escape(doc.location.hostname);
     hash = itsalltext.hashString(
         [ doc.location.protocol,
             doc.location.port,
@@ -87,7 +86,8 @@ function CacheObj(node) {
             doc.location.pathname,
             that.node_id].join(':')
     );
-    that.base_filename = [host, hash.slice(0, 10)].join('.');
+    basename = window.encodeURIComponent(doc.location.host + doc.location.pathname);
+    that.base_filename = [basename, hash.slice(0, 10)].join('.');
     /* The current extension.
      * @type String
      */
