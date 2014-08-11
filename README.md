@@ -56,10 +56,31 @@ In Microsoft Windows, a common problem I get is that someone is using Notepad or
 
 Out of the box, *It's All Text!* uses the `open` program. open behaves like double clicking on a file. It uses the type of the file to choose the correct application to run; for `.txt` files, that application is the built-in text editor. If this behavior is fine for you, then leave the editor option alone and enjoy! However, if you want to use a different editor or to force the same editor regardless of the file type, then you will need to do something a little more complicated. Firefox cannot run `.app` applications directly.
 
-To run a `.app` program in Mac OS X you need to do one of two things:
+To run a `.app` program in Mac OS X you need to do one of three things:
 
+* With some editors installed as .apps the editor is a mach-o binary in the .app (which itself is just a directory), using the path of the binary may launch the editor entirely.
 * If your editor comes with a non-.app version, then use that.
 * Otherwise you have to write a shell script.
+
+Check the .app directory through the Terminal, it will contain a Contents directory.  In the Contents directory is a MacOS directory.  In the MacOS directory there will be one or more executable binaries to launch your editor.
+
+For example, the .app for Emacs 24 contains the following binaries:
+
+`/Applications/Emacs.app/Contents/MacOS/Emacs-10.4`
+`/Applications/Emacs.app/Contents/MacOS/Emacs-10.7`
+
+Emacs-10.4 is a universal binary for use on any OS X system (including PPC), as the filename indicates it is for OS X 10.4 (Tiger) and above.  The Emacs-10.7 file is a 64-bit binary for OS X 10.7 (Lion) and above.  Use the file command to determine what type of binary your editor has been compiled as, like so:
+
+    bash-3.2$ file /Applications/Emacs.app/Contents/MacOS/Emacs-10.4
+    /Applications/Emacs.app/Contents/MacOS/Emacs-10.4: Mach-O universal binary with 3 architectures
+    /Applications/Emacs.app/Contents/MacOS/Emacs-10.4 (for architecture x86_64): Mach-O 64-bit executable x86_64
+    /Applications/Emacs.app/Contents/MacOS/Emacs-10.4 (for architecture i386): Mach-O executable i386
+    /Applications/Emacs.app/Contents/MacOS/Emacs-10.4 (for architecture ppc): Mach-O executable ppc
+    bash-3.2$ file /Applications/Emacs.app/Contents/MacOS/Emacs-10.7
+    /Applications/Emacs.app/Contents/MacOS/Emacs-10.7: Mach-O 64-bit executable x86_64
+    bash-3.2$ 
+
+This has been successfully tested with OS X 10.5 (Leopard) using Emacs 22 and with OS X 10.9 (Mavericks) and Emacs 24, many versions of Firefox and several versions of Seamonkey over several years.  It should operate in a similar manner for other editors, but extensive testing has not yet been performed.
 
 Check your editor's documentation.
 
