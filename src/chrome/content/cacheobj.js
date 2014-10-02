@@ -582,6 +582,10 @@ CacheObj.prototype.update = function () {
             var event = this.node.ownerDocument.createEvent("HTMLEvents");
             event.initEvent('change', true, false);
             this.node.dispatchEvent(event);
+            
+            var inputEvent = this.node.ownerDocument.createEvent("HTMLEvents");
+            inputEvent.initEvent('input', true, false);
+            this.node.dispatchEvent(inputEvent);
 
             return true;
         }
