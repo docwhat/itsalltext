@@ -27,7 +27,7 @@ function CacheObj(node) {
     var that = this,
     hitch_re = /^hitched_/,
     doc = node.ownerDocument,
-    basename,
+    urlname,
     hash,
     method,
     extension;
@@ -85,9 +85,30 @@ function CacheObj(node) {
             doc.location.search ? doc.location.search : '?',
             doc.location.pathname,
             that.node_id].join(':')
-    );
-    basename = window.encodeURIComponent(doc.location.host + doc.location.pathname);
-    that.base_filename = [basename, hash.slice(0, 10)].join('.');
+    ).slice(0, 10);
+
+    /* Determine the local filename for the document. */
+    for (urlname = doc.location.host + doc.location.pathname; ;) {
+        that.base_filename = [window.encodeURIComponent(urlname), hash].join('.');
+        try {
+            // Hope isWritable() would work here, but it throws
+            // NS_ERROR_FILE_TARGET_DOES_NOT_EXIST if the file is
+            // nonexistent.
+            this.getFile().isFile();
+        } catch (e) {
+            switch (e.name) {
+              case 'NS_ERROR_FILE_NAME_TOO_LONG':
+                if (urlname.length > 0) {
+                    urlname = urlname.slice(0, -1);
+                    continue;
+                }
+                break;
+            }
+            throw e;
+        }
+        break;
+    }
+
     /* The current extension.
      * @type String
      */
