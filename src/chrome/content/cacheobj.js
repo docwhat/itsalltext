@@ -103,8 +103,11 @@ function CacheObj(node) {
                     continue;
                 }
                 break;
+              case 'NS_ERROR_FILE_TARGET_DOES_NOT_EXIST':
+                break;
+              default:
+                throw e;
             }
-            throw e;
         }
         break;
     }
