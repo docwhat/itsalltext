@@ -27,6 +27,7 @@ function CacheObj(node) {
     var that = this,
     hitch_re = /^hitched_/,
     doc = node.ownerDocument,
+    starting_urlname,
     urlname,
     hash,
     method,
@@ -88,7 +89,13 @@ function CacheObj(node) {
     ).slice(0, 10);
 
     /* Determine the local filename for the document. */
-    for (urlname = doc.location.host + doc.location.pathname; ;) {
+
+    starting_urlname = (doc.location.host + doc.location.pathname)
+        .replace(/[\/\\]/g, '_')
+        .replace(/\.\.+/g, '.')
+        .replace(/[^a-z0-9_.-]+/gi, '');
+    //disabled-debug -- itsalltext.debug("starting_urlname:", starting_urlname);
+    for (urlname = starting_urlname; ;) {
         that.base_filename = [window.encodeURIComponent(urlname), hash].join('.');
         try {
             // Hope isWritable() would work here, but it throws
@@ -606,7 +613,7 @@ CacheObj.prototype.update = function () {
             var event = this.node.ownerDocument.createEvent("HTMLEvents");
             event.initEvent('change', true, false);
             this.node.dispatchEvent(event);
-            
+
             var inputEvent = this.node.ownerDocument.createEvent("HTMLEvents");
             inputEvent.initEvent('input', true, false);
             this.node.dispatchEvent(inputEvent);
