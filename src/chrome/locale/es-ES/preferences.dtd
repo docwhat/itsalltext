@@ -1,6 +1,6 @@
 <!ENTITY title "Preferencias It&apos;s All Text!">
 <!ENTITY editor.label "Editor:">
-<!ENTITY workingdir.label "Directorio de Caché (ADVERTENCIA: este directorio se auto-limpiado):">
+<!ENTITY workingdir.label "Directorio de Caché (AVISO: el directorio se autolimpia):">
 <!ENTITY picker.label "Búsqueda">
 <!ENTITY seconds.label "Segundos entre refrescos:">
 <!ENTITY charset.label "Conjunto de caracteres (por defecto: UTF-8):">
