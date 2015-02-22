@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! Preferences">
 <!ENTITY editor.label "Editor:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory (WARNING: this directory will be auto-cleaned):">
 <!ENTITY picker.label "Browse">
 <!ENTITY seconds.label "Seconds between refreshing:">
 <!ENTITY charset.label "Character Set (default: UTF-8):">

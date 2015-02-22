@@ -1,6 +1,6 @@
 <!ENTITY title "Impostazioni di It&apos;s All Text!">
 <!ENTITY editor.label "Editor:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory (WARNING: this directory will be auto-cleaned):">
 <!ENTITY picker.label "Sfoglia...">
 <!ENTITY seconds.label "Intervallo di aggiornamento in secondi:">
 <!ENTITY charset.label "Codifica dei caratteri (predefinita UTF-8):">

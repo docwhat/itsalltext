@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! 設定">
 <!ENTITY editor.label "エディタ:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory (WARNING: this directory will be auto-cleaned):">
 <!ENTITY picker.label "参照">
 <!ENTITY seconds.label "リフレッシュ間隔の秒数:">
 <!ENTITY charset.label "文字セット (既定: UTF-8):">

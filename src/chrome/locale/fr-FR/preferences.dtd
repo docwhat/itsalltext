@@ -1,6 +1,6 @@
 <!ENTITY title "Préférences de It&apos;s All Text!">
 <!ENTITY editor.label "Éditeur :">
-<!ENTITY workingdir.label "Répertoire de travail :">
+<!ENTITY workingdir.label "Répertoire cache (ATTENTION: ce répertoire se auto-nettoyer):">
 <!ENTITY picker.label "Parcourir">
 <!ENTITY seconds.label "Secondes entre deux rafraîchissements :">
 <!ENTITY charset.label "Encodage (par défaut : UTF-8) :">

@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! instellingen">
 <!ENTITY editor.label "Tekstbewerker:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory (WARNING: this directory will be auto-cleaned):">
 <!ENTITY picker.label "Bladeren">
 <!ENTITY seconds.label "Seconden tussen vernieuwen:">
 <!ENTITY charset.label "Tekenset (standaard: UTF-8):">

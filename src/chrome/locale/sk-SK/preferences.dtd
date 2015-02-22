@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! Nastavenia">
 <!ENTITY editor.label "Editor:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory:">
 <!ENTITY picker.label "Prehľadávať">
 <!ENTITY seconds.label "Počet sekúnd medzi obnovením:">
 <!ENTITY charset.label "Kódovanie (predvolené UTF-8)">

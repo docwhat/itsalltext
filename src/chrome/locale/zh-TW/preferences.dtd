@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! 個人設定">
 <!ENTITY editor.label "編輯工具:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory:">
 <!ENTITY picker.label "瀏覽">
 <!ENTITY seconds.label "每次更新間隔秒數:">
 <!ENTITY charset.label "字元編碼 (預設: UTF-8):">

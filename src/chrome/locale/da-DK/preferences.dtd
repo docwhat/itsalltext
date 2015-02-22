@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! indstillinger">
 <!ENTITY editor.label "Editor:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory (WARNING: this directory will be auto-cleaned):">
 <!ENTITY picker.label "Gennemse">
 <!ENTITY seconds.label "Sekunder mellem opdatering:">
 <!ENTITY charset.label "Tegnsæt (standard UTF-8):">

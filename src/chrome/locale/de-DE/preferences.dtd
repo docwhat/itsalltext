@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! Einstellungen">
 <!ENTITY editor.label "Editor:">
-<!ENTITY workingdir.label "Arbeitsverzeichnis:">
+<!ENTITY workingdir.label "Cache-Verzeichnis (ACHTUNG: Dieses Verzeichnis wird automatisch gereinigt werden):">
 <!ENTITY picker.label "Durchsuchen">
 <!ENTITY seconds.label "Sekunden zwischen den Aktualisierungen:">
 <!ENTITY charset.label "Zeichensatz (Standard: UTF-8):">

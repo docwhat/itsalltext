@@ -1,6 +1,6 @@
 <!ENTITY title "It&apos;s All Text! 偏好设置">
 <!ENTITY editor.label "作者：">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory:">
 <!ENTITY picker.label "浏览">
 <!ENTITY seconds.label "刷新间隔（秒：）">
 <!ENTITY charset.label "字符编码（默认UTF-8）">

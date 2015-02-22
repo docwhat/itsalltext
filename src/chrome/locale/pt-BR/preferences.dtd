@@ -1,6 +1,6 @@
 <!ENTITY title "Preferências do É Tudo Texto!">
 <!ENTITY editor.label "Editor:">
-<!ENTITY workingdir.label "Working Directory:">
+<!ENTITY workingdir.label "Cache Directory (WARNING: this directory will be auto-cleaned):">
 <!ENTITY picker.label "Procurar">
 <!ENTITY seconds.label "Segundos entre cada atualização:">
 <!ENTITY charset.label "Conjunto de caracteres (padrão UTF-8):">
