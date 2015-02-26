@@ -13,14 +13,24 @@ Vagrant.configure('2') do |config|
       sudo apt-get update
       sudo apt-get install -y vim-athena firefox
     SHELL
+
+    linux.vm.provider :virtualbox do |vb|
+      vb.gui = true
+      vb.memory = 1024
+      vb.cpus = 1
+    end
   end
 
   config.vm.define 'windows', autostart: false do |windows|
     windows.vm.box = 'win7-ie11'
     windows.vm.box_url = 'http://aka.ms/vagrant-win7-ie11'
-  end
+    windows.vm.guest = :windows
+    windows.vm.communicator = 'winrm'
 
-  config.vm.provider :virtualbox do |vb|
-    vb.gui = true
+    windows.vm.provider :virtualbox do |vb|
+      vb.gui = true
+      vb.memory = 2048
+      vb.cpus = 2
+    end
   end
 end
