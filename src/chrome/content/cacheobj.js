@@ -188,10 +188,11 @@ CacheObj.prototype.setExtension = function (ext) {
         return; /* It's already set.  No problem. */
     }
 
+    this.extension = ext;
+
     /* Create the nsIFile object */
     var file = this.getFile();
 
-    this.extension = ext;
     if (file.exists()) {
         this.timestamp = file.lastModifiedTime;
         this.size      = file.fileSize;
