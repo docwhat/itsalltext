@@ -116,8 +116,9 @@ function CacheObj(node) {
               case 'NS_ERROR_FILE_TARGET_DOES_NOT_EXIST':
                 break;
               default:
-                itsalltext.debug("File naming error:", e);
-                throw e;
+                itsalltext.debug("File naming, falling back to old-style;", e);
+                that.base_filename = [window.encodeURIComponent(doc.location.host), hash].join('.');
+                break;
             }
         }
         break;
