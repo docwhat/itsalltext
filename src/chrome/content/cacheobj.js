@@ -86,14 +86,15 @@ function CacheObj(node) {
             doc.location.search ? doc.location.search : '?',
             doc.location.pathname,
             that.node_id].join(':')
-    ).slice(0, 10);
+    ).slice(0, 8);
 
     /* Determine the local filename for the document. */
-
+    // Windows has a max filename length of 129 chars.
     starting_urlname = (doc.location.host + doc.location.pathname)
         .replace(/[\/\\]/g, '_')
         .replace(/\.\.+/g, '.')
-        .replace(/[^a-z0-9_.-]+/gi, '');
+        .replace(/[^a-z0-9_.-]+/gi, '')
+        .substring(0, 100);
     //disabled-debug -- itsalltext.debug("starting_urlname:", starting_urlname);
     for (urlname = starting_urlname; ;) {
         that.base_filename = [window.encodeURIComponent(urlname), hash].join('.');
@@ -110,14 +111,19 @@ function CacheObj(node) {
                     continue;
                 }
                 break;
+              case 'NS_ERROR_FILE_NOT_FOUND':
+                break;
               case 'NS_ERROR_FILE_TARGET_DOES_NOT_EXIST':
                 break;
               default:
+                itsalltext.debug("File naming error:", e);
                 throw e;
             }
         }
         break;
     }
+    that.base_filename = [window.encodeURIComponent(urlname), hash].join('.');
+    //disabled-debug -- itsalltext.debug("base_filename", that.base_filename);
 
     /* The current extension.
      * @type String
@@ -244,7 +250,6 @@ CacheObj.prototype.getExtension = function () {
     }
     return this.extension;
 }
-
 
 /**
  * Returns an nsIFile object for the current file.
