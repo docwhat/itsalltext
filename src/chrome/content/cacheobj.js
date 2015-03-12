@@ -273,6 +273,8 @@ CacheObj.prototype.initFromExistingFile = function () {
     fobj = itsalltext.factoryFile(itsalltext.getWorkingDir()),
     entries,
     ext = null,
+    last_mtime = 0,
+    prev_found = null,
     tmpfiles = /(\.bak|.tmp|~)$/,
     entry;
     if (fobj.exists() && fobj.isDirectory()) {
@@ -282,14 +284,18 @@ CacheObj.prototype.initFromExistingFile = function () {
             entry.QueryInterface(Components.interfaces.nsIFile);
             if (entry.leafName.indexOf(base) === 0) {
                 // startswith
-                if (ext === null && !entry.leafName.match(tmpfiles)) {
+                if (entry.lastModifiedTime > last_mtime && !entry.leafName.match(tmpfiles)) {
+                    if (prev_found !== null) {
+                        try {
+                            prev_found.remove(false);
+                        } catch (e) {
+                            //disabled-debug -- itsalltext.debug('unable to remove', entry, 'because:', e);
+                        }
+                    }
                     ext = entry.leafName.slice(base.length);
+                    last_mtime = entry.lastModifiedTime;
+                    prev_found = entry;
                     continue;
-                }
-                try {
-                    entry.remove(false);
-                } catch (e) {
-                    //disabled-debug -- itsalltext.debug('unable to remove', entry, 'because:', e);
                 }
             }
         }
