@@ -119,6 +119,7 @@ var ItsAllText = function () {
             extensions:         'Char',
             hotkey:             'Char',
             tracker_id:         'Char',
+            blacklist_domains:  'Char',
         },
 
         /**

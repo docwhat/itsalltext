@@ -34,6 +34,8 @@
                   name="extensions.itsalltext.fade_time" type="string" />
       <preference id="pref_hotkey"
                   name="extensions.itsalltext.hotkey" type="string" />
+      <preference id="pref_blacklist_domains"
+                  name="extensions.itsalltext.blacklist_domains" type="string" />
       <preference id="pref_debug"
                   name="extensions.itsalltext.debug" type="bool" />
     </preferences>
@@ -123,6 +125,12 @@
                        onkeypress="pref_grab('disp-hotkey', event);" />
               <spacer />
             </hbox>
+          </row>
+          <row align="baseline">
+            <label control="blacklist_domains"
+                   value="&blacklist_domains.label;" />
+            <textbox preference="pref_blacklist_domains" id="blacklist_domains"
+                    size="30" tabindex="12" multiline="true"/>
           </row>
         </rows>
       </grid>

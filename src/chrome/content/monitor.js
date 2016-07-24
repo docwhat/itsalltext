@@ -252,10 +252,33 @@ Monitor.prototype.isHTML = function (doc) {
     is_html = (contentType == 'text/html' ||
                contentType == 'text/xhtml' ||
                contentType == 'application/xhtml+xml');
+
+    var blacklisted_domains = itsalltext.preferences.blacklist_domains.split("\n");
+    var pattern,
+        domain_is_blacklisted = false;
+    for(var i=0, len=blacklisted_domains.length; i<len; i++)
+    {
+        pattern = new RegExp( blacklisted_domains[i] );
+        if( pattern.test( doc.domain ) )
+        {
+            domain_is_blacklisted = true;
+            break;
+        }
+    }
+
+    /*
+    var console = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+    if(domain_is_blacklisted)
+    {
+        console.logStringMessage( 'blacklisted: ' + doc.domain );
+    }
+    */
+
     is_usable = is_html &&
         location &&
-        location.protocol !== 'about:' &&
-        location.protocol !== 'chrome:';
+        location.protocol !== 'about:'  &&
+        location.protocol !== 'chrome:' &&
+        !domain_is_blacklisted;
     try {
         is_my_readme = location && location.href == itsalltext.README;
         /*
