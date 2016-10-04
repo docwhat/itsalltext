@@ -7,3 +7,4 @@ final/*
 .todo
 /.bundle
 /.vagrant
+/Gemfile.lock
