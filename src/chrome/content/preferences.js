@@ -155,21 +155,6 @@ function pref_onload() {
         desc.style.maxWidth = '18em';
         box.appendChild(desc);
     }
-    if (window['arguments'] && window.arguments[1]) {
-        var button = document.createElement('button');
-        button.setAttribute('label', locale.getString('close.button'));
-        button.addEventListener('command', function (event) { window.close(); }, true);
-
-        var spacer = document.createElement('spacer');
-        spacer.setAttribute('flex', 1);
-
-        var box = document.createElement('hbox');
-        box.appendChild(spacer);
-        box.appendChild(button);
-
-        var pane = document.getElementById('itsalltext-pane');
-        pane.appendChild(box);
-    }
 
     update_hotkey('disp-hotkey');
 }
