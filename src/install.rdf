@@ -20,7 +20,7 @@
 
     <em:name>It's All Text!</em:name>
     <em:description>Edit text using your favorite editor!</em:description>
-    <em:homepageURL>http://addons.mozilla.org/firefox/4125</em:homepageURL>
+    <em:homepageURL>https://addons.mozilla.org/en-US/firefox/addon/its-all-text/</em:homepageURL>
     <em:optionsURL>chrome://itsalltext/content/preferences.xul</em:optionsURL>
     <em:iconURL>chrome://itsalltext/content/icon.png</em:iconURL>
     <em:aboutURL>chrome://itsalltext/content/about.xul</em:aboutURL>
