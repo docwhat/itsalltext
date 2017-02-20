@@ -3,7 +3,7 @@
 /*
  *  It's All Text! - Easy external editing of web forms.
  *
- *  Copyright (C) 2006-2007 Christian Höltje
+ *  Copyright (C) 2006-2017 Christian Höltje
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
