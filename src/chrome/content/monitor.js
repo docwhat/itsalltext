@@ -85,6 +85,11 @@ Monitor.prototype.hitched_findnodes = function (doc) {
             nodes.push(tmp[i]);
         }
 
+        tmp = doc.getElementsByTagName('input');
+        for (i = 0; i < tmp.length; i++) {
+            nodes.push(tmp[i]);
+        }
+
         /* Now that we got the nodes in this document,
          * look for other documents. */
         iframes = doc.getElementsByTagName('iframe');
@@ -177,6 +182,7 @@ Monitor.prototype.hitched_handleMutation = function (mutations, observer) {
         }
 
         var has_textareas = mutation.target.getElementsByTagName('textarea').length > 0;
+	has_textareas = has_textareas && mutation.target.getElementsByTagName('input').length > 0;
         if (has_textareas) {
             //disabled-debug -- itsalltext.debug('handleMutation: %o', event.target);
             try {

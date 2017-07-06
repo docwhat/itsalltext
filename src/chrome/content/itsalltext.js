@@ -530,6 +530,7 @@ http://developer.mozilla.org/en/docs/Code_snippets:Miscellaneous#Operating_syste
             cstyle = doc.defaultView.getComputedStyle(node, '');
             is_disabled = (
                 !(tag == 'textarea' ||
+		  tag == 'input' ||
                   tag == 'textbox') ||
                   node.style.display == 'none' ||
                   (cstyle && (cstyle.display == 'none' ||
