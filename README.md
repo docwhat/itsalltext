@@ -4,7 +4,7 @@ With the Firefox 57, _It's All Text!_ has stopped working and fixing it would re
 
 Instead, I would suggest using one of these projects:
 
-- [emacs chrome](https://github.com/stsquad/emacs_chrome/) (which is being [ported to Firefox](https://github.com/stsquad/emacs_chrome/pull/130))
+- [emacs chrome](https://github.com/stsquad/emacs_chrome/) (which is [ported to Firefox](https://addons.mozilla.org/en-US/firefox/addon/edit-with-emacs1/))
 - [GhostText](https://github.com/GhostText/GhostText)
 
 Thank you everyone for your suggestions, appreciation, and help!
