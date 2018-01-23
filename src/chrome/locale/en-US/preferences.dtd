@@ -14,3 +14,4 @@
 <!ENTITY gumdrop_position.lower_left "Lower Left">
 <!ENTITY gumdrop_position.lower_right "Lower Right">
 <!ENTITY fade_time.label "Duration of button fade">
+<!ENTITY blacklist_domains.label "Domains to blacklist (accepts RegExp; one per line)">
